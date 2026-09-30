@@ -4,9 +4,6 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Crossword Puzzle Generator - Printable A4</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Inter:wght@400;500;600;700&family=Lora:ital,wght@0,500;0,700;1,400&display=swap" rel="stylesheet">
   <style>
     :root {
       --bg: #f3f4f6;
@@ -20,6 +17,17 @@
       --cell-size: 28px;
     }
 
+    [data-theme="dark"] {
+      --bg: #0f172a;
+      --card-bg: #1e293b;
+      --primary: #3b82f6;
+      --primary-hover: #60a5fa;
+      --text-main: #e2e8f0;
+      --text-muted: #94a3b8;
+      --border-dark: #ffffff;
+      --border-light: #334155;
+    }
+
     * {
       box-sizing: border-box;
       margin: 0;
@@ -27,7 +35,7 @@
     }
 
     body {
-      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
       background: var(--bg);
       color: var(--text-main);
       padding: 24px 16px;
@@ -35,9 +43,13 @@
       flex-direction: column;
       align-items: center;
       min-height: 100vh;
+      transition: background-color 0.3s, color 0.3s;
     }
 
-    /* Controls Panel */
+    h1, h2, h3, .brand-title, .sheet-title, .clue-header {
+      font-family: Georgia, 'Times New Roman', serif;
+    }
+
     .controls-panel {
       background: var(--card-bg);
       width: 100%;
@@ -45,7 +57,14 @@
       border-radius: 12px;
       box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
       padding: 16px 20px;
-      margin-bottom: 24px;
+      margin-bottom: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      transition: background-color 0.3s;
+    }
+
+    .controls-top {
       display: flex;
       flex-wrap: wrap;
       align-items: center;
@@ -54,7 +73,6 @@
     }
 
     .brand-title {
-      font-family: 'Cinzel', serif;
       font-size: 1.3rem;
       font-weight: 700;
       color: var(--primary);
@@ -72,7 +90,7 @@
 
     .difficulty-selector {
       display: flex;
-      background: #e2e8f0;
+      background: var(--border-light);
       border-radius: 8px;
       padding: 3px;
     }
@@ -90,7 +108,7 @@
     }
 
     .diff-btn.active {
-      background: #ffffff;
+      background: var(--card-bg);
       color: var(--primary);
       box-shadow: 0 2px 5px rgba(0,0,0,0.1);
     }
@@ -108,11 +126,16 @@
       transition: all 0.2s ease;
     }
 
+    .action-btn:disabled {
+      opacity: 0.7;
+      cursor: not-allowed;
+    }
+
     .btn-primary {
       background: var(--primary);
       color: #ffffff;
     }
-    .btn-primary:hover {
+    .btn-primary:hover:not(:disabled) {
       background: var(--primary-hover);
       transform: translateY(-1px);
     }
@@ -128,24 +151,98 @@
 
     .btn-outline {
       background: transparent;
-      border: 1.5px solid #cbd5e1;
-      color: #334155;
+      border: 1.5px solid var(--border-light);
+      color: var(--text-main);
     }
     .btn-outline:hover {
-      background: #f8fafc;
-      border-color: #94a3b8;
+      background: var(--border-light);
     }
-
     .btn-outline.active {
       background: #fef2f2;
       border-color: #ef4444;
       color: #b91c1c;
     }
 
-    /* Printable Sheet Container (A4 preview style) */
+    .dropdown-container {
+      position: relative;
+      display: inline-block;
+    }
+    .dropdown-content {
+      display: none;
+      position: absolute;
+      background-color: var(--card-bg);
+      min-width: 120px;
+      box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+      z-index: 1;
+      border-radius: 8px;
+      top: 100%;
+      right: 0;
+      margin-top: 4px;
+      border: 1px solid var(--border-light);
+    }
+    .dropdown-content button {
+      color: var(--text-main);
+      padding: 10px 16px;
+      text-decoration: none;
+      display: block;
+      background: none;
+      border: none;
+      width: 100%;
+      text-align: left;
+      cursor: pointer;
+    }
+    .dropdown-content button:hover {
+      background-color: var(--border-light);
+    }
+    .dropdown-container.show .dropdown-content {
+      display: block;
+    }
+
+    .categories-panel {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      padding-top: 12px;
+      border-top: 1px solid var(--border-light);
+    }
+
+    .cat-chip {
+      padding: 4px 10px;
+      border-radius: 12px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      cursor: pointer;
+      border: 1px solid var(--border-light);
+      background: var(--bg);
+      color: var(--text-muted);
+      transition: all 0.2s ease;
+      user-select: none;
+    }
+    .cat-chip.selected {
+      background: var(--primary);
+      color: #fff;
+      border-color: var(--primary);
+    }
+
+    .stats-bar {
+      width: 100%;
+      max-width: 900px;
+      background: var(--card-bg);
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      margin-bottom: 24px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+
     .printable-sheet {
-      background: #ffffff;
-      width: 210mm;
+      background: var(--card-bg);
+      width: 100%;
+      max-width: min(210mm, 100%);
       min-height: 297mm;
       padding: 14mm 16mm;
       box-shadow: 0 6px 25px rgba(0, 0, 0, 0.12);
@@ -153,10 +250,11 @@
       flex-direction: column;
       position: relative;
       margin-bottom: 24px;
+      color: var(--text-main);
     }
 
     .sheet-header {
-      border-bottom: 2px solid #0f172a;
+      border-bottom: 2px solid var(--border-dark);
       padding-bottom: 8px;
       margin-bottom: 14px;
       display: flex;
@@ -165,34 +263,31 @@
     }
 
     .sheet-title {
-      font-family: 'Cinzel', serif;
       font-size: 22pt;
       font-weight: 700;
       letter-spacing: 1px;
-      color: #0f172a;
+      color: var(--text-main);
       line-height: 1.1;
     }
 
     .sheet-subtitle {
       font-size: 9pt;
-      color: #475569;
+      color: var(--text-muted);
       text-transform: uppercase;
       letter-spacing: 0.5px;
       margin-top: 3px;
+      font-family: system-ui, -apple-system, sans-serif;
     }
 
     .meta-box {
       text-align: right;
       font-size: 8.5pt;
-      color: #475569;
+      color: var(--text-muted);
       line-height: 1.4;
+      font-family: system-ui, -apple-system, sans-serif;
     }
+    .meta-box strong { color: var(--text-main); }
 
-    .meta-box strong {
-      color: #0f172a;
-    }
-
-    /* Grid Area */
     .grid-wrapper {
       display: flex;
       justify-content: center;
@@ -210,7 +305,7 @@
     }
 
     .cell {
-      background-color: #ffffff;
+      background-color: var(--card-bg);
       width: var(--cell-size);
       height: var(--cell-size);
       position: relative;
@@ -220,11 +315,21 @@
       font-weight: 700;
       font-size: 13pt;
       text-transform: uppercase;
-      font-family: 'Inter', sans-serif;
+      font-family: system-ui, -apple-system, sans-serif;
+      color: var(--text-main);
     }
 
     .cell.blocked {
-      background-color: #0f172a;
+      background-color: var(--border-dark);
+    }
+
+    @keyframes cellReveal {
+      from { transform: scale(0.3); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+    .cell.animate-in {
+      animation: cellReveal 0.25s ease-out forwards;
+      opacity: 0;
     }
 
     .cell-num {
@@ -233,12 +338,11 @@
       left: 2px;
       font-size: 6.5pt;
       font-weight: 700;
-      color: #000;
+      color: var(--text-main);
       line-height: 1;
       pointer-events: none;
     }
 
-    /* Clues Area */
     .clues-section {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -247,19 +351,15 @@
       margin-top: 8px;
     }
 
-    .clue-column {
-      display: flex;
-      flex-direction: column;
-    }
+    .clue-column { display: flex; flex-direction: column; }
 
     .clue-header {
-      font-family: 'Cinzel', serif;
       font-size: 11pt;
       font-weight: 700;
-      border-bottom: 1.5px solid #0f172a;
+      border-bottom: 1.5px solid var(--border-dark);
       padding-bottom: 3px;
       margin-bottom: 8px;
-      color: #0f172a;
+      color: var(--text-main);
       letter-spacing: 0.5px;
     }
 
@@ -273,47 +373,39 @@
     .clue-item {
       font-size: 8.5pt;
       line-height: 1.35;
-      color: #1e293b;
+      color: var(--text-main);
       display: flex;
       align-items: baseline;
       gap: 5px;
     }
-
     .clue-item strong {
       font-weight: 700;
       min-width: 18px;
-      color: #000000;
+      color: var(--text-main);
     }
-
     .clue-word-len {
-      color: #64748b;
+      color: var(--text-muted);
       font-size: 7.5pt;
       font-weight: 600;
       white-space: nowrap;
     }
 
     .sheet-footer {
-      border-top: 1px solid #e2e8f0;
+      border-top: 1px solid var(--border-light);
       margin-top: auto;
       padding-top: 8px;
       display: flex;
       justify-content: space-between;
       font-size: 7.5pt;
-      color: #64748b;
+      color: var(--text-muted);
     }
 
-    /* Solution Sheet (Answer Key) */
-    #solution-sheet {
-      display: none;
-    }
-
-    #solution-sheet.visible {
-      display: flex;
-    }
+    #solution-sheet { display: none; }
+    #solution-sheet.visible { display: flex; }
 
     .cell.solution-cell {
-      color: #1e3a8a;
-      background-color: #f8fafc;
+      color: var(--primary);
+      background-color: var(--bg);
     }
 
     .words-summary-table {
@@ -328,23 +420,12 @@
       display: flex;
       align-items: baseline;
       gap: 6px;
-      border-bottom: 1px dashed #e2e8f0;
+      border-bottom: 1px dashed var(--border-light);
       padding-bottom: 2px;
     }
+    .solution-item .num { font-weight: 700; color: var(--text-main); min-width: 22px; }
+    .solution-item .word { font-weight: 700; color: var(--primary); }
 
-    .solution-item .num {
-      font-weight: 700;
-      color: #000;
-      min-width: 22px;
-    }
-
-    .solution-item .word {
-      font-weight: 700;
-      color: #1e3a8a;
-      letter-spacing: 0.5px;
-    }
-
-    /* Screen-only notice */
     .screen-tip {
       font-size: 0.85rem;
       color: var(--text-muted);
@@ -352,23 +433,39 @@
       margin-bottom: 16px;
     }
 
-    /* Print styles */
+    #batch-container { display: none; }
+
+    .toast {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #333;
+      color: #fff;
+      padding: 10px 20px;
+      border-radius: 20px;
+      font-size: 0.9rem;
+      opacity: 0;
+      transition: opacity 0.3s;
+      pointer-events: none;
+      z-index: 1000;
+    }
+    .toast.show { opacity: 1; }
+
     @media print {
       @page {
         size: A4 portrait;
         margin: 10mm 12mm;
       }
-
       body {
         background: #ffffff !important;
         padding: 0 !important;
         margin: 0 !important;
       }
-
-      .no-print, .controls-panel, .screen-tip {
+      .no-print, .controls-panel, .screen-tip, .stats-bar {
         display: none !important;
       }
-
+      
       .printable-sheet {
         box-shadow: none !important;
         width: 100% !important;
@@ -376,73 +473,120 @@
         padding: 0 !important;
         margin: 0 !important;
         page-break-after: always;
+        background: #ffffff !important;
+        color: #000000 !important;
+      }
+      
+      .sheet-header, .clue-header { border-bottom-color: #000000 !important; color: #000000 !important; }
+      .sheet-title, .meta-box strong, .clue-item strong { color: #000000 !important; }
+      .sheet-subtitle, .meta-box, .clue-item, .clue-word-len, .sheet-footer { color: #333333 !important; }
+      
+      .grid-wrapper {
+        max-width: 178mm;
+        margin-left: auto;
+        margin-right: auto;
+      }
+      .crossword-board {
+        border-color: #000000 !important;
+        background-color: #000000 !important;
       }
 
-      #solution-sheet.visible {
+      /* Batch print logic */
+      body.batch-print-active #puzzle-sheet,
+      body.batch-print-active #solution-sheet {
+        display: none !important;
+      }
+      body.batch-print-active #batch-container {
+        display: block !important;
+      }
+      #batch-container .printable-sheet {
+        display: flex !important;
+      }
+
+      /* Normal print logic */
+      body:not(.batch-print-active) #solution-sheet.visible {
         display: flex !important;
         page-break-before: always;
       }
-
-      #solution-sheet:not(.visible) {
+      body:not(.batch-print-active) #solution-sheet:not(.visible) {
         display: none !important;
       }
 
       .cell {
+        background-color: #ffffff !important;
+        color: #000000 !important;
         -webkit-print-color-adjust: exact !important;
         print-color-adjust: exact !important;
       }
-
       .cell.blocked {
         background-color: #000000 !important;
         -webkit-print-color-adjust: exact !important;
         print-color-adjust: exact !important;
       }
-
+      .cell-num { color: #000000 !important; }
       .cell.solution-cell {
         color: #000000 !important;
         background-color: #ffffff !important;
-      }
-
-      .clue-item {
-        color: #000000 !important;
       }
     }
   </style>
 </head>
 <body>
-
-  <!-- Controls Header (Hidden in Print) -->
   <header class="controls-panel no-print">
-    <div class="brand-title">
-      <span>🧩</span> English Crossword Maker
+    <div class="controls-top">
+      <div class="brand-title">
+        <span>🧩</span> English Crossword Maker
+      </div>
+      <div class="control-group">
+        <button id="btn-theme" class="action-btn btn-outline" title="Toggle Dark/Light Mode">🌙 Mode</button>
+        <button id="btn-share" class="action-btn btn-outline" title="Copy sharing link">🔗 Share</button>
+      </div>
     </div>
 
-    <div class="control-group">
-      <div class="difficulty-selector">
-        <button class="diff-btn" data-diff="easy">Easy (8-10)</button>
-        <button class="diff-btn active" data-diff="medium">Medium (12-15)</button>
-        <button class="diff-btn" data-diff="hard">Hard (17-20)</button>
+    <div class="control-group" style="justify-content: space-between;">
+      <div class="control-group">
+        <div class="difficulty-selector">
+          <button class="diff-btn" data-diff="easy">Easy</button>
+          <button class="diff-btn active" data-diff="medium">Medium</button>
+          <button class="diff-btn" data-diff="hard">Hard</button>
+        </div>
+        <button id="btn-generate" class="action-btn btn-primary" title="Create a new random puzzle">🔄 New Puzzle</button>
+        <button id="btn-toggle-solution" class="action-btn btn-outline" title="Show or hide solution key">👁️ Show Answer Key</button>
       </div>
-
-      <button id="btn-generate" class="action-btn btn-primary" title="Create a new random puzzle">
-        🔄 New Puzzle
-      </button>
-
-      <button id="btn-toggle-solution" class="action-btn btn-outline" title="Show or hide solution key">
-        👁️ Show Answer Key
-      </button>
-
-      <button id="btn-print" class="action-btn btn-print" title="Print to A4 paper or save as PDF">
-        🖨️ Print (A4)
-      </button>
+      
+      <div class="control-group">
+        <button id="btn-pdf" class="action-btn btn-outline" title="Download as PDF">📥 Download PDF</button>
+        <button id="btn-print" class="action-btn btn-print" title="Print to A4 paper">🖨️ Print (A4)</button>
+        <div class="dropdown-container">
+          <button id="btn-batch-print" class="action-btn btn-print" title="Batch Print">📄 Batch Print ▾</button>
+          <div class="dropdown-content" id="batch-dropdown">
+            <button data-count="2">2 Puzzles</button>
+            <button data-count="4">4 Puzzles</button>
+            <button data-count="6">6 Puzzles</button>
+            <button data-count="8">8 Puzzles</button>
+            <button data-count="10">10 Puzzles</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div id="cat-container" class="categories-panel">
+      <!-- Categories injected here -->
     </div>
   </header>
+
+  <div class="stats-bar" id="stats-container">
+    <span id="stats-words">Words: 0 placed</span>
+    <span id="stats-grid">Grid: 0x0</span>
+    <span id="stats-density">Density: 0%</span>
+    <span id="stats-intersections">Intersections: 0</span>
+    <span id="stats-longest">Longest: </span>
+  </div>
 
   <p class="screen-tip no-print">
     💡 <strong>Tip:</strong> Click <strong>Print (A4)</strong> to send directly to your printer or save as PDF. If <em>Answer Key</em> is active, it prints as page 2.
   </p>
 
-  <!-- Page 1: Main Puzzle Sheet -->
   <main id="puzzle-sheet" class="printable-sheet">
     <div class="sheet-header">
       <div>
@@ -456,12 +600,10 @@
       </div>
     </div>
 
-    <!-- Puzzle Grid -->
     <div class="grid-wrapper">
       <div id="crossword-grid" class="crossword-board"></div>
     </div>
 
-    <!-- Clues Section -->
     <section class="clues-section">
       <div class="clue-column">
         <h2 class="clue-header">Across</h2>
@@ -479,7 +621,6 @@
     </footer>
   </main>
 
-  <!-- Page 2: Answer Key Sheet (Optional / Hidden by default) -->
   <section id="solution-sheet" class="printable-sheet">
     <div class="sheet-header">
       <div>
@@ -492,12 +633,10 @@
       </div>
     </div>
 
-    <!-- Solution Grid -->
     <div class="grid-wrapper">
       <div id="solution-grid" class="crossword-board"></div>
     </div>
 
-    <!-- Word list recap -->
     <div>
       <h2 class="clue-header" style="margin-top: 14px;">Word Index</h2>
       <div id="solution-words-summary" class="words-summary-table"></div>
@@ -509,757 +648,1117 @@
     </footer>
   </section>
 
-  <!-- Word Bank & Generator Logic -->
+  <div id="batch-container"></div>
+
   <script>
-    /* Extensive 200+ English Word Bank with Curated Clues */
-    const WORD_BANK = [
-      // Animals & Nature
-      { word: "ELEPHANT", clue: "Largest land mammal with a long trunk" },
-      { word: "DOLPHIN", clue: "Highly intelligent aquatic marine mammal" },
-      { word: "PENGUIN", clue: "Flightless aquatic bird living in cold polar regions" },
-      { word: "CHEETAH", clue: "The fastest land mammal on Earth" },
-      { word: "GIRAFFE", clue: "Tall mammal with a remarkably long neck" },
-      { word: "KANGAROO", clue: "Australian marsupial that hops on powerful hind legs" },
-      { word: "OCTOPUS", clue: "Eight-armed sea creature with three hearts" },
-      { word: "CHAMELEON", clue: "Lizard known for its ability to change colors" },
-      { word: "BUTTERFLY", clue: "Insect that undergoes complete metamorphosis from caterpillar" },
-      { word: "EAGLE", clue: "Bird of prey with keen eyesight and sharp talons" },
-      { word: "TIGER", clue: "Striped big cat native to Asia" },
-      { word: "GORILLA", clue: "Largest living primate" },
-      { word: "KOALA", clue: "Eucalyptus-eating marsupial from Australia" },
-      { word: "FLAMINGO", clue: "Pink wading bird that often stands on one leg" },
-      { word: "HAMSTER", clue: "Small rodent commonly kept as a household pet" },
-      { word: "WHALE", clue: "Colossal marine mammal that breathes through a blowhole" },
-      { word: "FALCON", clue: "Fast predatory bird trained in falconry" },
-      { word: "BADGER", clue: "Nocturnal burrowing mammal with striped face" },
-      { word: "PARROT", clue: "Colorful bird capable of mimicking human speech" },
-      { word: "ZEBRA", clue: "African wild horse with black-and-white stripes" },
-      { word: "CROCODILE", clue: "Large predatory semiaquatic reptile with powerful jaws" },
-      { word: "HEDGEHOG", clue: "Small spiny nocturnal mammal that curls into a ball" },
+class SeededRandom {
+  constructor(seed) { this.state = seed; }
+  next() {
+    this.state |= 0;
+    this.state = this.state + 0x6D2B79F5 | 0;
+    let t = Math.imul(this.state ^ this.state >>> 15, 1 | this.state);
+    t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+    return ((t ^ t >>> 14) >>> 0) / 4294967296;
+  }
+  shuffle(arr) {
+    const a = [...arr];
+    for (let i = a.length - 1; i > 0; i--) {
+      const j = Math.floor(this.next() * (i + 1));
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+  }
+}
 
-      // Science, Astronomy & Nature
-      { word: "GRAVITY", clue: "Invisible natural force attracting bodies toward planetary center" },
-      { word: "OXYGEN", clue: "Colorless gas essential for human and animal respiration" },
-      { word: "MOLECULE", clue: "Group of atoms bonded together" },
-      { word: "VOLCANO", clue: "Rupture in crust allowing hot lava and ash to escape" },
-      { word: "GALAXY", clue: "Massive system of billions of stars, gas, and dust" },
-      { word: "ECLIPSE", clue: "Obscuring of light from one celestial body by another" },
-      { word: "COMET", clue: "Icy celestial body producing a glowing tail near the Sun" },
-      { word: "TORNADO", clue: "Violently rotating column of air in contact with ground" },
-      { word: "GLACIER", clue: "Slow-moving massive body of dense mountain ice" },
-      { word: "AURORA", clue: "Natural electrical light display in polar skies" },
-      { word: "METEOR", clue: "Streak of light created by space debris burning in atmosphere" },
-      { word: "FOSSIL", clue: "Preserved ancient remains or impression of living organism" },
-      { word: "PRISM", clue: "Transparent optical glass that disperses light into spectrum" },
-      { word: "ATMOSPHERE", clue: "Envelope of gases surrounding a planet" },
-      { word: "BIOLOGY", clue: "Scientific study of living organisms and life processes" },
-      { word: "MINERAL", clue: "Naturally occurring solid inorganic substance with crystal structure" },
-      { word: "CRATER", clue: "Bowl-shaped cavity formed by meteorite impact or volcano" },
-      { word: "LIGHTNING", clue: "Powerful natural electrostatic discharge during thunderstorm" },
-      { word: "RAINBOW", clue: "Meteorological phenomenon causing multicolored arc in the sky" },
+const RAW_WORD_BANK = [
+  // Animals & Nature (animals)
+  { word: "ELEPHANT", clue: "Largest land mammal with a long trunk", cat: "animals" },
+  { word: "DOLPHIN", clue: "Highly intelligent aquatic marine mammal", cat: "animals" },
+  { word: "PENGUIN", clue: "Flightless aquatic bird living in cold polar regions", cat: "animals" },
+  { word: "CHEETAH", clue: "The fastest land mammal on Earth", cat: "animals" },
+  { word: "GIRAFFE", clue: "Tall mammal with a remarkably long neck", cat: "animals" },
+  { word: "KANGAROO", clue: "Australian marsupial that hops on powerful hind legs", cat: "animals" },
+  { word: "OCTOPUS", clue: "Eight-armed sea creature with three hearts", cat: "animals" },
+  { word: "CHAMELEON", clue: "Lizard known for its ability to change colors", cat: "animals" },
+  { word: "BUTTERFLY", clue: "Insect that undergoes complete metamorphosis from caterpillar", cat: "animals" },
+  { word: "EAGLE", clue: "Bird of prey with keen eyesight and sharp talons", cat: "animals" },
+  { word: "TIGER", clue: "Striped big cat native to Asia", cat: "animals" },
+  { word: "GORILLA", clue: "Largest living primate", cat: "animals" },
+  { word: "KOALA", clue: "Eucalyptus-eating marsupial from Australia", cat: "animals" },
+  { word: "FLAMINGO", clue: "Pink wading bird that often stands on one leg", cat: "animals" },
+  { word: "HAMSTER", clue: "Small rodent commonly kept as a household pet", cat: "animals" },
+  { word: "WHALE", clue: "Colossal marine mammal that breathes through a blowhole", cat: "animals" },
+  { word: "FALCON", clue: "Fast predatory bird trained in falconry", cat: "animals" },
+  { word: "BADGER", clue: "Nocturnal burrowing mammal with striped face", cat: "animals" },
+  { word: "PARROT", clue: "Colorful bird capable of mimicking human speech", cat: "animals" },
+  { word: "ZEBRA", clue: "African wild horse with black-and-white stripes", cat: "animals" },
+  { word: "CROCODILE", clue: "Large predatory semiaquatic reptile with powerful jaws", cat: "animals" },
+  { word: "HEDGEHOG", clue: "Small spiny nocturnal mammal that curls into a ball", cat: "animals" },
+  // Science, Astronomy & Nature (science)
+  { word: "GRAVITY", clue: "Invisible natural force attracting bodies toward planetary center", cat: "science" },
+  { word: "OXYGEN", clue: "Colorless gas essential for human and animal respiration", cat: "science" },
+  { word: "MOLECULE", clue: "Group of atoms bonded together", cat: "science" },
+  { word: "VOLCANO", clue: "Rupture in crust allowing hot lava and ash to escape", cat: "science" },
+  { word: "GALAXY", clue: "Massive system of billions of stars, gas, and dust", cat: "science" },
+  { word: "ECLIPSE", clue: "Obscuring of light from one celestial body by another", cat: "science" },
+  { word: "COMET", clue: "Icy celestial body producing a glowing tail near the Sun", cat: "science" },
+  { word: "TORNADO", clue: "Violently rotating column of air in contact with ground", cat: "science" },
+  { word: "GLACIER", clue: "Slow-moving massive body of dense mountain ice", cat: "science" },
+  { word: "AURORA", clue: "Natural electrical light display in polar skies", cat: "science" },
+  { word: "METEOR", clue: "Streak of light created by space debris burning in atmosphere", cat: "science" },
+  { word: "FOSSIL", clue: "Preserved ancient remains or impression of living organism", cat: "science" },
+  { word: "PRISM", clue: "Transparent optical glass that disperses light into spectrum", cat: "science" },
+  { word: "ATMOSPHERE", clue: "Envelope of gases surrounding a planet", cat: "science" },
+  { word: "BIOLOGY", clue: "Scientific study of living organisms and life processes", cat: "science" },
+  { word: "MINERAL", clue: "Naturally occurring solid inorganic substance with crystal structure", cat: "science" },
+  { word: "CRATER", clue: "Bowl-shaped cavity formed by meteorite impact or volcano", cat: "science" },
+  { word: "LIGHTNING", clue: "Powerful natural electrostatic discharge during thunderstorm", cat: "science" },
+  { word: "RAINBOW", clue: "Meteorological phenomenon causing multicolored arc in the sky", cat: "science" },
+  // Geography & Places (geography)
+  { word: "ISLAND", clue: "Piece of land completely surrounded by water", cat: "geography" },
+  { word: "DESERT", clue: "Arid barren area of landscape with minimal rainfall", cat: "geography" },
+  { word: "CANYON", clue: "Deep narrow valley with steep rocky sides carved by river", cat: "geography" },
+  { word: "PYRAMID", clue: "Monumental stone structure built in ancient Egypt", cat: "geography" },
+  { word: "HARBOR", clue: "Sheltered body of water where ships anchor safely", cat: "geography" },
+  { word: "VALLEY", clue: "Low area between mountains, often with a flowing river", cat: "geography" },
+  { word: "JUNGLE", clue: "Dense tropical forest tangled with thick vegetation", cat: "geography" },
+  { word: "LAGOON", clue: "Shallow body of water separated from ocean by reefs", cat: "geography" },
+  { word: "PENINSULA", clue: "Piece of land bordered by water on three sides", cat: "geography" },
+  { word: "WATERFALL", clue: "Cascade of water falling from a significant height", cat: "geography" },
+  { word: "CAPITAL", clue: "City that functions as the seat of government of a country", cat: "geography" },
+  { word: "EQUATOR", clue: "Imaginary line dividing northern and southern hemispheres", cat: "geography" },
+  { word: "OASIS", clue: "Fertile spot in a desert where water is found", cat: "geography" },
+  // Food & Cuisine (food)
+  { word: "CHOCOLATE", clue: "Sweet confection prepared from roasted cacao seeds", cat: "food" },
+  { word: "CINNAMON", clue: "Aromatic spice obtained from the inner bark of tree", cat: "food" },
+  { word: "SANDWICH", clue: "Food consisting of filling placed between slices of bread", cat: "food" },
+  { word: "PANCAKE", clue: "Thin flat cake cooked on a hot griddle and served with syrup", cat: "food" },
+  { word: "AVOCADO", clue: "Creamy green fruit known for guacamole", cat: "food" },
+  { word: "CHEESE", clue: "Dairy product derived from milk and pressed into curds", cat: "food" },
+  { word: "COFFEE", clue: "Popular brewed beverage made from roasted dark beans", cat: "food" },
+  { word: "PUMPKIN", clue: "Large round orange vegetable carved during Halloween", cat: "food" },
+  { word: "BISCUIT", clue: "Small baked bread or sweet crisp cookie", cat: "food" },
+  { word: "HONEY", clue: "Sweet viscous liquid made by bees from flower nectar", cat: "food" },
+  { word: "SPAGHETTI", clue: "Long, thin, cylindrical pasta of Italian origin", cat: "food" },
+  { word: "BURGER", clue: "Patty of cooked ground meat placed inside a sliced bun", cat: "food" },
+  { word: "SALAD", clue: "Cold dish composed of fresh raw vegetables tossed together", cat: "food" },
+  { word: "VANILLA", clue: "Popular flavoring derived from tropical orchid pods", cat: "food" },
+  // Technology, Arts & Everyday Objects (technology)
+  { word: "COMPUTER", clue: "Electronic programmable machine for processing data", cat: "technology" },
+  { word: "INTERNET", clue: "Global computer network providing variety of information", cat: "technology" },
+  { word: "ROBOT", clue: "Machine capable of carrying out complex actions automatically", cat: "technology" },
+  { word: "CAMERA", clue: "Device for capturing photographs and recording videos", cat: "technology" },
+  { word: "BATTERY", clue: "Container storing chemical energy converted into electricity", cat: "technology" },
+  { word: "COMPASS", clue: "Navigational instrument with magnetic needle pointing North", cat: "technology" },
+  { word: "TELESCOPE", clue: "Optical instrument designed to view distant celestial stars", cat: "technology" }, // DUPLICATE 1 (will be removed by code)
+  { word: "MICROSCOPE", clue: "Laboratory optical device used to inspect tiny specimens", cat: "technology" },
+  { word: "SATELLITE", clue: "Artificial body placed in orbit around Earth for communications", cat: "technology" },
+  { word: "GUITAR", clue: "Stringed musical instrument played with fingers or plectrum", cat: "technology" },
+  { word: "PIANO", clue: "Large keyboard musical instrument with felt-covered hammers", cat: "technology" },
+  { word: "VIOLIN", clue: "Four-stringed wooden musical instrument played with a horsehair bow", cat: "technology" },
+  { word: "TRUMPET", clue: "Brass musical instrument with flared bell and three valves", cat: "technology" },
+  { word: "CANVAS", clue: "Heavy woven cloth used by artists as surface for oil painting", cat: "technology" },
+  { word: "STATUE", clue: "Three-dimensional carved or cast work of art", cat: "technology" },
+  { word: "MIRROR", clue: "Reflective glass surface producing clear images of objects", cat: "technology" },
+  { word: "CLOCK", clue: "Instrument for measuring and indicating time", cat: "technology" },
+  { word: "UMBRELLA", clue: "Canopy device protecting person from rain or sun", cat: "technology" },
+  { word: "SCISSORS", clue: "Cutting instrument consisting of two pivoted blades", cat: "technology" },
+  { word: "LANTERN", clue: "Portable lamp with protective case surrounding light source", cat: "technology" },
+  // Human Body & Professions (body)
+  { word: "SKELETON", clue: "Internal framework of bones supporting the human body", cat: "body" },
+  { word: "MUSCLE", clue: "Band of fibrous tissue that contracts to produce motion", cat: "body" },
+  { word: "HEART", clue: "Muscular organ that pumps blood through circulatory system", cat: "body" },
+  { word: "DOCTOR", clue: "Qualified practitioner of medicine who treats patients", cat: "body" },
+  { word: "ARCHITECT", clue: "Professional who designs buildings and oversees construction", cat: "body" },
+  { word: "PILOT", clue: "Person licensed to operate aircraft controls in flight", cat: "body" },
+  { word: "ASTRONAUT", clue: "Person trained to travel and work in outer space", cat: "body" },
+  { word: "CHEF", clue: "Professional cook in charge of kitchen restaurant operations", cat: "body" },
+  { word: "DETECTIVE", clue: "Investigator seeking clues to solve crimes", cat: "body" },
+  { word: "SAILOR", clue: "Person who works as member of ship crew at sea", cat: "body" },
+  { word: "FARMER", clue: "Person who cultivates crops and raises livestock", cat: "body" },
+  { word: "ENGINEER", clue: "Person who designs, builds, and maintains engines or machines", cat: "body" },
+  { word: "TEACHER", clue: "Educator instructing students in school or university", cat: "body" },
+  // Descriptive & General Words (general)
+  { word: "TREASURE", clue: "Quantity of precious metals, gems, or valuable objects", cat: "general" }, // DUPLICATE 3
+  { word: "CASTLE", clue: "Fortified medieval residence built for royalty or nobility", cat: "general" },
+  { word: "JOURNEY", clue: "Act of traveling from one location to another", cat: "general" },
+  { word: "MYSTERY", clue: "Something difficult or impossible to understand or explain", cat: "general" },
+  { word: "ADVENTURE", clue: "Exciting or daring undertaking usually involving risk", cat: "general" },
+  { word: "HORIZON", clue: "Line at which Earth surface and sky appear to meet", cat: "general" },
+  { word: "FORTUNE", clue: "Chance or luck as an external force affecting life", cat: "general" },
+  { word: "WISDOM", clue: "Quality of having experience, knowledge, and good judgment", cat: "general" },
+  { word: "FREEDOM", clue: "Power or right to act, speak, or think without restraint", cat: "general" },
+  { word: "HARMONY", clue: "Pleasing arrangement of parts or combination of musical notes", cat: "general" },
+  { word: "VICTORY", clue: "Defeat of an enemy or opponent in battle or competition", cat: "general" },
+  { word: "COURAGE", clue: "Ability to do something that frightens one; bravery", cat: "general" },
+  { word: "SECRET", clue: "Something kept hidden or unknown from others", cat: "general" },
+  { word: "MIRACLE", clue: "Extraordinary event attributed to supernatural intervention", cat: "general" },
+  { word: "FOREST", clue: "Large area covered densely with trees and undergrowth", cat: "general" },
+  { word: "SILENCE", clue: "Complete absence of sound or noise", cat: "general" },
+  { word: "SHADOW", clue: "Dark area or shape produced by body coming between rays and surface", cat: "general" },
+  { word: "BRIDGE", clue: "Structure carrying pathway or road across obstacle like river", cat: "general" },
+  { word: "LIGHT", clue: "Natural agent stimulating sight and making things visible", cat: "general" },
+  { word: "CLOUD", clue: "Visible mass of condensed water vapor floating in atmosphere", cat: "general" },
+  // Sports, Hobbies & Activities (sports)
+  { word: "FOOTBALL", clue: "Popular team sport played with spherical ball kicked into goal", cat: "sports" },
+  { word: "BASKETBALL", clue: "Game played on court where players shoot ball through elevated hoop", cat: "sports" },
+  { word: "TENNIS", clue: "Racket sport played between two or four players across net", cat: "sports" },
+  { word: "ARCHERY", clue: "Sport of shooting arrows with a bow at target", cat: "sports" },
+  { word: "SWIMMING", clue: "Propulsion of the body through water by combined arm and leg motions", cat: "sports" },
+  { word: "MARATHON", clue: "Long-distance foot race officially measuring 42.195 kilometers", cat: "sports" },
+  { word: "CHESS", clue: "Strategic board game of kings, queens, and knights played on checkered board", cat: "sports" },
+  { word: "CYCLING", clue: "Sport or recreational activity of riding a bicycle", cat: "sports" },
+  { word: "SKATING", clue: "Gliding across ice or smooth pavement on bladed or wheeled footwear", cat: "sports" },
+  { word: "FENCING", clue: "Swordplay combat sport using foil, epee, or sabre", cat: "sports" },
+  { word: "BOXING", clue: "Combat sport where two opponents throw punches inside a ring", cat: "sports" },
+  { word: "SURFING", clue: "Surface water pastime where rider catches breaking ocean waves", cat: "sports" },
+  { word: "CLIMBING", clue: "Activity of scaling steep rock faces or artificial walls", cat: "sports" },
+  { word: "BASEBALL", clue: "Bat-and-ball sport played between two opposing teams of nine", cat: "sports" },
+  // Household, Tools & Materials (household)
+  { word: "BLANKET", clue: "Large piece of woolen or warm fabric used as bed covering", cat: "household" },
+  { word: "CANDLE", clue: "Cylinder of wax with central wick ignited to provide light", cat: "household" },
+  { word: "CURTAIN", clue: "Draped piece of hanging fabric shielding window from light", cat: "household" },
+  { word: "CUSHION", clue: "Soft bag filled with feathers or foam used for sitting comfortably", cat: "household" },
+  { word: "HAMMER", clue: "Hand tool with heavy metal head used for pounding nails", cat: "household" },
+  { word: "LADDER", clue: "Vertical or inclined series of rungs or steps for climbing up", cat: "household" },
+  { word: "PILLOW", clue: "Soft support cushion for the head during sleep", cat: "household" },
+  { word: "NEEDLE", clue: "Slender pointed steel rod with eye hole used for sewing", cat: "household" },
+  { word: "BOTTLE", clue: "Rigid container with narrow neck used for storing liquids", cat: "household" },
+  { word: "KETTLE", clue: "Metal pot with spout and handle used to boil water", cat: "household" },
+  { word: "BUCKET", clue: "Cylindrical open container with arched handle for holding water", cat: "household" },
+  { word: "DIAMOND", clue: "Extremely hard precious gemstone formed of pure crystallized carbon", cat: "household" },
+  { word: "SILVER", clue: "Shiny grayish-white precious metallic element with high conductivity", cat: "household" },
+  { word: "BRONZE", clue: "Metallic alloy consisting primarily of copper and tin", cat: "household" },
+  { word: "CRYSTAL", clue: "Clear transparent mineral glass with geometrical facets", cat: "household" },
+  { word: "LEATHER", clue: "Durable flexible material made from treated animal hide", cat: "household" },
+  { word: "TIMBER", clue: "Wood prepared for use in building and carpentry", cat: "household" },
+  // Weather, Environment & Seasons (weather)
+  { word: "THUNDER", clue: "Loud crashing sound accompanying a flash of lightning", cat: "weather" },
+  { word: "BLIZZARD", clue: "Severe snowstorm with strong winds and freezing temperatures", cat: "weather" },
+  { word: "AUTUMN", clue: "Third season of the year when tree leaves turn gold and shed", cat: "weather" },
+  { word: "SUMMER", clue: "Warmest season of the year falling between spring and autumn", cat: "weather" },
+  { word: "WINTER", clue: "Coldest season of the year characterized by snow and frost", cat: "weather" },
+  { word: "SPRING", clue: "Season following winter when flowers blossom and seeds germinate", cat: "weather" },
+  { word: "DROUGHT", clue: "Prolonged shortage of precipitation causing arid conditions", cat: "weather" },
+  { word: "TYPHOON", clue: "Tropical cyclone occurring in northwestern Pacific Ocean", cat: "weather" },
+  { word: "SUNSHINE", clue: "Direct light and warmth received from the Sun", cat: "weather" },
+  { word: "BREEZE", clue: "Gentle pleasant light wind outdoors", cat: "weather" },
+  // Space & Vehicles (vehicles)
+  { word: "AIRPLANE", clue: "Powered flying aircraft with fixed wings", cat: "vehicles" },
+  { word: "SUBMARINE", clue: "Warship designed to operate completely submerged underwater", cat: "vehicles" },
+  { word: "TRAIN", clue: "Series of railway carriages pulled by locomotive engine", cat: "vehicles" },
+  { word: "HELICOPTER", clue: "Aircraft propelled by horizontal rotating overhead blades", cat: "vehicles" },
+  { word: "ROCKET", clue: "Cylindrical vehicle propelled through space by reaction engine", cat: "vehicles" },
+  { word: "PLANET", clue: "Large celestial body orbiting around a star", cat: "vehicles" },
+  { word: "SPACESHIP", clue: "Vehicle designed for manned or unmanned travel beyond Earth", cat: "vehicles" },
+  { word: "ASTEROID", clue: "Small rocky body orbiting Sun mostly between Mars and Jupiter", cat: "vehicles" },
+  { word: "MOTORCYCLE", clue: "Two-wheeled motor vehicle with saddle and handlebars", cat: "vehicles" },
+  // Society, Mind & Culture (culture)
+  { word: "LIBRARY", clue: "Building or room housing curated collection of books for reading", cat: "culture" },
+  { word: "MUSEUM", clue: "Institution preserving historical, scientific, or artistic artifacts", cat: "culture" },
+  { word: "THEATER", clue: "Venue designed for performance of dramatic plays and cinema", cat: "culture" },
+  { word: "PALACE", clue: "Grand imposing official residence of sovereign monarch", cat: "culture" },
+  { word: "HOSPITAL", clue: "Institution providing medical treatment and nursing care for sick", cat: "culture" },
+  { word: "UNIVERSITY", clue: "High-level educational institution granting academic degrees", cat: "culture" },
+  { word: "FESTIVAL", clue: "Periodic cultural celebration commemorating special occasion", cat: "culture" },
+  { word: "JOURNAL", clue: "Daily written record of personal experiences or professional news", cat: "culture" },
+  { word: "POETRY", clue: "Literary work expressing feelings and ideas with rhythm and rhyme", cat: "culture" },
+  { word: "SYMPHONY", clue: "Elaborate extended musical composition for full orchestra", cat: "culture" }, // DUPLICATE 2
+  { word: "PORTRAIT", clue: "Painting or photograph focusing on the face of a person", cat: "culture" },
+  { word: "SCULPTURE", clue: "Visual art created by shaping stone, metal, or wood", cat: "culture" },
+  { word: "VILLAGE", clue: "Small rural community settlement smaller than a town", cat: "culture" },
+  { word: "KINGDOM", clue: "Country, state, or territory ruled by king or queen", cat: "culture" },
+  { word: "EMPIRE", clue: "Extensive group of states under single supreme authority", cat: "culture" },
+  { word: "HARVEST", clue: "Gathering of mature agricultural crops from farm fields", cat: "culture" },
+  // Emotions & Virtues (emotions)
+  { word: "KINDNESS", clue: "Quality of being friendly, generous, and considerate toward others", cat: "emotions" },
+  { word: "PATIENCE", clue: "Capacity to accept delay or trouble without becoming angry", cat: "emotions" },
+  { word: "PASSION", clue: "Intense feeling of enthusiasm or compelling desire", cat: "emotions" },
+  { word: "SERENITY", clue: "State of being calm, peaceful, and untroubled", cat: "emotions" },
+  { word: "LOYALTY", clue: "Strong feeling of support, faithfulness, and allegiance", cat: "emotions" },
+  { word: "HAPPINESS", clue: "State of feeling contentment, pleasure, and genuine joy", cat: "emotions" },
+  { word: "GENIUS", clue: "Exceptional intellectual or creative power and originality", cat: "emotions" },
+  { word: "JUSTICE", clue: "Principle of moral rightness, fairness, and upholding law", cat: "emotions" },
+  // Colors, Shapes & Concepts (general)
+  { word: "EMERALD", clue: "Bright green precious stone variety of beryl", cat: "general" },
+  { word: "SAPPHIRE", clue: "Transparent blue precious gemstone variety of corundum", cat: "general" },
+  { word: "TRIANGLE", clue: "Geometric polygon with three corners and three straight edges", cat: "general" },
+  { word: "OCTAGON", clue: "Geometrical shape having eight straight sides and angles", cat: "general" },
+  { word: "SILHOUETTE", clue: "Dark shape and outline of someone or something against light", cat: "general" },
+  { word: "ILLUSION", clue: "Deceptive appearance or impression that fools senses", cat: "general" },
+  { word: "REFLECTION", clue: "Throwing back by body or surface of light, heat, or sound", cat: "general" },
+  { word: "DESTINY", clue: "Events that will necessarily happen to person in future", cat: "general" },
+  { word: "SERENADE", clue: "Piece of music sung or played in open air at night", cat: "general" },
+  { word: "TWILIGHT", clue: "Soft glowing light from sky between sunset and night", cat: "general" },
+  { word: "WHISPER", clue: "Speak very softly using breath rather than vocal cords", cat: "general" },
+  { word: "PHOENIX", clue: "Mythological bird that regenerates or is reborn from ashes", cat: "general" },
+  { word: "LABYRINTH", clue: "Complicated irregular network of passages or maze", cat: "general" }
+];
 
-      // Geography & Places
-      { word: "ISLAND", clue: "Piece of land completely surrounded by water" },
-      { word: "DESERT", clue: "Arid barren area of landscape with minimal rainfall" },
-      { word: "CANYON", clue: "Deep narrow valley with steep rocky sides carved by river" },
-      { word: "PYRAMID", clue: "Monumental stone structure built in ancient Egypt" },
-      { word: "HARBOR", clue: "Sheltered body of water where ships anchor safely" },
-      { word: "VALLEY", clue: "Low area between mountains, often with a flowing river" },
-      { word: "JUNGLE", clue: "Dense tropical forest tangled with thick vegetation" },
-      { word: "LAGOON", clue: "Shallow body of water separated from ocean by reefs" },
-      { word: "PENINSULA", clue: "Piece of land bordered by water on three sides" },
-      { word: "WATERFALL", clue: "Cascade of water falling from a significant height" },
-      { word: "CAPITAL", clue: "City that functions as the seat of government of a country" },
-      { word: "EQUATOR", clue: "Imaginary line dividing northern and southern hemispheres" },
-      { word: "OASIS", clue: "Fertile spot in a desert where water is found" },
+// BUG-1: Remove duplicates
+const WORD_BANK = [];
+const seenWords = new Set();
+for (const item of RAW_WORD_BANK) {
+  if (!seenWords.has(item.word)) {
+    seenWords.add(item.word);
+    WORD_BANK.push(item);
+  }
+}
 
-      // Food & Cuisine
-      { word: "CHOCOLATE", clue: "Sweet confection prepared from roasted cacao seeds" },
-      { word: "CINNAMON", clue: "Aromatic spice obtained from the inner bark of tree" },
-      { word: "SANDWICH", clue: "Food consisting of filling placed between slices of bread" },
-      { word: "PANCAKE", clue: "Thin flat cake cooked on a hot griddle and served with syrup" },
-      { word: "AVOCADO", clue: "Creamy green fruit known for guacamole" },
-      { word: "CHEESE", clue: "Dairy product derived from milk and pressed into curds" },
-      { word: "COFFEE", clue: "Popular brewed beverage made from roasted dark beans" },
-      { word: "PUMPKIN", clue: "Large round orange vegetable carved during Halloween" },
-      { word: "BISCUIT", clue: "Small baked bread or sweet crisp cookie" },
-      { word: "HONEY", clue: "Sweet viscous liquid made by bees from flower nectar" },
-      { word: "SPAGHETTI", clue: "Long, thin, cylindrical pasta of Italian origin" },
-      { word: "BURGER", clue: "Patty of cooked ground meat placed inside a sliced bun" },
-      { word: "SALAD", clue: "Cold dish composed of fresh raw vegetables tossed together" },
-      { word: "VANILLA", clue: "Popular flavoring derived from tropical orchid pods" },
-
-      // Technology, Arts & Everyday Objects
-      { word: "COMPUTER", clue: "Electronic programmable machine for processing data" },
-      { word: "INTERNET", clue: "Global computer network providing variety of information" },
-      { word: "ROBOT", clue: "Machine capable of carrying out complex actions automatically" },
-      { word: "CAMERA", clue: "Device for capturing photographs and recording videos" },
-      { word: "BATTERY", clue: "Container storing chemical energy converted into electricity" },
-      { word: "COMPASS", clue: "Navigational instrument with magnetic needle pointing North" },
-      { word: "TELESCOPE", clue: "Optical instrument designed to view distant celestial stars" },
-      { word: "MICROSCOPE", clue: "Laboratory optical device used to inspect tiny specimens" },
-      { word: "SATELLITE", clue: "Artificial body placed in orbit around Earth for communications" },
-      { word: "GUITAR", clue: "Stringed musical instrument played with fingers or plectrum" },
-      { word: "PIANO", clue: "Large keyboard musical instrument with felt-covered hammers" },
-      { word: "VIOLIN", clue: "Four-stringed wooden musical instrument played with a horsehair bow" },
-      { word: "TRUMPET", clue: "Brass musical instrument with flared bell and three valves" },
-      { word: "CANVAS", clue: "Heavy woven cloth used by artists as surface for oil painting" },
-      { word: "STATUE", clue: "Three-dimensional carved or cast work of art" },
-      { word: "MIRROR", clue: "Reflective glass surface producing clear images of objects" },
-      { word: "CLOCK", clue: "Instrument for measuring and indicating time" },
-      { word: "UMBRELLA", clue: "Canopy device protecting person from rain or sun" },
-      { word: "SCISSORS", clue: "Cutting instrument consisting of two pivoted blades" },
-      { word: "LANTERN", clue: "Portable lamp with protective case surrounding light source" },
-
-      // Human Body & Professions
-      { word: "SKELETON", clue: "Internal framework of bones supporting the human body" },
-      { word: "MUSCLE", clue: "Band of fibrous tissue that contracts to produce motion" },
-      { word: "HEART", clue: "Muscular organ that pumps blood through circulatory system" },
-      { word: "DOCTOR", clue: "Qualified practitioner of medicine who treats patients" },
-      { word: "ARCHITECT", clue: "Professional who designs buildings and oversees construction" },
-      { word: "PILOT", clue: "Person licensed to operate aircraft controls in flight" },
-      { word: "ASTRONAUT", clue: "Person trained to travel and work in outer space" },
-      { word: "CHEF", clue: "Professional cook in charge of kitchen restaurant operations" },
-      { word: "DETECTIVE", clue: "Investigator seeking clues to solve crimes" },
-      { word: "SAILOR", clue: "Person who works as member of ship crew at sea" },
-      { word: "FARMER", clue: "Person who cultivates crops and raises livestock" },
-      { word: "ENGINEER", clue: "Person who designs, builds, and maintains engines or machines" },
-      { word: "TEACHER", clue: "Educator instructing students in school or university" },
-
-      // Descriptive & General Words
-      { word: "TREASURE", clue: "Quantity of precious metals, gems, or valuable objects" },
-      { word: "CASTLE", clue: "Fortified medieval residence built for royalty or nobility" },
-      { word: "JOURNEY", clue: "Act of traveling from one location to another" },
-      { word: "MYSTERY", clue: "Something difficult or impossible to understand or explain" },
-      { word: "ADVENTURE", clue: "Exciting or daring undertaking usually involving risk" },
-      { word: "HORIZON", clue: "Line at which Earth surface and sky appear to meet" },
-      { word: "FORTUNE", clue: "Chance or luck as an external force affecting life" },
-      { word: "WISDOM", clue: "Quality of having experience, knowledge, and good judgment" },
-      { word: "FREEDOM", clue: "Power or right to act, speak, or think without restraint" },
-      { word: "HARMONY", clue: "Pleasing arrangement of parts or combination of musical notes" },
-      { word: "VICTORY", clue: "Defeat of an enemy or opponent in battle or competition" },
-      { word: "COURAGE", clue: "Ability to do something that frightens one; bravery" },
-      { word: "SECRET", clue: "Something kept hidden or unknown from others" },
-      { word: "MIRACLE", clue: "Extraordinary event attributed to supernatural intervention" },
-      { word: "FOREST", clue: "Large area covered densely with trees and undergrowth" },
-      { word: "SILENCE", clue: "Complete absence of sound or noise" },
-      { word: "SHADOW", clue: "Dark area or shape produced by body coming between rays and surface" },
-      { word: "BRIDGE", clue: "Structure carrying pathway or road across obstacle like river" },
-      { word: "LIGHT", clue: "Natural agent stimulating sight and making things visible" },
-      { word: "CLOUD", clue: "Visible mass of condensed water vapor floating in atmosphere" },
-
-      // Sports, Hobbies & Activities
-      { word: "FOOTBALL", clue: "Popular team sport played with spherical ball kicked into goal" },
-      { word: "BASKETBALL", clue: "Game played on court where players shoot ball through elevated hoop" },
-      { word: "TENNIS", clue: "Racket sport played between two or four players across net" },
-      { word: "ARCHERY", clue: "Sport of shooting arrows with a bow at target" },
-      { word: "SWIMMING", clue: "Propulsion of the body through water by combined arm and leg motions" },
-      { word: "MARATHON", clue: "Long-distance foot race officially measuring 42.195 kilometers" },
-      { word: "CHESS", clue: "Strategic board game of kings, queens, and knights played on checkered board" },
-      { word: "CYCLING", clue: "Sport or recreational activity of riding a bicycle" },
-      { word: "SKATING", clue: "Gliding across ice or smooth pavement on bladed or wheeled footwear" },
-      { word: "FENCING", clue: "Swordplay combat sport using foil, epee, or sabre" },
-      { word: "BOXING", clue: "Combat sport where two opponents throw punches inside a ring" },
-      { word: "SURFING", clue: "Surface water pastime where rider catches breaking ocean waves" },
-      { word: "CLIMBING", clue: "Activity of scaling steep rock faces or artificial walls" },
-      { word: "BASEBALL", clue: "Bat-and-ball sport played between two opposing teams of nine" },
-
-      // Household, Tools & Materials
-      { word: "BLANKET", clue: "Large piece of woolen or warm fabric used as bed covering" },
-      { word: "CANDLE", clue: "Cylinder of wax with central wick ignited to provide light" },
-      { word: "CURTAIN", clue: "Draped piece of hanging fabric shielding window from light" },
-      { word: "CUSHION", clue: "Soft bag filled with feathers or foam used for sitting comfortably" },
-      { word: "HAMMER", clue: "Hand tool with heavy metal head used for pounding nails" },
-      { word: "LADDER", clue: "Vertical or inclined series of rungs or steps for climbing up" },
-      { word: "PILLOW", clue: "Soft support cushion for the head during sleep" },
-      { word: "NEEDLE", clue: "Slender pointed steel rod with eye hole used for sewing" },
-      { word: "BOTTLE", clue: "Rigid container with narrow neck used for storing liquids" },
-      { word: "KETTLE", clue: "Metal pot with spout and handle used to boil water" },
-      { word: "BUCKET", clue: "Cylindrical open container with arched handle for holding water" },
-      { word: "DIAMOND", clue: "Extremely hard precious gemstone formed of pure crystallized carbon" },
-      { word: "SILVER", clue: "Shiny grayish-white precious metallic element with high conductivity" },
-      { word: "BRONZE", clue: "Metallic alloy consisting primarily of copper and tin" },
-      { word: "CRYSTAL", clue: "Clear transparent mineral glass with geometrical facets" },
-      { word: "LEATHER", clue: "Durable flexible material made from treated animal hide" },
-      { word: "TIMBER", clue: "Wood prepared for use in building and carpentry" },
-
-      // Weather, Environment & Seasons
-      { word: "THUNDER", clue: "Loud crashing sound accompanying a flash of lightning" },
-      { word: "BLIZZARD", clue: "Severe snowstorm with strong winds and freezing temperatures" },
-      { word: "AUTUMN", clue: "Third season of the year when tree leaves turn gold and shed" },
-      { word: "SUMMER", clue: "Warmest season of the year falling between spring and autumn" },
-      { word: "WINTER", clue: "Coldest season of the year characterized by snow and frost" },
-      { word: "SPRING", clue: "Season following winter when flowers blossom and seeds germinate" },
-      { word: "DROUGHT", clue: "Prolonged shortage of precipitation causing arid conditions" },
-      { word: "TYPHOON", clue: "Tropical cyclone occurring in northwestern Pacific Ocean" },
-      { word: "SUNSHINE", clue: "Direct light and warmth received from the Sun" },
-      { word: "BREEZE", clue: "Gentle pleasant light wind outdoors" },
-
-      // Space & Vehicles
-      { word: "AIRPLANE", clue: "Powered flying aircraft with fixed wings" },
-      { word: "SUBMARINE", clue: "Warship designed to operate completely submerged underwater" },
-      { word: "TRAIN", clue: "Series of railway carriages pulled by locomotive engine" },
-      { word: "HELICOPTER", clue: "Aircraft propelled by horizontal rotating overhead blades" },
-      { word: "ROCKET", clue: "Cylindrical vehicle propelled through space by reaction engine" },
-      { word: "PLANET", clue: "Large celestial body orbiting around a star" },
-      { word: "SPACESHIP", clue: "Vehicle designed for manned or unmanned travel beyond Earth" },
-      { word: "ASTEROID", clue: "Small rocky body orbiting Sun mostly between Mars and Jupiter" },
-      { word: "TELESCOPE", clue: "Instrument magnifying distant planets and stars" },
-      { word: "MOTORCYCLE", clue: "Two-wheeled motor vehicle with saddle and handlebars" },
-
-      // Society, Mind & Culture
-      { word: "LIBRARY", clue: "Building or room housing curated collection of books for reading" },
-      { word: "MUSEUM", clue: "Institution preserving historical, scientific, or artistic artifacts" },
-      { word: "THEATER", clue: "Venue designed for performance of dramatic plays and cinema" },
-      { word: "PALACE", clue: "Grand imposing official residence of sovereign monarch" },
-      { word: "HOSPITAL", clue: "Institution providing medical treatment and nursing care for sick" },
-      { word: "UNIVERSITY", clue: "High-level educational institution granting academic degrees" },
-      { word: "FESTIVAL", clue: "Periodic cultural celebration commemorating special occasion" },
-      { word: "JOURNAL", clue: "Daily written record of personal experiences or professional news" },
-      { word: "POETRY", clue: "Literary work expressing feelings and ideas with rhythm and rhyme" },
-      { word: "SYMPHONY", clue: "Elaborate extended musical composition for full orchestra" },
-      { word: "PORTRAIT", clue: "Painting or photograph focusing on the face of a person" },
-      { word: "SCULPTURE", clue: "Visual art created by shaping stone, metal, or wood" },
-      { word: "VILLAGE", clue: "Small rural community settlement smaller than a town" },
-      { word: "KINGDOM", clue: "Country, state, or territory ruled by king or queen" },
-      { word: "EMPIRE", clue: "Extensive group of states under single supreme authority" },
-      { word: "HARVEST", clue: "Gathering of mature agricultural crops from farm fields" },
-
-      // Emotions & Virtues
-      { word: "KINDNESS", clue: "Quality of being friendly, generous, and considerate toward others" },
-      { word: "PATIENCE", clue: "Capacity to accept delay or trouble without becoming angry" },
-      { word: "PASSION", clue: "Intense feeling of enthusiasm or compelling desire" },
-      { word: "SERENITY", clue: "State of being calm, peaceful, and untroubled" },
-      { word: "LOYALTY", clue: "Strong feeling of support, faithfulness, and allegiance" },
-      { word: "HAPPINESS", clue: "State of feeling contentment, pleasure, and genuine joy" },
-      { word: "GENIUS", clue: "Exceptional intellectual or creative power and originality" },
-      { word: "JUSTICE", clue: "Principle of moral rightness, fairness, and upholding law" },
-
-      // Colors, Shapes & Concepts
-      { word: "EMERALD", clue: "Bright green precious stone variety of beryl" },
-      { word: "SAPPHIRE", clue: "Transparent blue precious gemstone variety of corundum" },
-      { word: "TRIANGLE", clue: "Geometric polygon with three corners and three straight edges" },
-      { word: "OCTAGON", clue: "Geometrical shape having eight straight sides and angles" },
-      { word: "SILHOUETTE", clue: "Dark shape and outline of someone or something against light" },
-      { word: "ILLUSION", clue: "Deceptive appearance or impression that fools senses" },
-      { word: "REFLECTION", clue: "Throwing back by body or surface of light, heat, or sound" },
-      { word: "SYMPHONY", clue: "Elaborate orchestral musical composition in several movements" },
-      { word: "DESTINY", clue: "Events that will necessarily happen to person in future" },
-      { word: "SERENADE", clue: "Piece of music sung or played in open air at night" },
-      { word: "TWILIGHT", clue: "Soft glowing light from sky between sunset and night" },
-      { word: "WHISPER", clue: "Speak very softly using breath rather than vocal cords" },
-      { word: "TREASURE", clue: "Collection of valuable objects, precious gems, or gold" },
-      { word: "PHOENIX", clue: "Mythological bird that regenerates or is reborn from ashes" },
-      { word: "LABYRINTH", clue: "Complicated irregular network of passages or maze" }
-    ];
-
-    /* Crossword Puzzle Generator Algorithm */
-    class CrosswordGenerator {
-      constructor(wordBank, targetWordCount = 14) {
-        this.wordBank = wordBank;
-        this.targetCount = targetWordCount;
-        this.gridSize = 21; // fixed work grid, will be trimmed dynamically
+class CrosswordGenerator {
+  constructor(wordBank, targetWordCount = 14, rng = null) {
+    // Runtime deduplication
+    const unique = [];
+    const seen = new Set();
+    for (const w of wordBank) {
+      if (!seen.has(w.word)) {
+        seen.add(w.word);
+        unique.push(w);
       }
+    }
+    this.wordBank = unique;
+    this.targetCount = targetWordCount;
+    this.gridSize = 21;
+    this.rng = rng;
+  }
 
-      generate() {
-        const maxAttempts = 30;
-        let bestPuzzle = null;
+  generate() {
+    const maxAttempts = 30;
+    let bestPuzzle = null;
 
-        for (let attempt = 0; attempt < maxAttempts; attempt++) {
-          const puzzle = this._generateSingle();
-          if (puzzle && puzzle.allWords.length >= Math.max(6, this.targetCount - 3)) {
-            if (!bestPuzzle || puzzle.allWords.length > bestPuzzle.allWords.length) {
-              bestPuzzle = puzzle;
-              if (bestPuzzle.allWords.length >= this.targetCount) {
-                break;
-              }
-            }
+    for (let attempt = 0; attempt < maxAttempts; attempt++) {
+      const puzzle = this._generateSingle();
+      if (puzzle && puzzle.allWords.length >= Math.max(6, this.targetCount - 3)) {
+        if (!bestPuzzle || puzzle.allWords.length > bestPuzzle.allWords.length) {
+          bestPuzzle = puzzle;
+          if (bestPuzzle.allWords.length >= this.targetCount) {
+            break;
           }
         }
-
-        return bestPuzzle || this._generateFallback();
-      }
-
-      _generateSingle() {
-        // Shuffle and pick subset
-        const shuffled = [...this.wordBank].sort(() => Math.random() - 0.5);
-        // Sort words by length descending for better placement skeleton
-        const candidateWords = shuffled.slice(0, this.targetCount + 10).sort((a, b) => b.word.length - a.word.length);
-
-        const grid = Array.from({ length: this.gridSize }, () => Array(this.gridSize).fill(null));
-        const placedWords = [];
-
-        // 1. Place first word horizontally in center
-        const first = candidateWords[0];
-        const startRow = Math.floor(this.gridSize / 2);
-        const startCol = Math.floor((this.gridSize - first.word.length) / 2);
-
-        this._placeWordOnGrid(grid, first.word, startRow, startCol, 'across');
-        placedWords.push({
-          word: first.word,
-          clue: first.clue,
-          row: startRow,
-          col: startCol,
-          direction: 'across'
-        });
-
-        // 2. Try placing remaining words
-        for (let i = 1; i < candidateWords.length; i++) {
-          if (placedWords.length >= this.targetCount) break;
-
-          const item = candidateWords[i];
-          const bestPos = this._findBestPlacement(grid, item.word, placedWords);
-
-          if (bestPos) {
-            this._placeWordOnGrid(grid, item.word, bestPos.row, bestPos.col, bestPos.direction);
-            placedWords.push({
-              word: item.word,
-              clue: item.clue,
-              row: bestPos.row,
-              col: bestPos.col,
-              direction: bestPos.direction
-            });
-          }
-        }
-
-        if (placedWords.length < 5) return null;
-
-        return this._formatPuzzle(grid, placedWords);
-      }
-
-      _findBestPlacement(grid, word, placedWords) {
-        const matches = [];
-
-        // Check intersections against all letters in the word
-        for (let charIndex = 0; charIndex < word.length; charIndex++) {
-          const char = word[charIndex];
-
-          for (let r = 0; r < this.gridSize; r++) {
-            for (let c = 0; c < this.gridSize; c++) {
-              if (grid[r][c] === char) {
-                // Try crossing: if intersecting letter has adjacent horizontal neighbors, try vertical, and vice versa
-                // Or simply test both directions
-                for (const direction of ['across', 'down']) {
-                  const row = direction === 'across' ? r : r - charIndex;
-                  const col = direction === 'across' ? c - charIndex : c;
-
-                  if (this._canPlaceWord(grid, word, row, col, direction)) {
-                    const score = this._scorePlacement(grid, word, row, col, direction);
-                    matches.push({ row, col, direction, score });
-                  }
-                }
-              }
-            }
-          }
-        }
-
-        if (matches.length === 0) return null;
-
-        // Choose best scoring position (highest score, with tie breaker)
-        matches.sort((a, b) => b.score - a.score);
-        return matches[0];
-      }
-
-      _canPlaceWord(grid, word, row, col, direction) {
-        const len = word.length;
-
-        // Boundary checks
-        if (direction === 'across') {
-          if (row < 0 || row >= this.gridSize || col < 0 || col + len > this.gridSize) return false;
-          // Check cell immediately before and after
-          if (col > 0 && grid[row][col - 1] !== null) return false;
-          if (col + len < this.gridSize && grid[row][col + len] !== null) return false;
-
-          let intersections = 0;
-          for (let i = 0; i < len; i++) {
-            const curRow = row;
-            const curCol = col + i;
-            const currentCell = grid[curRow][curCol];
-            const char = word[i];
-
-            if (currentCell !== null && currentCell !== char) {
-              return false; // Letter collision
-            }
-
-            if (currentCell === char) {
-              intersections++;
-            } else {
-              // If empty, ensure we don't accidentally join parallel adjacent words
-              if (curRow > 0 && grid[curRow - 1][curCol] !== null) return false;
-              if (curRow < this.gridSize - 1 && grid[curRow + 1][curCol] !== null) return false;
-            }
-          }
-
-          return intersections > 0;
-        } else {
-          // 'down'
-          if (col < 0 || col >= this.gridSize || row < 0 || row + len > this.gridSize) return false;
-          // Check cell immediately above and below
-          if (row > 0 && grid[row - 1][col] !== null) return false;
-          if (row + len < this.gridSize && grid[row + len][col] !== null) return false;
-
-          let intersections = 0;
-          for (let i = 0; i < len; i++) {
-            const curRow = row + i;
-            const curCol = col;
-            const currentCell = grid[curRow][curCol];
-            const char = word[i];
-
-            if (currentCell !== null && currentCell !== char) {
-              return false;
-            }
-
-            if (currentCell === char) {
-              intersections++;
-            } else {
-              // Ensure we don't create invalid parallel words horizontally
-              if (curCol > 0 && grid[curRow][curCol - 1] !== null) return false;
-              if (curCol < this.gridSize - 1 && grid[curRow][curCol + 1] !== null) return false;
-            }
-          }
-
-          return intersections > 0;
-        }
-      }
-
-      _scorePlacement(grid, word, row, col, direction) {
-        let intersections = 0;
-        for (let i = 0; i < word.length; i++) {
-          const r = direction === 'across' ? row : row + i;
-          const c = direction === 'across' ? col + i : col;
-          if (grid[r][c] === word[i]) {
-            intersections++;
-          }
-        }
-
-        // Favor placements closer to grid center
-        const center = this.gridSize / 2;
-        const midRow = direction === 'across' ? row : row + word.length / 2;
-        const midCol = direction === 'across' ? col + word.length / 2 : col;
-        const distFromCenter = Math.hypot(midRow - center, midCol - center);
-
-        return (intersections * 10) - distFromCenter;
-      }
-
-      _placeWordOnGrid(grid, word, row, col, direction) {
-        for (let i = 0; i < word.length; i++) {
-          const r = direction === 'across' ? row : row + i;
-          const c = direction === 'across' ? col + i : col;
-          grid[r][c] = word[i];
-        }
-      }
-
-      _formatPuzzle(grid, placedWords) {
-        // 1. Calculate bounding box of active letters
-        let minR = this.gridSize, maxR = 0, minC = this.gridSize, maxC = 0;
-        for (let r = 0; r < this.gridSize; r++) {
-          for (let c = 0; c < this.gridSize; c++) {
-            if (grid[r][c] !== null) {
-              if (r < minR) minR = r;
-              if (r > maxR) maxR = r;
-              if (c < minC) minC = c;
-              if (c > maxC) maxC = c;
-            }
-          }
-        }
-
-        // Add 1 cell padding around the puzzle for clean border aesthetics
-        minR = Math.max(0, minR - 1);
-        minC = Math.max(0, minC - 1);
-        maxR = Math.min(this.gridSize - 1, maxR + 1);
-        maxC = Math.min(this.gridSize - 1, maxC + 1);
-
-        const rows = maxR - minR + 1;
-        const cols = maxC - minC + 1;
-
-        // Shift placed words coordinates to cropped grid
-        const adjustedWords = placedWords.map(w => ({
-          ...w,
-          row: w.row - minR,
-          col: w.col - minC
-        }));
-
-        // Assign numbers sequentially: scan grid row by row, col by col
-        let currentNumber = 1;
-        const numberedWords = [];
-        const cellNumbers = Array.from({ length: rows }, () => Array(cols).fill(null));
-
-        for (let r = 0; r < rows; r++) {
-          for (let c = 0; c < cols; c++) {
-            // Check if any word starts at this cell
-            const starting = adjustedWords.filter(w => w.row === r && w.col === c);
-            if (starting.length > 0) {
-              cellNumbers[r][c] = currentNumber;
-              for (const sw of starting) {
-                numberedWords.push({
-                  ...sw,
-                  number: currentNumber
-                });
-              }
-              currentNumber++;
-            }
-          }
-        }
-
-        // Build cropped 2D grid matrix
-        const finalGrid = [];
-        for (let r = minR; r <= maxR; r++) {
-          const rowData = [];
-          for (let c = minC; c <= maxC; c++) {
-            const letter = grid[r][c];
-            const num = cellNumbers[r - minR][c - minC];
-            rowData.push({
-              letter: letter,
-              number: num,
-              isBlocked: letter === null
-            });
-          }
-          finalGrid.push(rowData);
-        }
-
-        // Split into Across and Down clue lists
-        const acrossClues = numberedWords
-          .filter(w => w.direction === 'across')
-          .sort((a, b) => a.number - b.number);
-
-        const downClues = numberedWords
-          .filter(w => w.direction === 'down')
-          .sort((a, b) => a.number - b.number);
-
-        return {
-          rows,
-          cols,
-          grid: finalGrid,
-          acrossClues,
-          downClues,
-          allWords: numberedWords.sort((a, b) => a.number - b.number)
-        };
-      }
-
-      _generateFallback() {
-        // Static simple backup in case randomness fails repeatedly
-        const fallbackWords = [
-          { word: "ELEPHANT", clue: "Largest land mammal with a long trunk" },
-          { word: "PLANET", clue: "Celestial body orbiting a star" },
-          { word: "NATURE", clue: "Phenomena of the physical world collectively" }
-        ];
-        return this._formatPuzzle(
-          Array.from({ length: 15 }, () => Array(15).fill(null)),
-          []
-        );
       }
     }
 
-    /* App Controller & UI Renderer */
-    class CrosswordApp {
-      constructor() {
-        this.currentDifficulty = 'medium';
-        this.currentPuzzle = null;
-        this.isSolutionVisible = false;
+    return bestPuzzle || this._generateFallback();
+  }
 
-        this.targetCounts = {
-          easy: 9,
-          medium: 14,
-          hard: 19
-        };
+  _generateSingle() {
+    // BUG-2: Empty word bank crash
+    if (this.wordBank.length === 0) return null;
 
-        this.initDOMElements();
-        this.bindEvents();
-        this.generateNewPuzzle();
-      }
-
-      initDOMElements() {
-        this.diffButtons = document.querySelectorAll('.diff-btn');
-        this.btnGenerate = document.getElementById('btn-generate');
-        this.btnToggleSolution = document.getElementById('btn-toggle-solution');
-        this.btnPrint = document.getElementById('btn-print');
-
-        this.puzzleSheet = document.getElementById('puzzle-sheet');
-        this.solutionSheet = document.getElementById('solution-sheet');
-
-        this.crosswordGrid = document.getElementById('crossword-grid');
-        this.solutionGrid = document.getElementById('solution-grid');
-        this.acrossCluesList = document.getElementById('across-clues');
-        this.downCluesList = document.getElementById('down-clues');
-        this.solutionWordsSummary = document.getElementById('solution-words-summary');
-
-        this.puzzleIdDisplay = document.getElementById('puzzle-id');
-        this.solutionPuzzleIdDisplay = document.getElementById('solution-puzzle-id');
-        this.puzzleDiffDisplay = document.getElementById('puzzle-diff-label');
-        this.solutionDiffDisplay = document.getElementById('solution-diff-label');
-        this.puzzleDateDisplay = document.getElementById('puzzle-date');
-        this.pageCountDisplays = document.querySelectorAll('.page-count-display');
-      }
-
-      bindEvents() {
-        this.diffButtons.forEach(btn => {
-          btn.addEventListener('click', (e) => {
-            this.diffButtons.forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-            this.currentDifficulty = btn.dataset.diff;
-            this.generateNewPuzzle();
-          });
-        });
-
-        this.btnGenerate.addEventListener('click', () => {
-          this.generateNewPuzzle();
-        });
-
-        this.btnToggleSolution.addEventListener('click', () => {
-          this.toggleSolution();
-        });
-
-        this.btnPrint.addEventListener('click', () => {
-          window.print();
-        });
-      }
-
-      generateNewPuzzle() {
-        const targetCount = this.targetCounts[this.currentDifficulty];
-        const generator = new CrosswordGenerator(WORD_BANK, targetCount);
-        this.currentPuzzle = generator.generate();
-
-        const puzzleId = '#CW-' + Math.floor(1000 + Math.random() * 9000);
-        const today = new Date().toLocaleDateString('en-US', {
-          year: 'numeric',
-          month: 'short',
-          day: 'numeric'
-        });
-
-        const diffTitle = this.currentDifficulty.charAt(0).toUpperCase() + this.currentDifficulty.slice(1);
-
-        this.puzzleIdDisplay.textContent = puzzleId;
-        this.solutionPuzzleIdDisplay.textContent = puzzleId;
-        this.puzzleDiffDisplay.textContent = diffTitle;
-        this.solutionDiffDisplay.textContent = diffTitle;
-        this.puzzleDateDisplay.textContent = today;
-
-        this.renderPuzzles();
-      }
-
-      toggleSolution() {
-        this.isSolutionVisible = !this.isSolutionVisible;
-
-        if (this.isSolutionVisible) {
-          this.solutionSheet.classList.add('visible');
-          this.btnToggleSolution.classList.add('active');
-          this.btnToggleSolution.innerHTML = '🔒 Hide Answer Key';
-          this.pageCountDisplays.forEach(el => el.textContent = '2');
-        } else {
-          this.solutionSheet.classList.remove('visible');
-          this.btnToggleSolution.classList.remove('active');
-          this.btnToggleSolution.innerHTML = '👁️ Show Answer Key';
-          this.pageCountDisplays.forEach(el => el.textContent = '1');
-        }
-      }
-
-      renderPuzzles() {
-        if (!this.currentPuzzle) return;
-
-        const { rows, cols, grid, acrossClues, downClues, allWords } = this.currentPuzzle;
-
-        // Auto-scale cell size depending on grid dimensions for ideal A4 fit
-        const maxDim = Math.max(rows, cols);
-        let cellSizePx = 28;
-        if (maxDim > 18) cellSizePx = 21;
-        else if (maxDim > 15) cellSizePx = 24;
-        else if (maxDim > 12) cellSizePx = 27;
-        else cellSizePx = 30;
-
-        document.documentElement.style.setProperty('--cell-size', `${cellSizePx}px`);
-
-        // 1. Render Main Printable Grid (Empty letters)
-        this.renderGrid(this.crosswordGrid, grid, false);
-
-        // 2. Render Solution Grid (With letters)
-        this.renderGrid(this.solutionGrid, grid, true);
-
-        // 3. Render Clues
-        this.renderClues(this.acrossCluesList, acrossClues);
-        this.renderClues(this.downCluesList, downClues);
-
-        // 4. Render Answer Key Word Summary
-        this.renderSolutionWordsSummary(allWords);
-      }
-
-      renderGrid(container, grid, isSolution) {
-        container.innerHTML = '';
-        const rows = grid.length;
-        const cols = grid[0].length;
-
-        container.style.gridTemplateRows = `repeat(${rows}, var(--cell-size))`;
-        container.style.gridTemplateColumns = `repeat(${cols}, var(--cell-size))`;
-
-        for (let r = 0; r < rows; r++) {
-          for (let c = 0; c < cols; c++) {
-            const cellData = grid[r][c];
-            const cellDiv = document.createElement('div');
-            cellDiv.className = 'cell';
-
-            if (cellData.isBlocked) {
-              cellDiv.classList.add('blocked');
-            } else {
-              if (cellData.number) {
-                const numSpan = document.createElement('span');
-                numSpan.className = 'cell-num';
-                numSpan.textContent = cellData.number;
-                cellDiv.appendChild(numSpan);
-              }
-
-              if (isSolution && cellData.letter) {
-                cellDiv.classList.add('solution-cell');
-                const letterSpan = document.createElement('span');
-                letterSpan.textContent = cellData.letter;
-                cellDiv.appendChild(letterSpan);
-              }
-            }
-
-            container.appendChild(cellDiv);
-          }
-        }
-      }
-
-      renderClues(container, clueList) {
-        container.innerHTML = '';
-        if (clueList.length === 0) {
-          const emptyLi = document.createElement('li');
-          emptyLi.className = 'clue-item';
-          emptyLi.textContent = 'None';
-          container.appendChild(emptyLi);
-          return;
-        }
-
-        clueList.forEach(item => {
-          const li = document.createElement('li');
-          li.className = 'clue-item';
-          li.innerHTML = `
-            <strong>${item.number}.</strong>
-            <span>${item.clue}</span>
-            <span class="clue-word-len">(${item.word.length})</span>
-          `;
-          container.appendChild(li);
-        });
-      }
-
-      renderSolutionWordsSummary(words) {
-        this.solutionWordsSummary.innerHTML = '';
-        words.forEach(item => {
-          const div = document.createElement('div');
-          div.className = 'solution-item';
-          div.innerHTML = `
-            <span class="num">${item.number} ${item.direction === 'across' ? 'A' : 'D'}</span>
-            <span class="word">${item.word}</span>
-            <span class="clue-word-len">(${item.word.length} letters)</span>
-          `;
-          this.solutionWordsSummary.appendChild(div);
-        });
-      }
+    let shuffled;
+    if (this.rng) {
+      shuffled = this.rng.shuffle(this.wordBank);
+    } else {
+      shuffled = [...this.wordBank].sort(() => Math.random() - 0.5);
     }
+    
+    const candidateWords = shuffled.slice(0, this.targetCount + 10).sort((a, b) => b.word.length - a.word.length);
+    if (candidateWords.length === 0) return null;
 
-    // Launch Application
-    window.addEventListener('DOMContentLoaded', () => {
-      new CrosswordApp();
+    const grid = Array.from({ length: this.gridSize }, () => Array(this.gridSize).fill(null));
+    const placedWords = [];
+
+    const first = candidateWords[0];
+    const startRow = Math.floor(this.gridSize / 2);
+    const startCol = Math.floor((this.gridSize - first.word.length) / 2);
+
+    this._placeWordOnGrid(grid, first.word, startRow, startCol, 'across');
+    placedWords.push({
+      word: first.word,
+      clue: first.clue,
+      row: startRow,
+      col: startCol,
+      direction: 'across'
     });
+
+    for (let i = 1; i < candidateWords.length; i++) {
+      if (placedWords.length >= this.targetCount) break;
+
+      const item = candidateWords[i];
+      const bestPos = this._findBestPlacement(grid, item.word, placedWords);
+
+      if (bestPos) {
+        this._placeWordOnGrid(grid, item.word, bestPos.row, bestPos.col, bestPos.direction);
+        placedWords.push({
+          word: item.word,
+          clue: item.clue,
+          row: bestPos.row,
+          col: bestPos.col,
+          direction: bestPos.direction
+        });
+      }
+    }
+
+    if (placedWords.length < 5) return null;
+
+    return this._formatPuzzle(grid, placedWords);
+  }
+
+  _findBestPlacement(grid, word, placedWords) {
+    const matches = [];
+    for (let charIndex = 0; charIndex < word.length; charIndex++) {
+      const char = word[charIndex];
+      for (let r = 0; r < this.gridSize; r++) {
+        for (let c = 0; c < this.gridSize; c++) {
+          if (grid[r][c] === char) {
+            for (const direction of ['across', 'down']) {
+              const row = direction === 'across' ? r : r - charIndex;
+              const col = direction === 'across' ? c - charIndex : c;
+
+              if (this._canPlaceWord(grid, word, row, col, direction)) {
+                const score = this._scorePlacement(grid, word, row, col, direction);
+                matches.push({ row, col, direction, score });
+              }
+            }
+          }
+        }
+      }
+    }
+
+    if (matches.length === 0) return null;
+    matches.sort((a, b) => b.score - a.score);
+    return matches[0];
+  }
+
+  _canPlaceWord(grid, word, row, col, direction) {
+    const len = word.length;
+    if (direction === 'across') {
+      if (row < 0 || row >= this.gridSize || col < 0 || col + len > this.gridSize) return false;
+      if (col > 0 && grid[row][col - 1] !== null) return false;
+      if (col + len < this.gridSize && grid[row][col + len] !== null) return false;
+
+      let intersections = 0;
+      for (let i = 0; i < len; i++) {
+        const curRow = row;
+        const curCol = col + i;
+        const currentCell = grid[curRow][curCol];
+        const char = word[i];
+
+        if (currentCell !== null && currentCell !== char) return false;
+        if (currentCell === char) {
+          intersections++;
+        } else {
+          if (curRow > 0 && grid[curRow - 1][curCol] !== null) return false;
+          if (curRow < this.gridSize - 1 && grid[curRow + 1][curCol] !== null) return false;
+        }
+      }
+      return intersections > 0;
+    } else {
+      if (col < 0 || col >= this.gridSize || row < 0 || row + len > this.gridSize) return false;
+      if (row > 0 && grid[row - 1][col] !== null) return false;
+      if (row + len < this.gridSize && grid[row + len][col] !== null) return false;
+
+      let intersections = 0;
+      for (let i = 0; i < len; i++) {
+        const curRow = row + i;
+        const curCol = col;
+        const currentCell = grid[curRow][curCol];
+        const char = word[i];
+
+        if (currentCell !== null && currentCell !== char) return false;
+        if (currentCell === char) {
+          intersections++;
+        } else {
+          if (curCol > 0 && grid[curRow][curCol - 1] !== null) return false;
+          if (curCol < this.gridSize - 1 && grid[curRow][curCol + 1] !== null) return false;
+        }
+      }
+      return intersections > 0;
+    }
+  }
+
+  _scorePlacement(grid, word, row, col, direction) {
+    let intersections = 0;
+    for (let i = 0; i < word.length; i++) {
+      const r = direction === 'across' ? row : row + i;
+      const c = direction === 'across' ? col + i : col;
+      if (grid[r][c] === word[i]) intersections++;
+    }
+    const center = this.gridSize / 2;
+    const midRow = direction === 'across' ? row : row + word.length / 2;
+    const midCol = direction === 'across' ? col + word.length / 2 : col;
+    const distFromCenter = Math.hypot(midRow - center, midCol - center);
+    return (intersections * 10) - distFromCenter;
+  }
+
+  _placeWordOnGrid(grid, word, row, col, direction) {
+    for (let i = 0; i < word.length; i++) {
+      const r = direction === 'across' ? row : row + i;
+      const c = direction === 'across' ? col + i : col;
+      grid[r][c] = word[i];
+    }
+  }
+
+  _formatPuzzle(grid, placedWords) {
+    const gridRows = grid.length;
+    const gridCols = grid[0].length;
+    let minR = gridRows, maxR = 0, minC = gridCols, maxC = 0;
+    let intersections = 0;
+    for (let r = 0; r < gridRows; r++) {
+      for (let c = 0; c < gridCols; c++) {
+        if (grid[r][c] !== null) {
+          if (r < minR) minR = r;
+          if (r > maxR) maxR = r;
+          if (c < minC) minC = c;
+          if (c > maxC) maxC = c;
+          // check if intersection
+          const hasH = (c > 0 && grid[r][c-1] !== null) || (c < gridCols-1 && grid[r][c+1] !== null);
+          const hasV = (r > 0 && grid[r-1][c] !== null) || (r < gridRows-1 && grid[r+1][c] !== null);
+          if (hasH && hasV) intersections++;
+        }
+      }
+    }
+
+    minR = Math.max(0, minR - 1);
+    minC = Math.max(0, minC - 1);
+    maxR = Math.min(gridRows - 1, maxR + 1);
+    maxC = Math.min(gridCols - 1, maxC + 1);
+
+    const rows = maxR - minR + 1;
+    const cols = maxC - minC + 1;
+
+    const adjustedWords = placedWords.map(w => ({
+      ...w,
+      row: w.row - minR,
+      col: w.col - minC
+    }));
+
+    let currentNumber = 1;
+    const numberedWords = [];
+    const cellNumbers = Array.from({ length: rows }, () => Array(cols).fill(null));
+
+    for (let r = 0; r < rows; r++) {
+      for (let c = 0; c < cols; c++) {
+        const starting = adjustedWords.filter(w => w.row === r && w.col === c);
+        if (starting.length > 0) {
+          cellNumbers[r][c] = currentNumber;
+          for (const sw of starting) {
+            numberedWords.push({
+              ...sw,
+              number: currentNumber
+            });
+          }
+          currentNumber++;
+        }
+      }
+    }
+
+    const finalGrid = [];
+    for (let r = minR; r <= maxR; r++) {
+      const rowData = [];
+      for (let c = minC; c <= maxC; c++) {
+        const letter = grid[r][c];
+        const num = cellNumbers[r - minR][c - minC];
+        rowData.push({
+          letter: letter,
+          number: num,
+          isBlocked: letter === null
+        });
+      }
+      finalGrid.push(rowData);
+    }
+
+    const acrossClues = numberedWords.filter(w => w.direction === 'across').sort((a, b) => a.number - b.number);
+    const downClues = numberedWords.filter(w => w.direction === 'down').sort((a, b) => a.number - b.number);
+
+    return {
+      rows, cols, grid: finalGrid,
+      acrossClues, downClues,
+      allWords: numberedWords.sort((a, b) => a.number - b.number),
+      intersections
+    };
+  }
+
+  _generateFallback() {
+    // BUG-3: Use fallback words
+    const fallbackWords = [
+      { word: "ELEPHANT", clue: "Largest land mammal with a long trunk", row: 7, col: 3, direction: 'across' },
+      { word: "PLANET", clue: "Celestial body orbiting a star", row: 5, col: 3, direction: 'down' },
+      { word: "NATURE", clue: "Phenomena of the physical world collectively", row: 7, col: 7, direction: 'down' }
+    ];
+    const grid = Array.from({ length: 15 }, () => Array(15).fill(null));
+    for (const fw of fallbackWords) {
+      this._placeWordOnGrid(grid, fw.word, fw.row, fw.col, fw.direction);
+    }
+    const placedWords = fallbackWords.map(w => ({word: w.word, clue: w.clue, row: w.row, col: w.col, direction: w.direction}));
+    return this._formatPuzzle(grid, placedWords);
+  }
+}
+
+// App
+class CrosswordApp {
+  constructor() {
+    this.currentDifficulty = 'medium';
+    this.currentPuzzle = null;
+    this.isSolutionVisible = false;
+    this.targetCounts = { easy: 9, medium: 14, hard: 19 };
+    this.categories = ['animals', 'science', 'geography', 'food', 'technology', 'body', 'general', 'sports', 'household', 'weather', 'vehicles', 'culture', 'emotions'];
+    this.selectedCategories = new Set(this.categories);
+
+    this.initDOMElements();
+    this.bindEvents();
+    this.applyTheme();
+    
+    // YEN-3: URL Hash parsing
+    this.checkHash();
+  }
+
+  initDOMElements() {
+    this.diffButtons = document.querySelectorAll('.diff-btn');
+    this.btnGenerate = document.getElementById('btn-generate');
+    this.btnToggleSolution = document.getElementById('btn-toggle-solution');
+    this.btnPrint = document.getElementById('btn-print');
+    
+    this.puzzleSheet = document.getElementById('puzzle-sheet');
+    this.solutionSheet = document.getElementById('solution-sheet');
+    this.crosswordGrid = document.getElementById('crossword-grid');
+    this.solutionGrid = document.getElementById('solution-grid');
+    this.acrossCluesList = document.getElementById('across-clues');
+    this.downCluesList = document.getElementById('down-clues');
+    this.solutionWordsSummary = document.getElementById('solution-words-summary');
+    
+    this.puzzleIdDisplay = document.getElementById('puzzle-id');
+    this.solutionPuzzleIdDisplay = document.getElementById('solution-puzzle-id');
+    this.puzzleDiffDisplay = document.getElementById('puzzle-diff-label');
+    this.solutionDiffDisplay = document.getElementById('solution-diff-label');
+    this.puzzleDateDisplay = document.getElementById('puzzle-date');
+    this.pageCountDisplays = document.querySelectorAll('.page-count-display');
+    
+    this.btnBatchPrint = document.getElementById('btn-batch-print');
+    this.batchDropdown = document.getElementById('batch-dropdown');
+    this.btnShare = document.getElementById('btn-share');
+    this.btnPdf = document.getElementById('btn-pdf');
+    this.btnTheme = document.getElementById('btn-theme');
+    this.catContainer = document.getElementById('cat-container');
+    
+    // Stats
+    this.statsWords = document.getElementById('stats-words');
+    this.statsGrid = document.getElementById('stats-grid');
+    this.statsDensity = document.getElementById('stats-density');
+    this.statsIntersections = document.getElementById('stats-intersections');
+    this.statsLongest = document.getElementById('stats-longest');
+
+    // Create Category Chips
+    this.categories.forEach(cat => {
+      const chip = document.createElement('div');
+      chip.className = 'cat-chip selected';
+      chip.textContent = cat.charAt(0).toUpperCase() + cat.slice(1);
+      chip.dataset.cat = cat;
+      chip.addEventListener('click', () => this.toggleCategory(chip, cat));
+      this.catContainer.appendChild(chip);
+    });
+  }
+
+  bindEvents() {
+    this.diffButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        this.diffButtons.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        this.currentDifficulty = btn.dataset.diff;
+        // EKS-3 Reset answer key on diff change
+        this.resetSolutionKey();
+        this.generateNewPuzzle();
+      });
+    });
+
+    this.btnGenerate.addEventListener('click', () => {
+      // EKS-3 Reset answer key
+      this.resetSolutionKey();
+      this.generateNewPuzzle();
+    });
+
+    this.btnToggleSolution.addEventListener('click', () => {
+      this.toggleSolution();
+    });
+
+    this.btnPrint.addEventListener('click', () => {
+      window.print();
+    });
+
+    // Batch Print
+    this.btnBatchPrint.addEventListener('click', (e) => {
+      e.stopPropagation();
+      this.batchDropdown.parentElement.classList.toggle('show');
+    });
+    document.addEventListener('click', () => {
+      this.batchDropdown.parentElement.classList.remove('show');
+    });
+    this.batchDropdown.querySelectorAll('button').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const count = parseInt(btn.dataset.count);
+        this.batchPrint(count);
+      });
+    });
+
+    // Theme Toggle
+    this.btnTheme.addEventListener('click', () => {
+      const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+      if (isDark) {
+        document.documentElement.removeAttribute('data-theme');
+        localStorage.setItem('theme', 'light');
+        this.btnTheme.textContent = '🌙 Mode';
+      } else {
+        document.documentElement.setAttribute('data-theme', 'dark');
+        localStorage.setItem('theme', 'dark');
+        this.btnTheme.textContent = '☀️ Mode';
+      }
+    });
+
+    // Share
+    this.btnShare.addEventListener('click', () => {
+      if (!this.currentSeed) return;
+      const cats = Array.from(this.selectedCategories).join(',');
+      const url = new URL(window.location.href);
+      url.hash = `#seed=${this.currentSeed}&diff=${this.currentDifficulty}&cats=${cats}`;
+      navigator.clipboard.writeText(url.href).then(() => {
+        this.showToast('🔗 Link copied!');
+      });
+    });
+
+    // PDF
+    this.btnPdf.addEventListener('click', () => {
+      this.exportPdf();
+    });
+  }
+
+  applyTheme() {
+    const saved = localStorage.getItem('theme');
+    if (saved === 'dark') {
+      document.documentElement.setAttribute('data-theme', 'dark');
+      this.btnTheme.textContent = '☀️ Mode';
+    }
+  }
+
+  toggleCategory(chip, cat) {
+    if (this.selectedCategories.has(cat)) {
+      if (this.selectedCategories.size <= 2) {
+        this.showToast('At least 2 categories must remain selected.');
+        return;
+      }
+      this.selectedCategories.delete(cat);
+      chip.classList.remove('selected');
+    } else {
+      this.selectedCategories.add(cat);
+      chip.classList.add('selected');
+    }
+    this.resetSolutionKey();
+    this.generateNewPuzzle();
+  }
+
+  resetSolutionKey() {
+    this.isSolutionVisible = false;
+    this.solutionSheet.classList.remove('visible');
+    this.btnToggleSolution.classList.remove('active');
+    this.btnToggleSolution.innerHTML = '👁️ Show Answer Key';
+    this.pageCountDisplays.forEach(el => el.textContent = '1');
+  }
+
+  checkHash() {
+    if (window.location.hash) {
+      const params = new URLSearchParams(window.location.hash.slice(1));
+      const seed = params.get('seed');
+      const diff = params.get('diff');
+      const cats = params.get('cats');
+      
+      if (diff && this.targetCounts[diff]) {
+        this.currentDifficulty = diff;
+        this.diffButtons.forEach(b => {
+          b.classList.toggle('active', b.dataset.diff === diff);
+        });
+      }
+      if (cats) {
+        const catList = cats.split(',');
+        this.selectedCategories = new Set();
+        document.querySelectorAll('.cat-chip').forEach(chip => {
+          if (catList.includes(chip.dataset.cat)) {
+            this.selectedCategories.add(chip.dataset.cat);
+            chip.classList.add('selected');
+          } else {
+            chip.classList.remove('selected');
+          }
+        });
+      }
+      if (seed) {
+        this.generateNewPuzzle(parseInt(seed));
+        return;
+      }
+    }
+    this.generateNewPuzzle();
+  }
+
+  getFilteredWords() {
+    return WORD_BANK.filter(w => this.selectedCategories.has(w.cat));
+  }
+
+  generateNewPuzzle(forceSeed = null) {
+    // EKS-5 Loading indicator
+    const originalText = this.btnGenerate.innerHTML;
+    this.btnGenerate.innerHTML = '⏳ Generating...';
+    this.btnGenerate.disabled = true;
+
+    setTimeout(() => {
+      const targetCount = this.targetCounts[this.currentDifficulty];
+      const bank = this.getFilteredWords();
+      
+      this.currentSeed = forceSeed !== null ? forceSeed : Math.floor(Math.random() * 2147483647);
+      const rng = new SeededRandom(this.currentSeed);
+      const generator = new CrosswordGenerator(bank, targetCount, rng);
+      
+      this.currentPuzzle = generator.generate();
+
+      const puzzleId = '#CW-' + this.currentSeed.toString().substring(0,4);
+      const today = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+
+      // Difficulty Score (YEN-8)
+      let scoreLabel = '';
+      if (this.currentPuzzle) {
+        let avgLen = 0, rarePoints = 0;
+        this.currentPuzzle.allWords.forEach(w => {
+          avgLen += w.word.length;
+          for(const c of w.word) {
+            if (['Q','X','Z','J','K'].includes(c)) rarePoints++;
+          }
+        });
+        avgLen /= this.currentPuzzle.allWords.length;
+        const numWords = this.currentPuzzle.allWords.length;
+        const intersections = this.currentPuzzle.intersections || 1;
+        const diffScore = (avgLen * 0.5) + (rarePoints * 1.5) + (numWords * 0.3) - (intersections * 0.2);
+        const score = Math.max(1, Math.min(10, Math.round(diffScore)));
+        const stars = score <= 3 ? '⭐ Easy' : (score <= 6 ? '⭐⭐ Medium' : '⭐⭐⭐ Hard');
+        scoreLabel = `${stars} (${score}/10)`;
+      }
+
+      this.puzzleIdDisplay.textContent = puzzleId;
+      this.solutionPuzzleIdDisplay.textContent = puzzleId;
+      this.puzzleDiffDisplay.textContent = scoreLabel;
+      this.solutionDiffDisplay.textContent = scoreLabel;
+      this.puzzleDateDisplay.textContent = today;
+
+      this.renderPuzzles();
+      
+      this.btnGenerate.innerHTML = originalText;
+      this.btnGenerate.disabled = false;
+      
+      if(forceSeed !== null) {
+        // clear hash so normal generation works next
+        history.replaceState(null, null, ' ');
+      }
+    }, 50);
+  }
+
+  toggleSolution() {
+    this.isSolutionVisible = !this.isSolutionVisible;
+    if (this.isSolutionVisible) {
+      this.solutionSheet.classList.add('visible');
+      this.btnToggleSolution.classList.add('active');
+      this.btnToggleSolution.innerHTML = '🔒 Hide Answer Key';
+      this.pageCountDisplays.forEach(el => el.textContent = '2');
+    } else {
+      this.solutionSheet.classList.remove('visible');
+      this.btnToggleSolution.classList.remove('active');
+      this.btnToggleSolution.innerHTML = '👁️ Show Answer Key';
+      this.pageCountDisplays.forEach(el => el.textContent = '1');
+    }
+  }
+
+  renderPuzzles() {
+    if (!this.currentPuzzle) return;
+    const { rows, cols, grid, acrossClues, downClues, allWords, intersections } = this.currentPuzzle;
+
+    let cellSizePx = 28;
+    const maxDim = Math.max(rows, cols);
+    if (maxDim > 18) cellSizePx = 21;
+    else if (maxDim > 15) cellSizePx = 24;
+    else if (maxDim > 12) cellSizePx = 27;
+    else cellSizePx = 30;
+
+    document.documentElement.style.setProperty('--cell-size', `${cellSizePx}px`);
+
+    this.renderGrid(this.crosswordGrid, grid, false, true);
+    this.renderGrid(this.solutionGrid, grid, true, false);
+
+    this.renderClues(this.acrossCluesList, acrossClues);
+    this.renderClues(this.downCluesList, downClues);
+    this.renderSolutionWordsSummary(allWords);
+    
+    // Stats Update (YEN-5)
+    let filledCells = 0;
+    let longestWord = '';
+    for(let r=0; r<rows; r++) {
+      for(let c=0; c<cols; c++) {
+        if(!grid[r][c].isBlocked) filledCells++;
+      }
+    }
+    allWords.forEach(w => {
+      if(w.word.length > longestWord.length) longestWord = w.word;
+    });
+    
+    const density = Math.round((filledCells / (rows * cols)) * 100);
+    this.statsWords.textContent = `Words: ${allWords.length} placed`;
+    this.statsGrid.textContent = `Grid: ${rows}x${cols}`;
+    this.statsDensity.textContent = `Density: ${density}%`;
+    this.statsIntersections.textContent = `Intersections: ${intersections}`;
+    this.statsLongest.textContent = `Longest: ${longestWord}`;
+  }
+
+  renderGrid(container, grid, isSolution, animate) {
+    container.innerHTML = '';
+    const rows = grid.length;
+    const cols = grid[0].length;
+    container.style.gridTemplateRows = `repeat(${rows}, var(--cell-size))`;
+    container.style.gridTemplateColumns = `repeat(${cols}, var(--cell-size))`;
+
+    for (let r = 0; r < rows; r++) {
+      for (let c = 0; c < cols; c++) {
+        const cellData = grid[r][c];
+        const cellDiv = document.createElement('div');
+        cellDiv.className = 'cell';
+        
+        if (animate) {
+          cellDiv.classList.add('animate-in');
+          cellDiv.style.animationDelay = `${(r * cols + c) * 12}ms`;
+        }
+
+        if (cellData.isBlocked) {
+          cellDiv.classList.add('blocked');
+        } else {
+          if (cellData.number) {
+            const numSpan = document.createElement('span');
+            numSpan.className = 'cell-num';
+            numSpan.textContent = cellData.number;
+            cellDiv.appendChild(numSpan);
+          }
+          if (isSolution && cellData.letter) {
+            cellDiv.classList.add('solution-cell');
+            const letterSpan = document.createElement('span');
+            letterSpan.textContent = cellData.letter;
+            cellDiv.appendChild(letterSpan);
+          }
+        }
+        container.appendChild(cellDiv);
+      }
+    }
+  }
+
+  renderClues(container, clueList) {
+    container.innerHTML = '';
+    if (clueList.length === 0) {
+      const li = document.createElement('li');
+      li.className = 'clue-item';
+      li.textContent = 'None';
+      container.appendChild(li);
+      return;
+    }
+    clueList.forEach(item => {
+      const li = document.createElement('li');
+      li.className = 'clue-item';
+      li.innerHTML = `<strong>${item.number}.</strong> <span>${item.clue}</span> <span class="clue-word-len">(${item.word.length})</span>`;
+      container.appendChild(li);
+    });
+  }
+
+  renderSolutionWordsSummary(words) {
+    this.solutionWordsSummary.innerHTML = '';
+    words.forEach(item => {
+      const div = document.createElement('div');
+      div.className = 'solution-item';
+      div.innerHTML = `<span class="num">${item.number} ${item.direction === 'across' ? 'A' : 'D'}</span> <span class="word">${item.word}</span> <span class="clue-word-len">(${item.word.length} letters)</span>`;
+      this.solutionWordsSummary.appendChild(div);
+    });
+  }
+
+  showToast(msg) {
+    const toast = document.createElement('div');
+    toast.className = 'toast show';
+    toast.textContent = msg;
+    document.body.appendChild(toast);
+    setTimeout(() => {
+      toast.classList.remove('show');
+      setTimeout(() => toast.remove(), 300);
+    }, 3000);
+  }
+
+  batchPrint(count) {
+    const container = document.getElementById('batch-container');
+    container.innerHTML = '';
+    document.body.classList.add('batch-print-active');
+    
+    const bank = this.getFilteredWords();
+    const targetCount = this.targetCounts[this.currentDifficulty];
+    const generatedPuzzles = [];
+    
+    // Generate puzzles
+    for(let i=0; i<count; i++) {
+      const rng = new SeededRandom(Math.floor(Math.random() * 2147483647));
+      const generator = new CrosswordGenerator(bank, targetCount, rng);
+      generatedPuzzles.push(generator.generate());
+    }
+    
+    // Render puzzles
+    generatedPuzzles.forEach((puzzle, idx) => {
+      const sheet = this.puzzleSheet.cloneNode(true);
+      sheet.id = '';
+      sheet.querySelector('#puzzle-id').textContent = `Batch #${idx+1}`;
+      
+      const pGrid = sheet.querySelector('#crossword-grid');
+      this.renderGrid(pGrid, puzzle.grid, false, false);
+      
+      const acList = sheet.querySelector('#across-clues');
+      const dnList = sheet.querySelector('#down-clues');
+      this.renderClues(acList, puzzle.acrossClues);
+      this.renderClues(dnList, puzzle.downClues);
+      
+      sheet.querySelector('.page-count-display').textContent = `${count*2}`;
+      // Footer text modification
+      const footer = sheet.querySelector('.sheet-footer');
+      footer.innerHTML = `<span>Page ${idx+1} of ${count*2} (Puzzles)</span>`;
+      
+      container.appendChild(sheet);
+    });
+    
+    // Render solutions
+    generatedPuzzles.forEach((puzzle, idx) => {
+      const sheet = this.solutionSheet.cloneNode(true);
+      sheet.id = '';
+      sheet.classList.add('visible');
+      sheet.querySelector('#solution-puzzle-id').textContent = `Batch #${idx+1}`;
+      
+      const sGrid = sheet.querySelector('#solution-grid');
+      this.renderGrid(sGrid, puzzle.grid, true, false);
+      
+      const sSummary = sheet.querySelector('#solution-words-summary');
+      sSummary.innerHTML = '';
+      puzzle.allWords.forEach(item => {
+        const div = document.createElement('div');
+        div.className = 'solution-item';
+        div.innerHTML = `<span class="num">${item.number} ${item.direction === 'across' ? 'A' : 'D'}</span> <span class="word">${item.word}</span>`;
+        sSummary.appendChild(div);
+      });
+      
+      const footer = sheet.querySelector('.sheet-footer');
+      footer.innerHTML = `<span>Page ${count + idx + 1} of ${count*2} (Solutions)</span>`;
+      
+      container.appendChild(sheet);
+    });
+
+    const onAfterPrint = () => {
+      document.body.classList.remove('batch-print-active');
+      container.innerHTML = '';
+      window.removeEventListener('afterprint', onAfterPrint);
+    };
+    window.addEventListener('afterprint', onAfterPrint);
+    
+    setTimeout(() => {
+      window.print();
+    }, 100);
+  }
+
+  exportPdf() {
+    if (!window.jspdf) {
+      const script = document.createElement('script');
+      script.src = 'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.2/jspdf.umd.min.js';
+      script.onload = () => this._generatePdf();
+      script.onerror = () => {
+        this.showToast('PDF export requires internet. Use Print button and select "Save as PDF" instead.');
+      };
+      document.head.appendChild(script);
+    } else {
+      this._generatePdf();
+    }
+  }
+
+  _generatePdf() {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+    
+    const puzzle = this.currentPuzzle;
+    if(!puzzle) return;
+
+    const renderPage = (isSol) => {
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(22);
+      doc.text(isSol ? "Answer Key" : "English Crossword", 15, 25);
+      
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(10);
+      doc.text(`ID: ${this.puzzleIdDisplay.textContent}`, 195, 20, { align: 'right' });
+      doc.text(`Difficulty: ${this.currentDifficulty}`, 195, 25, { align: 'right' });
+
+      // Grid
+      const cellW = 8;
+      const gridW = puzzle.cols * cellW;
+      const startX = (210 - gridW) / 2;
+      const startY = 35;
+
+      doc.setLineWidth(0.5);
+      
+      for(let r=0; r<puzzle.rows; r++) {
+        for(let c=0; c<puzzle.cols; c++) {
+          const cell = puzzle.grid[r][c];
+          const x = startX + c*cellW;
+          const y = startY + r*cellW;
+          
+          if(cell.isBlocked) {
+            doc.setFillColor(0, 0, 0);
+            doc.rect(x, y, cellW, cellW, "F");
+          } else {
+            doc.setFillColor(255, 255, 255);
+            doc.rect(x, y, cellW, cellW, "FD");
+            if(cell.number) {
+              doc.setFontSize(6);
+              doc.text(cell.number.toString(), x + 1, y + 2.5);
+            }
+            if(isSol && cell.letter) {
+              doc.setFontSize(12);
+              doc.text(cell.letter, x + cellW/2, y + cellW/2 + 1.5, { align: 'center' });
+            }
+          }
+        }
+      }
+
+      // Clues
+      let currentY = startY + puzzle.rows * cellW + 15;
+      doc.setFontSize(12);
+      doc.setFont("helvetica", "bold");
+      doc.text("Across", 15, currentY);
+      doc.text("Down", 110, currentY);
+      
+      currentY += 6;
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(9);
+      
+      const startYClues = currentY;
+      let yA = currentY;
+      puzzle.acrossClues.forEach(clue => {
+        const text = `${clue.number}. ${clue.clue} (${clue.word.length})`;
+        const lines = doc.splitTextToSize(text, 90);
+        doc.text(lines, 15, yA);
+        yA += lines.length * 4.5;
+      });
+      
+      let yD = startYClues;
+      puzzle.downClues.forEach(clue => {
+        const text = `${clue.number}. ${clue.clue} (${clue.word.length})`;
+        const lines = doc.splitTextToSize(text, 90);
+        doc.text(lines, 110, yD);
+        yD += lines.length * 4.5;
+      });
+    };
+
+    renderPage(false);
+    
+    if (this.isSolutionVisible) {
+      doc.addPage();
+      renderPage(true);
+    }
+
+    doc.save(`crossword-${this.puzzleIdDisplay.textContent.replace('#', '')}.pdf`);
+  }
+}
+
+window.addEventListener('DOMContentLoaded', () => {
+  new CrosswordApp();
+});
   </script>
 </body>
 </html>
