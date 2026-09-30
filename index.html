@@ -755,7 +755,7 @@ const RAW_WORD_BANK = [
   { word: "CAMERA", clue: "Device for capturing photographs and recording videos", cat: "technology" },
   { word: "BATTERY", clue: "Container storing chemical energy converted into electricity", cat: "technology" },
   { word: "COMPASS", clue: "Navigational instrument with magnetic needle pointing North", cat: "technology" },
-  { word: "TELESCOPE", clue: "Optical instrument designed to view distant celestial stars", cat: "technology" }, // DUPLICATE 1 (will be removed by code)
+  { word: "TELESCOPE", clue: "Optical instrument designed to view distant celestial stars", cat: "technology" },
   { word: "MICROSCOPE", clue: "Laboratory optical device used to inspect tiny specimens", cat: "technology" },
   { word: "SATELLITE", clue: "Artificial body placed in orbit around Earth for communications", cat: "technology" },
   { word: "GUITAR", clue: "Stringed musical instrument played with fingers or plectrum", cat: "technology" },
@@ -784,7 +784,7 @@ const RAW_WORD_BANK = [
   { word: "ENGINEER", clue: "Person who designs, builds, and maintains engines or machines", cat: "body" },
   { word: "TEACHER", clue: "Educator instructing students in school or university", cat: "body" },
   // Descriptive & General Words (general)
-  { word: "TREASURE", clue: "Quantity of precious metals, gems, or valuable objects", cat: "general" }, // DUPLICATE 3
+  { word: "TREASURE", clue: "Quantity of precious metals, gems, or valuable objects", cat: "general" },
   { word: "CASTLE", clue: "Fortified medieval residence built for royalty or nobility", cat: "general" },
   { word: "JOURNEY", clue: "Act of traveling from one location to another", cat: "general" },
   { word: "MYSTERY", clue: "Something difficult or impossible to understand or explain", cat: "general" },
@@ -1315,9 +1315,41 @@ class CrosswordApp {
       const cats = Array.from(this.selectedCategories).join(',');
       const url = new URL(window.location.href);
       url.hash = `#seed=${this.currentSeed}&diff=${this.currentDifficulty}&cats=${cats}`;
-      navigator.clipboard.writeText(url.href).then(() => {
-        this.showToast('🔗 Link copied!');
-      });
+      const shareUrl = url.href;
+
+      const copyFallback = (text) => {
+        try {
+          const textArea = document.createElement('textarea');
+          textArea.value = text;
+          textArea.style.position = 'fixed';
+          textArea.style.left = '-9999px';
+          textArea.style.top = '0';
+          document.body.appendChild(textArea);
+          textArea.focus();
+          textArea.select();
+          const successful = document.execCommand('copy');
+          document.body.removeChild(textArea);
+          if (successful) {
+            this.showToast('🔗 Link copied!');
+          } else {
+            prompt('Copy this puzzle link:', text);
+          }
+        } catch (err) {
+          prompt('Copy this puzzle link:', text);
+        }
+      };
+
+      if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(shareUrl)
+          .then(() => {
+            this.showToast('🔗 Link copied!');
+          })
+          .catch(() => {
+            copyFallback(shareUrl);
+          });
+      } else {
+        copyFallback(shareUrl);
+      }
     });
 
     // PDF
@@ -1447,7 +1479,7 @@ class CrosswordApp {
       
       if(forceSeed !== null) {
         // clear hash so normal generation works next
-        history.replaceState(null, null, ' ');
+        history.replaceState(null, null, window.location.pathname + window.location.search);
       }
     }, 50);
   }
