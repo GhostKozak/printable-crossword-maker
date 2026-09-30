@@ -162,6 +162,11 @@
       border-color: #ef4444;
       color: #b91c1c;
     }
+    [data-theme="dark"] .btn-outline.active {
+      background: #450a0a;
+      border-color: #f87171;
+      color: #fca5a5;
+    }
 
     .dropdown-container {
       position: relative;
@@ -1425,7 +1430,8 @@ class CrosswordApp {
         const diffScore = (avgLen * 0.5) + (rarePoints * 1.5) + (numWords * 0.3) - (intersections * 0.2);
         const score = Math.max(1, Math.min(10, Math.round(diffScore)));
         const stars = score <= 3 ? '⭐ Easy' : (score <= 6 ? '⭐⭐ Medium' : '⭐⭐⭐ Hard');
-        scoreLabel = `${stars} (${score}/10)`;
+        const diffTitle = this.currentDifficulty.charAt(0).toUpperCase() + this.currentDifficulty.slice(1);
+        scoreLabel = `${diffTitle} — ${stars} (${score}/10)`;
       }
 
       this.puzzleIdDisplay.textContent = puzzleId;
