@@ -1,0 +1,77 @@
+@media print {
+      @page {
+        size: A4 portrait;
+        margin: 10mm 12mm;
+      }
+      body {
+        background: #ffffff !important;
+        padding: 0 !important;
+        margin: 0 !important;
+      }
+      .no-print, .controls-panel, .screen-tip, .stats-bar {
+        display: none !important;
+      }
+      
+      .printable-sheet {
+        box-shadow: none !important;
+        width: 100% !important;
+        min-height: auto !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        page-break-after: always;
+        background: #ffffff !important;
+        color: #000000 !important;
+      }
+      
+      .sheet-header, .clue-header { border-bottom-color: #000000 !important; color: #000000 !important; }
+      .sheet-title, .meta-box strong, .clue-item strong { color: #000000 !important; }
+      .sheet-subtitle, .meta-box, .clue-item, .clue-word-len, .sheet-footer { color: #333333 !important; }
+      
+      .grid-wrapper {
+        max-width: 178mm;
+        margin-left: auto;
+        margin-right: auto;
+      }
+      .crossword-board {
+        border-color: #000000 !important;
+        background-color: #000000 !important;
+      }
+
+      /* Batch print logic */
+      body.batch-print-active #puzzle-sheet,
+      body.batch-print-active #solution-sheet {
+        display: none !important;
+      }
+      body.batch-print-active #batch-container {
+        display: block !important;
+      }
+      #batch-container .printable-sheet {
+        display: flex !important;
+      }
+
+      /* Normal print logic */
+      body:not(.batch-print-active) #solution-sheet.visible {
+        display: flex !important;
+        page-break-before: always;
+      }
+      body:not(.batch-print-active) #solution-sheet:not(.visible) {
+        display: none !important;
+      }
+
+      .cell {
+        background-color: #ffffff !important;
+        color: #000000 !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+      }
+      .cell.blocked {
+        background-color: #000000 !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+      }
+      .cell-num { color: #000000 !important; }
+      .cell.solution-cell {
+        color: #000000 !important;
+        background-color: #ffffff !important;
+      }
+    }
