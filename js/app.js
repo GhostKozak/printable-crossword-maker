@@ -12,6 +12,8 @@ export class CrosswordApp {
     this.currentPuzzle = null;
     this.currentCengelPuzzles = [];
     this.isSolutionVisible = false;
+    this.isHintsActive = false;
+    this.focusedCell = null; // { mode: 'cengel'|'classic', pIdx: 0, r: 0, c: 0, dir: 'across'|'down' }
     this.targetCounts = { easy: 14, medium: 21, hard: 30 };
     this.categories = ['animals', 'science', 'geography', 'food', 'technology', 'body', 'general', 'sports', 'household', 'weather', 'vehicles', 'culture', 'emotions'];
     this.categoryMeta = {
@@ -51,6 +53,8 @@ export class CrosswordApp {
     this.langButtons = document.querySelectorAll('.lang-btn');
     this.btnGenerate = document.getElementById('btn-generate');
     this.btnToggleSolution = document.getElementById('btn-toggle-solution');
+    this.btnHint = document.getElementById('btn-hint');
+    this.btnCheck = document.getElementById('btn-check');
     this.btnPrint = document.getElementById('btn-print');
     
     this.puzzleSheet = document.getElementById('puzzle-sheet');
@@ -187,6 +191,23 @@ export class CrosswordApp {
       this.toggleSolution();
     });
 
+    if (this.btnHint) {
+      this.btnHint.addEventListener('click', () => {
+        this.toggleHints();
+      });
+    }
+
+    if (this.btnCheck) {
+      this.btnCheck.addEventListener('click', () => {
+        this.checkAnswers();
+      });
+    }
+
+    // Interactive Keyboard Play Listener (YEN-1)
+    document.addEventListener('keydown', (e) => {
+      this.handleKeyDown(e);
+    });
+
     this.btnPrint.addEventListener('click', () => {
       window.print();
     });
@@ -282,10 +303,33 @@ export class CrosswordApp {
   }
 
   updatePuzzleLanguage() {
+    // BUG-4 Fix: Update clues in-place without regenerating or resetting user progress
     if (this.puzzleType === 'cengel') {
-      if (this.currentSeed) {
-        this.generateNewPuzzle(this.currentSeed);
-      }
+      if (!this.currentCengelPuzzles || this.currentCengelPuzzles.length === 0) return;
+      const rng = new SeededRandom((this.currentSeed || 12345) + 77);
+      const randFn = () => rng.next();
+
+      this.currentCengelPuzzles.forEach(puzzle => {
+        for (let r = 0; r < puzzle.rows; r++) {
+          for (let c = 0; c < puzzle.cols; c++) {
+            const cell = puzzle.grid[r][c];
+            if (cell.type === 'clue') {
+              const isDual = !!(cell.acrossWord && cell.downWord);
+              if (cell.acrossWord && cell.acrossWord.clues) {
+                cell.acrossWord.clue = CengelGenerator.pickBestClue(cell.acrossWord.clues, this.clueLang, randFn, isDual);
+              }
+              if (cell.downWord && cell.downWord.clues) {
+                cell.downWord.clue = CengelGenerator.pickBestClue(cell.downWord.clues, this.clueLang, randFn, isDual);
+              }
+            }
+          }
+        }
+        if (puzzle.secretWord && puzzle.secretWord.clues) {
+          puzzle.secretWord.clue = CengelGenerator.pickBestClue(puzzle.secretWord.clues, this.clueLang, randFn, false);
+        }
+      });
+
+      this.renderCengelView();
       this.showToast(`Dil değiştirildi: ${this.clueLang === 'tr' ? 'Türkçe' : (this.clueLang === 'en' ? 'English' : 'Karışık')}`);
       return;
     }
@@ -397,11 +441,20 @@ export class CrosswordApp {
     this.btnGenerate.innerHTML = '⏳ Generating...';
     this.btnGenerate.disabled = true;
 
+    this.isHintsActive = false;
+    this.focusedCell = null;
+    if (this.btnHint) {
+      this.btnHint.classList.remove('active');
+      this.btnHint.innerHTML = '💡 İpucu Harf';
+    }
+
     setTimeout(() => {
       const bank = this.getFilteredWords();
       this.currentSeed = forceSeed !== null ? forceSeed : Math.floor(Math.random() * 2147483647);
       const today = new Date().toLocaleDateString('tr-TR', { year: 'numeric', month: 'short', day: 'numeric' });
       this.puzzleDateDisplay.textContent = today;
+
+      const titleEl = document.querySelector('.sheet-title');
 
       if (this.puzzleType === 'cengel') {
         this.cengelView.style.display = 'flex';
@@ -414,7 +467,7 @@ export class CrosswordApp {
         if (this.cengelLayout === 'single') {
           if (this.currentDifficulty === 'easy') { rows = 14; cols = 11; }
           else if (this.currentDifficulty === 'medium') { rows = 16; cols = 12; }
-          else { rows = 19; cols = 13; }
+          else { rows = 18; cols = 13; }
         } else {
           // Dual mode (2 puzzles stacked)
           if (this.currentDifficulty === 'easy') { rows = 11; cols = 11; }
@@ -422,7 +475,6 @@ export class CrosswordApp {
           else { rows = 14; cols = 12; }
         }
 
-        const titleEl = document.querySelector('.sheet-title');
         if (titleEl && (titleEl.textContent === 'English Crossword' || titleEl.textContent === 'Çengel Bulmaca')) {
           titleEl.textContent = 'Çengel Bulmaca';
         }
@@ -471,6 +523,11 @@ export class CrosswordApp {
         this.solutionCengelView.style.display = 'none';
         if (this.solutionClassicView) this.solutionClassicView.style.display = 'block';
 
+        // BUG-5 Fix: Restore sheet title when switching back to Classic mode
+        if (titleEl && titleEl.textContent === 'Çengel Bulmaca') {
+          titleEl.textContent = 'English Crossword';
+        }
+
         const targetCount = this.targetCounts[this.currentDifficulty];
         const rng = new SeededRandom(this.currentSeed);
         const generator = new CrosswordGenerator(bank, targetCount, rng, this.clueLang);
@@ -489,10 +546,6 @@ export class CrosswordApp {
 
       this.btnGenerate.innerHTML = originalText;
       this.btnGenerate.disabled = false;
-
-      if (forceSeed !== null) {
-        history.replaceState(null, null, window.location.pathname + window.location.search);
-      }
     }, 50);
   }
 
@@ -511,7 +564,7 @@ export class CrosswordApp {
       cellSize = '36px';
     } else {
       const p = this.currentCengelPuzzles[0];
-      if (p.rows >= 19) cellSize = '46px';
+      if (p.rows >= 18) cellSize = '46px';
       else if (p.rows >= 16) cellSize = '50px';
       else cellSize = '54px';
     }
@@ -529,26 +582,29 @@ export class CrosswordApp {
       }
 
       // Puzzle view (unsolved)
-      const block1 = this.createCengelDOMBlock(puzzle, false);
+      const block1 = this.createCengelDOMBlock(puzzle, false, idx);
       this.cengelView.appendChild(block1);
 
       // Solution view (solved)
-      const block2 = this.createCengelDOMBlock(puzzle, true);
+      const block2 = this.createCengelDOMBlock(puzzle, true, idx);
       this.solutionCengelView.appendChild(block2);
     });
 
-    // Update Stats bar
+    // Update Stats bar (BUG-5 Fix: real computed active density)
     const totalWords = this.currentCengelPuzzles.reduce((sum, p) => sum + p.words.length, 0);
     const totalIntersections = this.currentCengelPuzzles.reduce((sum, p) => sum + p.intersections, 0);
+    const avgDensity = Math.round(
+      this.currentCengelPuzzles.reduce((sum, p) => sum + (p.density || 0), 0) / this.currentCengelPuzzles.length
+    );
     const p0 = this.currentCengelPuzzles[0];
 
     this.statsWords.textContent = `Words: ${totalWords} placed`;
     this.statsGrid.textContent = isDual ? `Grid: 2x (${p0.rows}x${p0.cols})` : `Grid: ${p0.rows}x${p0.cols}`;
-    this.statsDensity.textContent = 'Density: 100% (Sıfır Boşluk)';
+    this.statsDensity.textContent = `Density: ${avgDensity}% (Aktif Alan)`;
     this.statsIntersections.textContent = `Intersections: ${totalIntersections}`;
   }
 
-  createCengelDOMBlock(puzzle, isSolution) {
+  createCengelDOMBlock(puzzle, isSolution, pIdx = 0) {
     const block = document.createElement('div');
     block.className = 'cengel-puzzle-block';
 
@@ -569,39 +625,86 @@ export class CrosswordApp {
           cellDiv.className = 'cengel-cell blocked';
         } else if (cell.type === 'letter') {
           cellDiv.className = 'cengel-cell letter-cell';
+          cellDiv.dataset.pidx = pIdx;
+          cellDiv.dataset.r = r;
+          cellDiv.dataset.c = c;
+
+          // YEN-2: Secret Keyword Number Badge
+          if (cell.secretIndex && this.cengelLayout === 'single') {
+            const badge = document.createElement('span');
+            badge.className = 'secret-index-badge';
+            badge.textContent = cell.secretIndex;
+            cellDiv.appendChild(badge);
+          }
+
           const span = document.createElement('span');
           span.className = 'letter-char';
           span.textContent = cell.char;
+
           if (isSolution) {
             span.style.display = 'block';
+            cellDiv.appendChild(span);
+          } else {
+            if (cell.isHint) {
+              cellDiv.classList.add('hint-cell');
+              span.style.display = 'block';
+              cellDiv.appendChild(span);
+            } else {
+              cellDiv.appendChild(span);
+              if (cell.userChar) {
+                cellDiv.classList.add('user-filled');
+                const uSpan = document.createElement('span');
+                uSpan.className = 'user-char';
+                uSpan.textContent = cell.userChar;
+                cellDiv.appendChild(uSpan);
+              }
+            }
+
+            if (
+              this.focusedCell &&
+              this.focusedCell.mode === 'cengel' &&
+              this.focusedCell.pIdx === pIdx &&
+              this.focusedCell.r === r &&
+              this.focusedCell.c === c
+            ) {
+              cellDiv.classList.add('focused-cell');
+            }
+
+            cellDiv.addEventListener('click', (e) => {
+              e.stopPropagation();
+              this.focusCengelCell(pIdx, r, c);
+            });
           }
-          cellDiv.appendChild(span);
         } else {
-          // Clue Cell
+          // Clue Cell (EKS-1 & EKS-2)
           cellDiv.className = 'cengel-cell clue-cell';
           if (cell.acrossWord && cell.downWord) {
             cellDiv.classList.add('dual-clue');
+            const acLong = cell.acrossWord.clue.length > 14 ? ' long-clue' : '';
+            const dnLong = cell.downWord.clue.length > 14 ? ' long-clue' : '';
             cellDiv.innerHTML = `
               <div class="clue-sub">
-                <span class="clue-text">${cell.acrossWord.clue}</span>
+                <span class="clue-text${acLong}">${cell.acrossWord.clue}</span>
                 <span class="clue-arrow arrow-right">→</span>
               </div>
               <div class="clue-sub">
-                <span class="clue-text">${cell.downWord.clue}</span>
+                <span class="clue-text${dnLong}">${cell.downWord.clue}</span>
                 <span class="clue-arrow arrow-down">↓</span>
               </div>
             `;
           } else if (cell.acrossWord) {
+            const acLong = cell.acrossWord.clue.length > 18 ? ' long-clue' : '';
             cellDiv.innerHTML = `
               <div class="clue-sub">
-                <span class="clue-text">${cell.acrossWord.clue}</span>
+                <span class="clue-text${acLong}">${cell.acrossWord.clue}</span>
                 <span class="clue-arrow arrow-right">→</span>
               </div>
             `;
           } else if (cell.downWord) {
+            const dnLong = cell.downWord.clue.length > 18 ? ' long-clue' : '';
             cellDiv.innerHTML = `
               <div class="clue-sub">
-                <span class="clue-text">${cell.downWord.clue}</span>
+                <span class="clue-text${dnLong}">${cell.downWord.clue}</span>
                 <span class="clue-arrow arrow-down">↓</span>
               </div>
             `;
@@ -615,7 +718,335 @@ export class CrosswordApp {
     }
 
     block.appendChild(board);
+
+    // YEN-2: Secret Keyword Bar below single-layout Çengel puzzle
+    if (puzzle.secretWord && this.cengelLayout === 'single') {
+      const secretBar = document.createElement('div');
+      secretBar.className = 'cengel-secret-bar';
+
+      const infoDiv = document.createElement('div');
+      infoDiv.className = 'secret-bar-info';
+      infoDiv.innerHTML = `
+        <span class="secret-bar-label">🔐 ŞİFRELİ KELİME</span>
+        <span class="secret-bar-clue">${puzzle.secretWord.clue}</span>
+      `;
+
+      const boxesDiv = document.createElement('div');
+      boxesDiv.className = 'secret-bar-boxes';
+
+      puzzle.secretWord.positions.forEach(pos => {
+        const box = document.createElement('div');
+        box.className = 'secret-box';
+        if (!isSolution) {
+          box.dataset.secretIdx = pos.index;
+        }
+
+        const numSpan = document.createElement('span');
+        numSpan.className = 'secret-box-num';
+        numSpan.textContent = pos.index;
+        box.appendChild(numSpan);
+
+        const charSpan = document.createElement('span');
+        charSpan.className = 'secret-box-char';
+        const gridCell = puzzle.grid[pos.r][pos.c];
+        if (isSolution) {
+          charSpan.textContent = pos.char;
+        } else if (gridCell.isHint) {
+          charSpan.textContent = gridCell.char;
+        } else if (gridCell.userChar) {
+          charSpan.textContent = gridCell.userChar;
+        }
+        box.appendChild(charSpan);
+
+        boxesDiv.appendChild(box);
+      });
+
+      secretBar.appendChild(infoDiv);
+      secretBar.appendChild(boxesDiv);
+      block.appendChild(secretBar);
+    }
+
     return block;
+  }
+
+  // YEN-3: Toggle Starter Hint Letters (~15% of letter cells)
+  toggleHints() {
+    this.isHintsActive = !this.isHintsActive;
+    if (this.btnHint) {
+      this.btnHint.classList.toggle('active', this.isHintsActive);
+      this.btnHint.innerHTML = this.isHintsActive ? '💡 İpuçlarını Gizle' : '💡 İpucu Harf';
+    }
+
+    const rng = new SeededRandom((this.currentSeed || 12345) + 333);
+
+    if (this.puzzleType === 'cengel') {
+      this.currentCengelPuzzles.forEach(puzzle => {
+        for (let r = 0; r < puzzle.rows; r++) {
+          for (let c = 0; c < puzzle.cols; c++) {
+            const cell = puzzle.grid[r][c];
+            if (cell.type === 'letter') {
+              if (this.isHintsActive) {
+                cell.isHint = rng.next() < 0.16;
+              } else {
+                cell.isHint = false;
+              }
+            }
+          }
+        }
+      });
+      this.renderCengelView();
+    } else if (this.currentPuzzle) {
+      const { rows, cols, grid } = this.currentPuzzle;
+      for (let r = 0; r < rows; r++) {
+        for (let c = 0; c < cols; c++) {
+          const cell = grid[r][c];
+          if (!cell.isBlocked) {
+            cell.isHint = this.isHintsActive ? (rng.next() < 0.16) : false;
+          }
+        }
+      }
+      this.renderGrid(this.crosswordGrid, grid, false, false);
+    }
+
+    this.showToast(
+      this.isHintsActive
+        ? '💡 Başlangıç ipucu harfleri tabloya yerleştirildi!'
+        : '💡 İpucu harfler gizlendi.'
+    );
+  }
+
+  // YEN-1: Validate User-Entered Letters
+  checkAnswers() {
+    let correctCount = 0;
+    let wrongCount = 0;
+    let emptyCount = 0;
+
+    if (this.puzzleType === 'cengel') {
+      const cells = this.cengelView.querySelectorAll('.cengel-cell.letter-cell');
+      cells.forEach(cellDiv => {
+        cellDiv.classList.remove('cell-correct', 'cell-wrong');
+        const pIdx = parseInt(cellDiv.dataset.pidx || '0');
+        const r = parseInt(cellDiv.dataset.r);
+        const c = parseInt(cellDiv.dataset.c);
+        const cell = this.currentCengelPuzzles[pIdx]?.grid[r]?.[c];
+        if (!cell || cell.isHint) return;
+
+        if (cell.userChar) {
+          if (cell.userChar.toUpperCase() === cell.char.toUpperCase()) {
+            cellDiv.classList.add('cell-correct');
+            correctCount++;
+          } else {
+            cellDiv.classList.add('cell-wrong');
+            wrongCount++;
+          }
+        } else {
+          emptyCount++;
+        }
+      });
+    } else if (this.currentPuzzle) {
+      const cells = this.crosswordGrid.querySelectorAll('.cell:not(.blocked)');
+      cells.forEach(cellDiv => {
+        cellDiv.classList.remove('cell-correct', 'cell-wrong');
+        const r = parseInt(cellDiv.dataset.r);
+        const c = parseInt(cellDiv.dataset.c);
+        const cell = this.currentPuzzle.grid[r]?.[c];
+        if (!cell || cell.isHint) return;
+
+        if (cell.userChar) {
+          if (cell.userChar.toUpperCase() === cell.letter.toUpperCase()) {
+            cellDiv.classList.add('cell-correct');
+            correctCount++;
+          } else {
+            cellDiv.classList.add('cell-wrong');
+            wrongCount++;
+          }
+        } else {
+          emptyCount++;
+        }
+      });
+    }
+
+    if (correctCount === 0 && wrongCount === 0) {
+      this.showToast('✏️ Kontrol etmek için önce bir kutuya tıklayıp klavyeyle harf girin.');
+    } else if (wrongCount === 0 && emptyCount === 0) {
+      this.showToast(`🎉 Tebrikler! Tüm bulmacayı (${correctCount} harf) hatasız çözdünüz!`);
+    } else {
+      this.showToast(`✅ ${correctCount} doğru, ❌ ${wrongCount} hatalı harf (${emptyCount} boş kutu kaldı)`);
+    }
+  }
+
+  focusCengelCell(pIdx, r, c) {
+    let dir = 'across';
+    if (
+      this.focusedCell &&
+      this.focusedCell.mode === 'cengel' &&
+      this.focusedCell.pIdx === pIdx &&
+      this.focusedCell.r === r &&
+      this.focusedCell.c === c
+    ) {
+      // Clicking the same cell toggles direction
+      dir = this.focusedCell.dir === 'across' ? 'down' : 'across';
+    } else if (this.focusedCell && this.focusedCell.mode === 'cengel') {
+      dir = this.focusedCell.dir;
+    }
+
+    this.focusedCell = { mode: 'cengel', pIdx, r, c, dir };
+    this.cengelView.querySelectorAll('.cengel-cell.focused-cell').forEach(el => el.classList.remove('focused-cell'));
+    const target = this.cengelView.querySelector(`.cengel-cell.letter-cell[data-pidx="${pIdx}"][data-r="${r}"][data-c="${c}"]`);
+    if (target) target.classList.add('focused-cell');
+  }
+
+  focusClassicCell(r, c) {
+    let dir = 'across';
+    if (
+      this.focusedCell &&
+      this.focusedCell.mode === 'classic' &&
+      this.focusedCell.r === r &&
+      this.focusedCell.c === c
+    ) {
+      dir = this.focusedCell.dir === 'across' ? 'down' : 'across';
+    } else if (this.focusedCell && this.focusedCell.mode === 'classic') {
+      dir = this.focusedCell.dir;
+    }
+
+    this.focusedCell = { mode: 'classic', pIdx: 0, r, c, dir };
+    this.crosswordGrid.querySelectorAll('.cell.focused-cell').forEach(el => el.classList.remove('focused-cell'));
+    const target = this.crosswordGrid.querySelector(`.cell[data-r="${r}"][data-c="${c}"]`);
+    if (target) target.classList.add('focused-cell');
+  }
+
+  handleKeyDown(e) {
+    if (!this.focusedCell) return;
+    // Ignore if user is editing a contenteditable header or input element
+    const activeEl = document.activeElement;
+    if (activeEl && (activeEl.isContentEditable || ['INPUT', 'TEXTAREA', 'SELECT'].includes(activeEl.tagName))) {
+      return;
+    }
+    if (e.ctrlKey || e.metaKey || e.altKey) return;
+
+    const { mode, pIdx, r, c, dir } = this.focusedCell;
+
+    if (e.key === ' ') {
+      e.preventDefault();
+      this.focusedCell.dir = dir === 'across' ? 'down' : 'across';
+      this.showToast(`Yazma yönü: ${this.focusedCell.dir === 'across' ? '→ Soldan Sağa' : '↓ Yukarıdan Aşağıya'}`);
+      return;
+    }
+
+    if (['ArrowRight', 'ArrowLeft', 'ArrowDown', 'ArrowUp'].includes(e.key)) {
+      e.preventDefault();
+      const dr = e.key === 'ArrowDown' ? 1 : (e.key === 'ArrowUp' ? -1 : 0);
+      const dc = e.key === 'ArrowRight' ? 1 : (e.key === 'ArrowLeft' ? -1 : 0);
+      this.moveFocusStep(dr, dc);
+      return;
+    }
+
+    if (e.key === 'Backspace' || e.key === 'Delete') {
+      e.preventDefault();
+      this.setFocusedCellChar('');
+      if (e.key === 'Backspace') {
+        const dr = dir === 'down' ? -1 : 0;
+        const dc = dir === 'across' ? -1 : 0;
+        this.moveFocusStep(dr, dc);
+      }
+      return;
+    }
+
+    if (/^[a-zA-Z]$/.test(e.key)) {
+      e.preventDefault();
+      const letter = e.key.toUpperCase();
+      this.setFocusedCellChar(letter);
+      const dr = dir === 'down' ? 1 : 0;
+      const dc = dir === 'across' ? 1 : 0;
+      this.moveFocusStep(dr, dc);
+    }
+  }
+
+  setFocusedCellChar(char) {
+    if (!this.focusedCell) return;
+    const { mode, pIdx, r, c } = this.focusedCell;
+
+    if (mode === 'cengel') {
+      const puzzle = this.currentCengelPuzzles[pIdx];
+      if (!puzzle) return;
+      const cell = puzzle.grid[r]?.[c];
+      if (!cell || cell.type !== 'letter' || cell.isHint) return;
+
+      cell.userChar = char;
+      const cellDiv = this.cengelView.querySelector(`.cengel-cell.letter-cell[data-pidx="${pIdx}"][data-r="${r}"][data-c="${c}"]`);
+      if (cellDiv) {
+        cellDiv.classList.remove('cell-correct', 'cell-wrong');
+        let uSpan = cellDiv.querySelector('.user-char');
+        if (char) {
+          cellDiv.classList.add('user-filled');
+          if (!uSpan) {
+            uSpan = document.createElement('span');
+            uSpan.className = 'user-char';
+            cellDiv.appendChild(uSpan);
+          }
+          uSpan.textContent = char;
+        } else {
+          cellDiv.classList.remove('user-filled');
+          if (uSpan) uSpan.remove();
+        }
+      }
+
+      // Sync with Secret Keyword Bar if this cell has a secretIndex
+      if (cell.secretIndex && this.cengelLayout === 'single') {
+        const secretBoxChar = this.cengelView.querySelector(`.secret-box[data-secret-idx="${cell.secretIndex}"] .secret-box-char`);
+        if (secretBoxChar) {
+          secretBoxChar.textContent = char;
+        }
+      }
+    } else if (mode === 'classic' && this.currentPuzzle) {
+      const cell = this.currentPuzzle.grid[r]?.[c];
+      if (!cell || cell.isBlocked || cell.isHint) return;
+
+      cell.userChar = char;
+      const cellDiv = this.crosswordGrid.querySelector(`.cell[data-r="${r}"][data-c="${c}"]`);
+      if (cellDiv) {
+        cellDiv.classList.remove('cell-correct', 'cell-wrong');
+        let uSpan = cellDiv.querySelector('.user-char');
+        if (char) {
+          cellDiv.classList.add('user-filled');
+          if (!uSpan) {
+            uSpan = document.createElement('span');
+            uSpan.className = 'user-char';
+            cellDiv.appendChild(uSpan);
+          }
+          uSpan.textContent = char;
+        } else {
+          cellDiv.classList.remove('user-filled');
+          if (uSpan) uSpan.remove();
+        }
+      }
+    }
+  }
+
+  moveFocusStep(dr, dc) {
+    if (!this.focusedCell) return;
+    const { mode, pIdx, r, c } = this.focusedCell;
+
+    if (mode === 'cengel') {
+      const puzzle = this.currentCengelPuzzles[pIdx];
+      if (!puzzle) return;
+      const nr = r + dr;
+      const nc = c + dc;
+      if (nr >= 0 && nr < puzzle.rows && nc >= 0 && nc < puzzle.cols) {
+        if (puzzle.grid[nr][nc].type === 'letter') {
+          this.focusCengelCell(pIdx, nr, nc);
+        }
+      }
+    } else if (mode === 'classic' && this.currentPuzzle) {
+      const { rows, cols, grid } = this.currentPuzzle;
+      const nr = r + dr;
+      const nc = c + dc;
+      if (nr >= 0 && nr < rows && nc >= 0 && nc < cols) {
+        if (!grid[nr][nc].isBlocked) {
+          this.focusClassicCell(nr, nc);
+        }
+      }
+    }
   }
 
   toggleSolution() {
@@ -689,6 +1120,8 @@ export class CrosswordApp {
         if (cellData.isBlocked) {
           cellDiv.classList.add('blocked');
         } else {
+          cellDiv.dataset.r = r;
+          cellDiv.dataset.c = c;
           if (cellData.number) {
             const numSpan = document.createElement('span');
             numSpan.className = 'cell-num';
@@ -700,6 +1133,23 @@ export class CrosswordApp {
             const letterSpan = document.createElement('span');
             letterSpan.textContent = cellData.letter;
             cellDiv.appendChild(letterSpan);
+          } else if (!isSolution) {
+            if (cellData.isHint && cellData.letter) {
+              cellDiv.classList.add('hint-cell');
+              const hintSpan = document.createElement('span');
+              hintSpan.textContent = cellData.letter;
+              cellDiv.appendChild(hintSpan);
+            } else if (cellData.userChar) {
+              cellDiv.classList.add('user-filled');
+              const uSpan = document.createElement('span');
+              uSpan.className = 'user-char';
+              uSpan.textContent = cellData.userChar;
+              cellDiv.appendChild(uSpan);
+            }
+            cellDiv.addEventListener('click', (e) => {
+              e.stopPropagation();
+              this.focusClassicCell(r, c);
+            });
           }
         }
         container.appendChild(cellDiv);
@@ -778,7 +1228,7 @@ export class CrosswordApp {
       if (this.cengelLayout === 'single') {
         if (this.currentDifficulty === 'easy') { rows = 14; cols = 11; }
         else if (this.currentDifficulty === 'medium') { rows = 16; cols = 12; }
-        else { rows = 19; cols = 13; }
+        else { rows = 18; cols = 13; }
       } else {
         if (this.currentDifficulty === 'easy') { rows = 11; cols = 11; }
         else if (this.currentDifficulty === 'medium') { rows = 13; cols = 11; }
@@ -810,7 +1260,9 @@ export class CrosswordApp {
         }
       }
 
-      // Render puzzle sheets
+      const isDualBatch = this.cengelLayout === 'dual';
+
+      // Render puzzle sheets (BUG-6 Fix: apply layout-single / layout-dual classes)
       batchPuzzlesList.forEach((puzzles, idx) => {
         const sheet = this.puzzleSheet.cloneNode(true);
         sheet.id = '';
@@ -821,6 +1273,8 @@ export class CrosswordApp {
 
         const cView = sheet.querySelector('#cengel-view');
         cView.style.display = 'flex';
+        cView.classList.toggle('layout-single', !isDualBatch);
+        cView.classList.toggle('layout-dual', isDualBatch);
         cView.innerHTML = '';
         puzzles.forEach((puz, pIdx) => {
           if (pIdx > 0) {
@@ -828,7 +1282,7 @@ export class CrosswordApp {
             div.className = 'cengel-dual-divider';
             cView.appendChild(div);
           }
-          cView.appendChild(this.createCengelDOMBlock(puz, false));
+          cView.appendChild(this.createCengelDOMBlock(puz, false, pIdx));
         });
 
         const footer = sheet.querySelector('.sheet-footer');
@@ -848,6 +1302,8 @@ export class CrosswordApp {
 
         const sView = sheet.querySelector('#solution-cengel-view');
         sView.style.display = 'flex';
+        sView.classList.toggle('layout-single', !isDualBatch);
+        sView.classList.toggle('layout-dual', isDualBatch);
         sView.innerHTML = '';
         puzzles.forEach((puz, pIdx) => {
           if (pIdx > 0) {
@@ -855,7 +1311,7 @@ export class CrosswordApp {
             div.className = 'cengel-dual-divider';
             sView.appendChild(div);
           }
-          sView.appendChild(this.createCengelDOMBlock(puz, true));
+          sView.appendChild(this.createCengelDOMBlock(puz, true, pIdx));
         });
 
         const footer = sheet.querySelector('.sheet-footer');

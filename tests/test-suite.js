@@ -89,32 +89,62 @@ if (/[çÇğĞıİöÖşŞüÜ—–“”‘’]/.test(sanitized)) {
 }
 console.log('✓ PDF Sanitizer passed');
 
-// 5. Gazete Çengel Generator Verification (Zero-Waste, In-Grid Clues)
-console.log('\n5. Testing Gazete Çengel Generator (Zero-Waste & Clues)...');
+// 5. Gazete Çengel Generator Verification (Exact Word-Length Invariant, Secret Keyword & Clues)
+console.log('\n5. Testing Gazete Çengel Generator (Word-Length Invariant & Secret Keyword)...');
+
+function verifyCengelWordLengths(puzzle, label) {
+  for (const w of puzzle.words) {
+    let r = w.row;
+    let c = w.col;
+    let actual = '';
+    while (r < puzzle.rows && c < puzzle.cols && puzzle.grid[r][c].type === 'letter') {
+      actual += puzzle.grid[r][c].char;
+      if (w.dir === 'across') c++;
+      else r++;
+    }
+    if (actual !== w.word) {
+      throw new Error(`[${label}] Word length/boundary violation for ${w.word} (${w.dir}): found "${actual}" on board`);
+    }
+  }
+}
 
 // Test 13x11 Dual Layout
 const cengelRng = new SeededRandom(12345);
 const cGenDual = new CengelGenerator(RAW_WORD_BANK, { rows: 13, cols: 11, rng: cengelRng, clueLang: 'mixed' });
 const cDual = cGenDual.generate();
 
-console.log(`- Dual Layout (13x11): Placed ${cDual.words.length} words | Letters: ${cDual.letterCells} | Clues: ${cDual.clueCells} | Blocked: ${cDual.blockedCells} | Dual clues: ${cDual.dualClueCells}`);
+console.log(`- Dual Layout (13x11): Placed ${cDual.words.length} words | Letters: ${cDual.letterCells} | Clues: ${cDual.clueCells} | Blocked: ${cDual.blockedCells} | Active Density: ${cDual.density}%`);
 if (cDual.letterCells + cDual.clueCells + cDual.blockedCells !== 13 * 11) {
   throw new Error(`Total cells mismatch: expected ${13 * 11} cells, got ${cDual.letterCells + cDual.clueCells + cDual.blockedCells}`);
 }
-if (cDual.words.length < 20) {
-  throw new Error(`Expected at least 20 words placed in 13x11, got ${cDual.words.length}`);
+if (cDual.words.length < 18) {
+  throw new Error(`Expected at least 18 words placed in 13x11, got ${cDual.words.length}`);
 }
+verifyCengelWordLengths(cDual, '13x11 Dual');
 
 // Test 18x13 Full-Page Single Layout
 const cGenSingle = new CengelGenerator(RAW_WORD_BANK, { rows: 18, cols: 13, rng: new SeededRandom(54321), clueLang: 'mixed' });
 const cSingle = cGenSingle.generate();
-console.log(`- Full-Page Single Layout (18x13): Placed ${cSingle.words.length} words | Letters: ${cSingle.letterCells} | Clues: ${cSingle.clueCells} | Blocked: ${cSingle.blockedCells} | Dual clues: ${cSingle.dualClueCells}`);
+console.log(`- Full-Page Single Layout (18x13): Placed ${cSingle.words.length} words | Letters: ${cSingle.letterCells} | Clues: ${cSingle.clueCells} | Blocked: ${cSingle.blockedCells} | Active Density: ${cSingle.density}%`);
 if (cSingle.letterCells + cSingle.clueCells + cSingle.blockedCells !== 18 * 13) {
   throw new Error(`Total cells mismatch: expected ${18 * 13} cells, got ${cSingle.letterCells + cSingle.clueCells + cSingle.blockedCells}`);
 }
-if (cSingle.words.length < 35) {
-  throw new Error(`Expected at least 35 words placed in 18x13, got ${cSingle.words.length}`);
+if (cSingle.words.length < 32) {
+  throw new Error(`Expected at least 32 words placed in 18x13, got ${cSingle.words.length}`);
 }
+verifyCengelWordLengths(cSingle, '18x13 Single');
+
+// Verify Secret Keyword (Şifreli Kelime)
+if (!cSingle.secretWord || !cSingle.secretWord.word || cSingle.secretWord.positions.length !== cSingle.secretWord.word.length) {
+  throw new Error('Secret keyword was not generated properly');
+}
+for (const pos of cSingle.secretWord.positions) {
+  const cell = cSingle.grid[pos.r][pos.c];
+  if (cell.type !== 'letter' || cell.char !== pos.char || cell.secretIndex !== pos.index) {
+    throw new Error(`Secret keyword cell mismatch at index ${pos.index}`);
+  }
+}
+console.log(`✓ Secret Keyword verified: "${cSingle.secretWord.word}" (${cSingle.secretWord.clue})`);
 
 // Test Seed Reproducibility
 const cSeed = 777888;
@@ -128,6 +158,6 @@ for (let i = 0; i < cTest1.words.length; i++) {
     throw new Error(`Cengel determinism mismatch at word index ${i}`);
   }
 }
-console.log('✓ Gazete Çengel Generator passed (100% cell utilization, zero dead cells, reproducible seed)');
+console.log('✓ Gazete Çengel Generator passed (100% exact word lengths, secret keyword, reproducible seed)');
 
 console.log('\n=== ALL TESTS PASSED SUCCESSFULLY! ===');

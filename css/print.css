@@ -150,17 +150,65 @@
     justify-content: center !important;
   }
   .cengel-container.layout-single .cengel-cell {
-    width: 14.2mm !important;
-    height: 14.2mm !important;
+    width: 13.6mm !important;
+    height: 13.6mm !important;
   }
   .cengel-container.layout-single .clue-text {
     font-size: 4.8pt !important;
     line-height: 1.15 !important;
   }
+  .cengel-container.layout-single .clue-text.long-clue {
+    font-size: 4.1pt !important;
+    line-height: 1.08 !important;
+  }
   .cengel-container.layout-single .clue-arrow {
     font-size: 7.0pt !important;
   }
   .cengel-container.layout-single .letter-cell {
-    font-size: 14.5pt !important;
+    font-size: 14pt !important;
+  }
+
+  /* Interactive & Hint Print Overrides */
+  .cengel-cell.letter-cell.focused-cell,
+  .cell.focused-cell {
+    outline: none !important;
+    background-color: #ffffff !important;
+  }
+  .cengel-cell.letter-cell.hint-cell .letter-char {
+    display: block !important;
+    color: #334155 !important;
+  }
+
+  /* Secret Word Bar Print Styles */
+  .secret-index-badge {
+    background: #ffffff !important;
+    color: #0284c7 !important;
+    border: 0.8px solid #0284c7 !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+  .cengel-secret-bar {
+    margin-top: 8px !important;
+    padding: 6px 10px !important;
+    background: #f8fafc !important;
+    border: 1.2px solid #000000 !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+  .secret-bar-label {
+    color: #000000 !important;
+  }
+  .secret-bar-clue {
+    color: #333333 !important;
+  }
+  .secret-box {
+    width: 24px !important;
+    height: 24px !important;
+    background: #ffffff !important;
+    border: 1.2px solid #000000 !important;
+    color: #000000 !important;
+  }
+  .secret-box-num {
+    color: #0284c7 !important;
   }
 }
