@@ -43,11 +43,14 @@ A modern, zero-dependency web application designed to generate authentic **newsp
 - **✅ Check Answers (`#btn-check`):** Highlights correct answers in green (`.cell-correct`) and mistakes in red (`.cell-wrong`), displaying an accurate progress score.
 - **💡 Starter Hints (`#btn-hint`):** Reveals ~15% of grid letters to help beginners or unblock challenging words.
 
-### 4. 🌐 Complete Bilingual Support (UI & Clues)
+### 4. 🌐 Complete Bilingual Support (UI, Answer Language & Clues)
 - **One-Click UI Language Toggle (`🌐 TR` / `🌐 EN`):** Instantly switches all interface labels, buttons, dialogs, sheet titles, stats, and notification toasts. Persisted in `localStorage`.
+- **Selectable Answer Language (`🇬🇧 EN` Default | `🇹🇷 TR` Optional):**
+  - **🇬🇧 English Answers (Default):** Generates puzzles from the **2,046+ English Word Bank** — ideal for practicing English vocabulary.
+  - **🇹🇷 Turkish Answers:** Generates authentic Turkish newspaper crosswords from the **848+ Turkish Word Bank (`TR_WORD_BANK`)** with full Turkish keyboard character support (`Ç, Ğ, İ, Ö, Ş, Ü`).
 - **Flexible Clue Languages:**
-  - 🇹🇷 **TR:** Turkish clues with English solutions (great for language learners).
-  - 🇬🇧 **EN:** Native English definitions and synonyms.
+  - 🇹🇷 **TR:** Turkish clues (great for language learners).
+  - 🇬🇧 **EN:** Native English definitions, synonyms, and idioms.
   - 🔀 **Mixed:** Randomized blend of Turkish and English clues.
 - **In-Place Clue Updating:** Switching clue language updates all clues dynamically without regenerating the grid or wiping entered letters.
 
@@ -57,14 +60,15 @@ A modern, zero-dependency web application designed to generate authentic **newsp
 - **📄 Batch Print:** Print 2, 4, 6, 8, or 10 distinct puzzles followed by matching answer keys in one go.
 - **📥 Vector PDF:** Generates crisp, printable PDF documents with clean typography and Turkish character sanitization.
 
-### 6. 📚 1000+ Curated Word Bank across 13 Categories
-- 1006 high-quality English words spanning 3 to 10+ letters.
-- **Categories:** Animals, Science, Geography, Food, Technology, Body & Jobs, General, Sports, Household, Weather, Vehicles, Culture, Emotions.
-- Filter by category with one click (select all or clear to minimum 2 categories).
+### 6. 📚 2,046+ English & 848+ Turkish Words across 19 Categories + CEFR Levels
+- **2,046 unique English words** and **848 unique Turkish words** spanning 3 to 10+ letters, each with **3+ concise newspaper-style clues** in both languages.
+- **⭐ Top 1000 Most Frequent Words (`⭐ Top 1000`):** Includes a dedicated one-click quick filter and category chip containing **1,006 high-frequency core English words** that can be selected on its own or combined with other themes.
+- **19 Thematic Categories:** Top 1000, Animals, Science, Geography, Food, Technology, Body & Jobs, General, Sports, Household, Weather, Vehicles, Culture, Emotions, Cinema & Art, History, Space, Business & Economy, Idioms & Phrases.
+- **CEFR Vocabulary Difficulty Filtering:** Selecting **Easy** (A1–A2), **Medium** (B1–B2), or **Hard** (C1) filters both grid dimensions and word difficulty levels.
 
 ### 7. 🔗 Deterministic Seed & URL Sharing
 - Powered by a seeded pseudo-random generator (`mulberry32`).
-- **🔗 Share Link:** Copies a permalink with hash parameters (`#seed=...&type=cengel&diff=medium&lang=en`). Opening the link reconstructs the **exact same puzzle**.
+- **🔗 Share Link:** Copies a permalink with hash parameters (`#seed=...&type=cengel&diff=medium&ans=en&lang=en`). Opening the link reconstructs the **exact same puzzle**.
 
 ---
 
@@ -72,7 +76,7 @@ A modern, zero-dependency web application designed to generate authentic **newsp
 
 | Key | Action |
 | --- | --- |
-| `A` – `Z` | Enter letter and advance to the next cell |
+| `A` – `Z` (or `Ç Ğ İ Ö Ş Ü` in TR mode) | Enter letter and advance to the next cell |
 | `Space` | Toggle typing direction (`→ Across` / `↓ Down`) |
 | `Arrow Keys` | Move cursor in the specified direction |
 | `Backspace` | Clear cell and step back |
@@ -98,7 +102,9 @@ cengel-bulmaca/
 │   │   ├── cengel-generator.js # Arrowword engine (in-grid clues, secret word)
 │   │   └── generator.js        # Classic crossword engine
 │   ├── data/
-│   │   └── words.js            # 1006 words with TR/EN clues & categories
+│   │   ├── words.js            # Unified barrel exports (WORD_BANK & TR_WORD_BANK)
+│   │   ├── words-en.js         # 2,046 English words (19 categories, CEFR levels, Top 1000)
+│   │   └── words-tr.js         # 848 Turkish words for Turkish Answer Mode
 │   └── utils/
 │       ├── i18n.js             # Dual-language translation strings (TR & EN)
 │       ├── seeded-random.js    # Mulberry32 deterministic PRNG
@@ -192,11 +198,14 @@ Gerçek **Türk gazetesi formatında Çengel Bulmaca (Scandinavian Arrowword)** 
 - **✅ Kontrol Et (`#btn-check`):** Yazdığınız harfleri doğrular; doğru harfleri yeşil (`.cell-correct`), hatalı harfleri kırmızı (`.cell-wrong`) vurgular ve anlık skor bildirimi sunar.
 - **💡 İpucu Harf (`#btn-hint`):** Takıldığınızda bulmacadaki harflerin ~%15'ini başlangıç ipucu olarak açıp kapatabilirsiniz.
 
-### 4. 🌐 Tam Çift Dil Desteği (Arayüz & İpuçları)
+### 4. 🌐 Tam Çift Dil Desteği (Arayüz, Cevap Dili & İpuçları)
 - **Tek Tıkla Arayüz Dil Değiştirici (`🌐 TR` / `🌐 EN`):** Tüm butonları, başlıkları, diyalogları, istatistikleri ve bildirimleri anında Türkçeye veya İngilizceye çevirir. Tercih `localStorage` ile saklanır.
+- **Seçilebilir Cevap Dili (`🇬🇧 İngilizce` Varsayılan | `🇹🇷 Türkçe` Opsiyonel):**
+  - **🇬🇧 İngilizce Cevaplar (Varsayılan):** İngilizce kelime pratiği için **2.046+ kelimelik İngilizce Kelime Havuzundan** bulmaca üretir.
+  - **🇹🇷 Türkçe Cevaplar:** Klasik Türk gazetesi bulmacası çözmek isteyenler için **848+ kelimelik Türkçe Kelime Havuzundan (`TR_WORD_BANK`)** bulmaca üretir (Tam Türkçe klavye `Ç, Ğ, İ, Ö, Ş, Ü` desteğiyle).
 - **3 Farklı İpucu Dili:**
   - 🇹🇷 **TR:** Türkçe ipuçları (İngilizce kelime haznesi geliştirmek için mükemmel).
-  - 🇬🇧 **EN:** İngilizce eş anlamlılar ve tanımlar.
+  - 🇬🇧 **EN:** İngilizce eş anlamlılar, tanımlar ve deyimler.
   - 🔀 **Mix:** Karışık Türkçe ve İngilizce ipucu kombinasyonu.
 - **Yerinde Güncelleme:** İpucu dili değiştirildiğinde bulmaca yapısı bozulmaz veya girilen harfler silinmez; ipuçları anında güncellenir.
 
@@ -206,14 +215,15 @@ Gerçek **Türk gazetesi formatında Çengel Bulmaca (Scandinavian Arrowword)** 
 - **📄 Toplu Baskı (Batch Print):** Tek tıkla 2, 4, 6, 8 veya 10 farklı bulmacayı ve arkasındaki cevap anahtarlarını sıralı olarak yazdırabilirsiniz.
 - **📥 Vektörel PDF İndirme:** Sayfayı Türkçe karakter destekli, net çizgili PDF formatında tek tıkla kaydeder.
 
-### 6. 📚 1000+ Kelimelik Zengin Çok Dilli Veri Havuzu
-- 3 harfliden 10+ harfliye kadar dengeli 1006 benzersiz İngilizce kelime.
-- **13 Kategori:** Hayvanlar, Bilim, Coğrafya, Yemek, Teknoloji, Vücut & Meslekler, Genel, Spor, Ev, Hava Durumu, Taşıtlar, Kültür, Duygular.
-- Kategorileri filtreleme ve tek tıkla tümünü seçme / temizleme.
+### 6. 📚 2.046+ İngilizce & 848+ Türkçe Kelime, 19 Kategori ve CEFR Seviyeleri
+- 3 harfliden 10+ harfliye kadar dengeli **2.046 benzersiz İngilizce kelime** ve **848 benzersiz Türkçe kelime** (her kelimede gazete çengel kutularına uygun **3+ özlü ipucu**).
+- **⭐ En Sık Kullanılan 1000 Kelime (`⭐ İlk 1000`):** Günlük hayatta en sık kullanılan **1.006 temel İngilizce kelimeyi** tek tıkla tek başına veya diğer kategorilerle birlikte seçebilme imkanı.
+- **19 Zengin Kategori:** En Sık 1000, Hayvanlar, Bilim, Coğrafya, Yiyecekler, Teknoloji, Vücut & Meslekler, Genel, Spor, Ev & Eşya, Hava Durumu, Taşıtlar, Kültür, Duygular, Sinema & Sanat, Tarih, Uzay, İş & Ekonomi, Deyimler.
+- **CEFR Kelime Zorluk Filtresi:** **Kolay** (A1–A2), **Orta** (B1–B2) ve **Zor** (C1) seçimi yalnızca ızgara boyutunu değil, seçilen kelimelerin zorluk seviyesini de akıllıca filtreler.
 
 ### 7. 🔗 URL ile Paylaşım & Deterministik Seed
 - Her bulmaca `mulberry32` algoritması ile deterministik bir tohum (seed) üzerinden üretilir.
-- **🔗 Paylaş Butonu:** Bulmacanın tam halini içeren URL hash parametresini (`#seed=...&type=cengel&diff=medium&lang=tr`) panoya kopyalar. Linki açan herkes **birebir aynı** bulmacayı görür.
+- **🔗 Paylaş Butonu:** Bulmacanın tam halini içeren URL hash parametresini (`#seed=...&type=cengel&diff=medium&ans=en&lang=tr`) panoya kopyalar. Linki açan herkes **birebir aynı** bulmacayı görür.
 
 ---
 

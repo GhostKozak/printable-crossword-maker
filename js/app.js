@@ -1,4 +1,4 @@
-import { WORD_BANK } from "./data/words.js";
+import { WORD_BANK, TR_WORD_BANK } from "./data/words.js";
 import { SeededRandom } from "./utils/seeded-random.js";
 import { CrosswordGenerator } from "./core/generator.js";
 import { CengelGenerator } from "./core/cengel-generator.js";
@@ -16,8 +16,13 @@ export class CrosswordApp {
     this.isHintsActive = false;
     this.focusedCell = null; // { mode: 'cengel'|'classic', pIdx: 0, r: 0, c: 0, dir: 'across'|'down' }
     this.targetCounts = { easy: 14, medium: 21, hard: 30 };
-    this.categories = ['animals', 'science', 'geography', 'food', 'technology', 'body', 'general', 'sports', 'household', 'weather', 'vehicles', 'culture', 'emotions'];
+    this.categories = [
+      'top1000', 'animals', 'science', 'geography', 'food', 'technology',
+      'body', 'general', 'sports', 'household', 'weather', 'vehicles',
+      'culture', 'emotions', 'cinema', 'history', 'space', 'business', 'idioms'
+    ];
     this.categoryMeta = {
+      top1000: { icon: '⭐', en: 'Top 1000', tr: 'En Sık 1000' },
       animals: { icon: '🐾', en: 'Animals', tr: 'Hayvanlar' },
       science: { icon: '🔬', en: 'Science', tr: 'Bilim' },
       geography: { icon: '🌍', en: 'Geography', tr: 'Coğrafya' },
@@ -30,13 +35,24 @@ export class CrosswordApp {
       weather: { icon: '🌤️', en: 'Weather', tr: 'Hava' },
       vehicles: { icon: '🚀', en: 'Vehicles', tr: 'Taşıtlar' },
       culture: { icon: '🏛️', en: 'Culture', tr: 'Kültür' },
-      emotions: { icon: '❤️', en: 'Emotions', tr: 'Duygular' }
+      emotions: { icon: '❤️', en: 'Emotions', tr: 'Duygular' },
+      cinema: { icon: '🎬', en: 'Cinema/Art', tr: 'Sinema/Sanat' },
+      history: { icon: '🏺', en: 'History', tr: 'Tarih' },
+      space: { icon: '🌌', en: 'Space', tr: 'Uzay' },
+      business: { icon: '💼', en: 'Business', tr: 'İş/Ekonomi' },
+      idioms: { icon: '💬', en: 'Idioms', tr: 'Deyimler' }
     };
     this.selectedCategories = new Set(this.categories);
     
     this.uiLang = 'tr';
     try {
       this.uiLang = localStorage.getItem('uiLang') || (navigator.language.startsWith('tr') ? 'tr' : 'en');
+    } catch(e){}
+
+    // Default answer language is English ('en') so English practice remains primary
+    this.answerLang = 'en';
+    try {
+      this.answerLang = localStorage.getItem('answerLang') || 'en';
     } catch(e){}
 
     this.clueLang = 'mixed';
@@ -58,6 +74,7 @@ export class CrosswordApp {
     this.cengelLayoutSection = document.getElementById('cengel-layout-section');
 
     this.diffButtons = document.querySelectorAll('.diff-btn');
+    this.ansLangButtons = document.querySelectorAll('.ans-lang-btn');
     this.langButtons = document.querySelectorAll('.lang-btn');
     this.btnUiLang = document.getElementById('btn-ui-lang');
     this.btnGenerate = document.getElementById('btn-generate');
@@ -108,7 +125,8 @@ export class CrosswordApp {
     const t = TRANSLATIONS[this.uiLang] || TRANSLATIONS.tr;
     quickControls.innerHTML = `
       <button type="button" class="cat-quick-btn" id="btn-cat-all" title="Select all categories">${t.catAll}</button>
-      <button type="button" class="cat-quick-btn" id="btn-cat-clear" title="Keep minimum 2 categories">${t.catClear}</button>
+      <button type="button" class="cat-quick-btn" id="btn-cat-top1000" title="Select only Top 1000 most frequent words">${t.catTop1000}</button>
+      <button type="button" class="cat-quick-btn" id="btn-cat-clear" title="Keep minimum 1 category">${t.catClear}</button>
     `;
     this.catContainer.appendChild(quickControls);
 
@@ -119,8 +137,19 @@ export class CrosswordApp {
       this.generateNewPuzzle();
     });
 
+    quickControls.querySelector('#btn-cat-top1000').addEventListener('click', () => {
+      this.selectedCategories = new Set(['top1000']);
+      document.querySelectorAll('.cat-chip').forEach(c => {
+        c.classList.toggle('selected', c.dataset.cat === 'top1000');
+      });
+      const tr = TRANSLATIONS[this.uiLang] || TRANSLATIONS.tr;
+      this.showToast(tr.toastTop1000Selected);
+      this.resetSolutionKey();
+      this.generateNewPuzzle();
+    });
+
     quickControls.querySelector('#btn-cat-clear').addEventListener('click', () => {
-      this.selectedCategories = new Set(this.categories.slice(0, 2));
+      this.selectedCategories = new Set(['top1000']);
       document.querySelectorAll('.cat-chip').forEach(c => {
         if (this.selectedCategories.has(c.dataset.cat)) {
           c.classList.add('selected');
@@ -128,8 +157,8 @@ export class CrosswordApp {
           c.classList.remove('selected');
         }
       });
-      const t = TRANSLATIONS[this.uiLang] || TRANSLATIONS.tr;
-      this.showToast(t.toastMinCategories);
+      const tr = TRANSLATIONS[this.uiLang] || TRANSLATIONS.tr;
+      this.showToast(tr.toastMinCategories);
       this.resetSolutionKey();
       this.generateNewPuzzle();
     });
@@ -179,6 +208,24 @@ export class CrosswordApp {
         btn.classList.add('active');
         this.currentDifficulty = btn.dataset.diff;
         // EKS-3 Reset answer key on diff change
+        this.resetSolutionKey();
+        this.generateNewPuzzle();
+      });
+    });
+
+    // Answer Language Selector (EN default | TR optional)
+    this.ansLangButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        this.ansLangButtons.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        this.answerLang = btn.dataset.ansLang;
+        try { localStorage.setItem('answerLang', this.answerLang); } catch(e){}
+        // If user switches to Turkish answers, default clues to Turkish if currently EN
+        if (this.answerLang === 'tr' && this.clueLang === 'en') {
+          this.clueLang = 'tr';
+          try { localStorage.setItem('clueLang', 'tr'); } catch(e){}
+          this.langButtons.forEach(b => b.classList.toggle('active', b.dataset.lang === 'tr'));
+        }
         this.resetSolutionKey();
         this.generateNewPuzzle();
       });
@@ -267,7 +314,7 @@ export class CrosswordApp {
       if (!this.currentSeed) return;
       const cats = Array.from(this.selectedCategories).join(',');
       const url = new URL(window.location.href);
-      url.hash = `#seed=${this.currentSeed}&type=${this.puzzleType}&layout=${this.cengelLayout}&diff=${this.currentDifficulty}&lang=${this.clueLang}&cats=${cats}`;
+      url.hash = `#seed=${this.currentSeed}&type=${this.puzzleType}&layout=${this.cengelLayout}&diff=${this.currentDifficulty}&ans=${this.answerLang}&lang=${this.clueLang}&cats=${cats}`;
       const shareUrl = url.href;
 
       const copyFallback = (text) => {
@@ -317,7 +364,12 @@ export class CrosswordApp {
       document.documentElement.setAttribute('data-theme', 'dark');
       this.btnTheme.textContent = '☀️';
     }
-    // Sync language buttons
+    // Sync answer & clue language buttons
+    if (this.ansLangButtons) {
+      this.ansLangButtons.forEach(b => {
+        b.classList.toggle('active', b.dataset.ansLang === this.answerLang);
+      });
+    }
     this.langButtons.forEach(b => {
       b.classList.toggle('active', b.dataset.lang === this.clueLang);
     });
@@ -352,9 +404,13 @@ export class CrosswordApp {
     setText('diff-btn-easy', t.diffEasy);
     setText('diff-btn-medium', t.diffMedium);
     setText('diff-btn-hard', t.diffHard);
+    setText('heading-answer-lang', t.headingAnswerLang);
+    setText('ans-lang-btn-en', t.ansLangEn);
+    setText('ans-lang-btn-tr', t.ansLangTr);
     setText('heading-clue-lang', t.headingClueLang);
     setText('heading-categories', t.headingCategories);
     setText('btn-cat-all', t.catAll);
+    setText('btn-cat-top1000', t.catTop1000);
     setText('btn-cat-clear', t.catClear);
     setHTML('screen-tip', t.screenTip);
 
@@ -471,7 +527,7 @@ export class CrosswordApp {
 
   toggleCategory(chip, cat) {
     if (this.selectedCategories.has(cat)) {
-      if (this.selectedCategories.size <= 2) {
+      if (this.selectedCategories.size <= 1) {
         const t = TRANSLATIONS[this.uiLang] || TRANSLATIONS.tr;
         this.showToast(t.toastMinCategories);
         return;
@@ -502,6 +558,7 @@ export class CrosswordApp {
       const pType = params.get('type');
       const pLayout = params.get('layout');
       const diff = params.get('diff');
+      const ans = params.get('ans');
       const lang = params.get('lang');
       const cats = params.get('cats');
       
@@ -523,6 +580,13 @@ export class CrosswordApp {
         this.diffButtons.forEach(b => {
           b.classList.toggle('active', b.dataset.diff === diff);
         });
+      }
+      if (ans && ['en', 'tr'].includes(ans)) {
+        this.answerLang = ans;
+        try { localStorage.setItem('answerLang', this.answerLang); } catch(e){}
+        if (this.ansLangButtons) {
+          this.ansLangButtons.forEach(b => b.classList.toggle('active', b.dataset.ansLang === ans));
+        }
       }
       if (lang && ['tr', 'en', 'mixed'].includes(lang)) {
         this.clueLang = lang;
@@ -552,7 +616,29 @@ export class CrosswordApp {
   }
 
   getFilteredWords() {
-    return WORD_BANK.filter(w => this.selectedCategories.has(w.cat));
+    const sourceBank = this.answerLang === 'tr' ? TR_WORD_BANK : WORD_BANK;
+    const includeTop1000 = this.selectedCategories.has('top1000');
+
+    // 1. Category filter (if 'top1000' is selected, include all words tagged with top1000: true)
+    const catPool = sourceBank.filter(w =>
+      this.selectedCategories.has(w.cat) || (includeTop1000 && w.top1000)
+    );
+
+    // 2. CEFR / Vocabulary Difficulty filter with automatic pool size safeguard
+    if (this.currentDifficulty === 'easy') {
+      const easyPool = catPool.filter(w => !w.level || w.level === 'easy');
+      if (easyPool.length >= 60) return easyPool;
+      const easyMedPool = catPool.filter(w => !w.level || w.level === 'easy' || w.level === 'medium');
+      return easyMedPool.length >= 45 ? easyMedPool : catPool;
+    }
+
+    if (this.currentDifficulty === 'medium') {
+      const medPool = catPool.filter(w => !w.level || w.level === 'easy' || w.level === 'medium');
+      return medPool.length >= 60 ? medPool : catPool;
+    }
+
+    // 'hard': include all levels (easy/medium/hard) so C1/hard words are mixed with 3-4 letter connectors
+    return catPool;
   }
 
   generateNewPuzzle(forceSeed = null) {
@@ -1082,6 +1168,16 @@ export class CrosswordApp {
         const dc = dir === 'across' ? -1 : 0;
         this.moveFocusStep(dr, dc);
       }
+      return;
+    }
+
+    if (this.answerLang === 'tr' && /^[a-zA-ZçğıöşüÇĞİÖŞÜ]$/.test(e.key)) {
+      e.preventDefault();
+      const letter = e.key.toLocaleUpperCase('tr-TR');
+      this.setFocusedCellChar(letter);
+      const dr = dir === 'down' ? 1 : 0;
+      const dc = dir === 'across' ? 1 : 0;
+      this.moveFocusStep(dr, dc);
       return;
     }
 
