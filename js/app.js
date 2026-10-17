@@ -795,16 +795,8 @@ export class CrosswordApp {
     this.solutionCengelView.classList.toggle('layout-single', !isDual);
     this.solutionCengelView.classList.toggle('layout-dual', isDual);
 
-    let cellSize = '52px';
-    if (isDual) {
-      cellSize = '38px';
-    } else {
-      const p = this.currentCengelPuzzles[0];
-      if (p.cols <= 12) cellSize = '54px';
-      else if (p.cols <= 14) cellSize = '48px';
-      else cellSize = '44px';
-    }
-    document.documentElement.style.setProperty('--cengel-cell-size', cellSize);
+    // Remove any static inline style so responsive CSS clamp rules dynamically adapt to screen size
+    document.documentElement.style.removeProperty('--cengel-cell-size');
 
     this.currentCengelPuzzles.forEach((puzzle, idx) => {
       if (idx > 0) {
@@ -1321,12 +1313,12 @@ export class CrosswordApp {
     if (!this.currentPuzzle) return;
     const { rows, cols, grid, acrossClues, downClues, allWords, intersections } = this.currentPuzzle;
 
-    let cellSizePx = 28;
+    let cellSizePx = 36;
     const maxDim = Math.max(rows, cols);
-    if (maxDim > 18) cellSizePx = 21;
-    else if (maxDim > 15) cellSizePx = 24;
-    else if (maxDim > 12) cellSizePx = 27;
-    else cellSizePx = 30;
+    if (maxDim > 18) cellSizePx = 28;
+    else if (maxDim > 15) cellSizePx = 34;
+    else if (maxDim > 12) cellSizePx = 40;
+    else cellSizePx = 46;
 
     document.documentElement.style.setProperty('--cell-size', `${cellSizePx}px`);
 

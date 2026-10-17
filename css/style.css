@@ -597,7 +597,7 @@ h1, h2, h3, .brand-name, .sheet-title, .clue-header {
 /* Topbar & Stats */
 .app-topbar {
   width: 100%;
-  max-width: min(210mm, 100%);
+  max-width: min(1200px, 95vw);
   margin-bottom: 18px;
   display: flex;
   flex-direction: column;
@@ -648,7 +648,7 @@ h1, h2, h3, .brand-name, .sheet-title, .clue-header {
 
 .file-protocol-banner {
   width: 100%;
-  max-width: min(210mm, 100%);
+  max-width: min(1200px, 95vw);
   background: #fef3c7;
   color: #92400e;
   border: 1px solid #f59e0b;
@@ -673,9 +673,9 @@ h1, h2, h3, .brand-name, .sheet-title, .clue-header {
 .printable-sheet {
   background: var(--card-bg);
   width: 100%;
-  max-width: min(210mm, 100%);
-  min-height: 297mm;
-  padding: 10mm 12mm;
+  max-width: min(1200px, 95vw);
+  min-height: auto;
+  padding: 24px clamp(16px, 3.2vw, 36px) 36px;
   box-shadow: 0 12px 36px -4px rgba(15, 23, 42, 0.12), 0 4px 12px -2px rgba(15, 23, 42, 0.06);
   border: 1px solid var(--border-light);
   border-top: 4px solid var(--border-dark);
@@ -1083,6 +1083,14 @@ h1, h2, h3, .brand-name, .sheet-title, .clue-header {
   width: 100%;
 }
 
+.cengel-container.layout-single .cengel-puzzle-block {
+  --cengel-cell-size: clamp(48px, calc((min(1120px, 94vw - 360px) - 40px) / var(--cengel-cols, 14)), 74px);
+}
+
+.cengel-container.layout-dual .cengel-puzzle-block {
+  --cengel-cell-size: clamp(38px, calc((min(1120px, 94vw - 360px) - 40px) / var(--cengel-cols, 11)), 56px);
+}
+
 /* Reference-Style Blue Newspaper Banner */
 .cengel-banner {
   background: #0284c7;
@@ -1266,24 +1274,44 @@ h1, h2, h3, .brand-name, .sheet-title, .clue-header {
   right: 2px;
 }
 
-/* Layout Single (Tam Sayfa) Typography */
+/* Layout Single (Tam Sayfa) Typography - Scales dynamically with cell size */
 .cengel-container.layout-single .cengel-board {
   max-width: 100%;
 }
 .cengel-container.layout-single .clue-text {
-  font-size: 5.3pt;
-  line-height: 1.16;
+  font-size: clamp(5.4pt, calc(var(--cengel-cell-size) * 0.134), 8.6pt);
+  line-height: 1.15;
   font-weight: 700;
 }
 .cengel-container.layout-single .clue-text.long-clue {
-  font-size: 4.6pt !important;
+  font-size: clamp(4.5pt, calc(var(--cengel-cell-size) * 0.11), 7.2pt) !important;
   line-height: 1.08 !important;
 }
 .cengel-container.layout-single .clue-arrow {
-  font-size: 7.2pt;
+  font-size: clamp(7.0pt, calc(var(--cengel-cell-size) * 0.165), 11.5pt);
 }
 .cengel-container.layout-single .cengel-cell.letter-cell {
-  font-size: 16pt;
+  font-size: clamp(15pt, calc(var(--cengel-cell-size) * 0.38), 24pt);
+}
+
+/* Layout Dual (İkili Sayfa) Typography */
+.cengel-container.layout-dual .cengel-board {
+  max-width: 100%;
+}
+.cengel-container.layout-dual .clue-text {
+  font-size: clamp(4.5pt, calc(var(--cengel-cell-size) * 0.125), 6.8pt);
+  line-height: 1.12;
+  font-weight: 700;
+}
+.cengel-container.layout-dual .clue-text.long-clue {
+  font-size: clamp(4.0pt, calc(var(--cengel-cell-size) * 0.10), 5.8pt) !important;
+  line-height: 1.06 !important;
+}
+.cengel-container.layout-dual .clue-arrow {
+  font-size: clamp(6.2pt, calc(var(--cengel-cell-size) * 0.15), 9.0pt);
+}
+.cengel-container.layout-dual .cengel-cell.letter-cell {
+  font-size: clamp(12pt, calc(var(--cengel-cell-size) * 0.35), 18pt);
 }
 
 /* Interactive Play, Hints & Check States */
@@ -1433,8 +1461,8 @@ h1, h2, h3, .brand-name, .sheet-title, .clue-header {
   flex-shrink: 0 !important;
 }
 .secret-box {
-  width: 30px;
-  height: 30px;
+  width: clamp(28px, calc(var(--cengel-cell-size, 48px) * 0.52), 40px);
+  height: clamp(28px, calc(var(--cengel-cell-size, 48px) * 0.52), 40px);
   border: 1.5px solid var(--border-dark);
   background: var(--card-bg);
   border-radius: 5px;
@@ -1443,7 +1471,7 @@ h1, h2, h3, .brand-name, .sheet-title, .clue-header {
   align-items: center;
   justify-content: center;
   font-weight: 800;
-  font-size: 11.5pt;
+  font-size: clamp(11pt, calc(var(--cengel-cell-size, 48px) * 0.28), 16pt);
   color: var(--text-main);
   flex-shrink: 0;
   box-shadow: inset 0 1px 2px rgba(15, 23, 42, 0.06);
@@ -1503,5 +1531,11 @@ h1, h2, h3, .brand-name, .sheet-title, .clue-header {
   }
   .stats-bar {
     grid-template-columns: repeat(2, 1fr);
+  }
+  .cengel-container.layout-single .cengel-puzzle-block {
+    --cengel-cell-size: clamp(34px, calc((100vw - 44px) / var(--cengel-cols, 14)), 64px);
+  }
+  .cengel-container.layout-dual .cengel-puzzle-block {
+    --cengel-cell-size: clamp(30px, calc((100vw - 44px) / var(--cengel-cols, 11)), 50px);
   }
 }
