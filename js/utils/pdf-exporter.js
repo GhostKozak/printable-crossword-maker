@@ -245,36 +245,18 @@ export class PdfExporter {
         const subId = isDual ? `${puzzleId}${pIdx === 0 ? 'A' : 'B'}` : puzzleId;
         const subTitle = isDual ? `${difficulty} - Gazete Cengel #${pIdx + 1}` : `${difficulty} - Gazete Cengel Bulmacasi`;
 
-        // Banner width & grid calculation
+        // Grid calculation (No banner - grid starts directly)
         let cellW;
         if (isDual) {
           cellW = 13.0;
         } else {
-          // Single full-page puzzle: dynamically scale to fill A4 page
+          // Single full-page puzzle: dynamically scale to fill A4 page (width 180mm, height 255mm)
           const maxAvailW = 180;
-          const maxAvailH = 242;
+          const maxAvailH = 255;
           cellW = Math.min(maxAvailW / puzzle.cols, maxAvailH / puzzle.rows);
         }
         const gridW = puzzle.cols * cellW;
         const startX = (210 - gridW) / 2;
-        const bannerH = isDual ? 7 : 8;
-
-        // Draw Newspaper Blue Banner
-        doc.setFillColor(2, 132, 199);
-        doc.rect(startX, currentY, gridW, bannerH, 'F');
-
-        doc.setFont('helvetica', 'bold');
-        doc.setFontSize(isDual ? 10.5 : 11.5);
-        doc.setTextColor(255, 255, 255);
-        doc.text(this.sanitizeText(subTitle), startX + 3, currentY + (isDual ? 5 : 5.5));
-
-        // Number Badge
-        doc.setFillColor(3, 105, 161);
-        doc.rect(startX + gridW - 22, currentY + 1, 20, bannerH - 2, 'F');
-        doc.setFontSize(isDual ? 9 : 10);
-        doc.text(this.sanitizeText(subId), startX + gridW - 12, currentY + (isDual ? 4.8 : 5.2), { align: 'center' });
-
-        currentY += bannerH;
 
         // Draw Board
         doc.setDrawColor(0, 0, 0);
@@ -286,13 +268,31 @@ export class PdfExporter {
             const x = startX + c * cellW;
             const y = currentY + r * cellW;
 
-            if (cell.type === 'letter') {
+            if (cell.type === 'blocked') {
+              // Hatched Blocked Cell (Taralı Kutu)
+              doc.setFillColor(255, 255, 255);
+              doc.rect(x, y, cellW, cellW, 'FD');
+              doc.setDrawColor(120, 120, 120);
+              doc.setLineWidth(0.2);
+              const step = 2.5;
+              for (let d = -cellW; d <= cellW; d += step) {
+                const x1 = Math.max(x, x + d);
+                const y1 = Math.max(y, y - d);
+                const x2 = Math.min(x + cellW, x + cellW + d);
+                const y2 = Math.min(y + cellW, y + cellW - d);
+                if (x1 < x2 && y1 < y2) {
+                  doc.line(x1, y2, x2, y1);
+                }
+              }
+              doc.setDrawColor(0, 0, 0);
+              doc.setLineWidth(0.3);
+            } else if (cell.type === 'letter') {
               doc.setFillColor(255, 255, 255);
               doc.rect(x, y, cellW, cellW, 'FD');
 
               if (isSol && cell.char) {
                 doc.setFont('helvetica', 'bold');
-                doc.setFontSize(cellW > 12 ? 11 : 9.5);
+                doc.setFontSize(cellW > 12.5 ? 12.5 : 9.5);
                 doc.setTextColor(29, 78, 216);
                 doc.text(cell.char, x + cellW / 2, y + cellW / 2 + 1.2, { align: 'center' });
               }
@@ -304,7 +304,7 @@ export class PdfExporter {
               if (cell.acrossWord && cell.downWord) {
                 // Dual Clue
                 doc.setFont('helvetica', 'bold');
-                doc.setFontSize(cellW > 12.5 ? 4.6 : 4.0);
+                doc.setFontSize(cellW > 12.5 ? 4.2 : 3.8);
                 doc.setTextColor(20, 20, 20);
 
                 const tAcross = this.sanitizeText(cell.acrossWord.clue);
@@ -312,7 +312,7 @@ export class PdfExporter {
                 doc.text(lA.slice(0, 2), x + 1, y + 2.2);
 
                 doc.setTextColor(2, 132, 199);
-                doc.setFontSize(cellW > 12.5 ? 5.8 : 5.0);
+                doc.setFontSize(cellW > 12.5 ? 5.2 : 4.6);
                 doc.text('>', x + cellW - 1.2, y + cellW / 2 - 0.6, { align: 'right' });
 
                 // Divider line
@@ -324,45 +324,43 @@ export class PdfExporter {
 
                 // Down Clue
                 doc.setFont('helvetica', 'bold');
-                doc.setFontSize(cellW > 12.5 ? 4.6 : 4.0);
+                doc.setFontSize(cellW > 12.5 ? 4.2 : 3.8);
                 doc.setTextColor(20, 20, 20);
                 const tDown = this.sanitizeText(cell.downWord.clue);
                 const lD = doc.splitTextToSize(tDown, cellW - 2.8);
                 doc.text(lD.slice(0, 2), x + 1, y + cellW / 2 + 2.2);
 
                 doc.setTextColor(2, 132, 199);
-                doc.setFontSize(cellW > 12.5 ? 5.8 : 5.0);
+                doc.setFontSize(cellW > 12.5 ? 5.2 : 4.6);
                 doc.text('v', x + cellW - 1.2, y + cellW - 0.8, { align: 'right' });
               } else if (cell.acrossWord) {
                 // Single Across Clue
                 doc.setFont('helvetica', 'bold');
-                doc.setFontSize(cellW > 12.5 ? 5.2 : 4.6);
+                doc.setFontSize(cellW > 12.5 ? 4.8 : 4.4);
                 doc.setTextColor(20, 20, 20);
                 const t = this.sanitizeText(cell.acrossWord.clue);
                 const lines = doc.splitTextToSize(t, cellW - 2.5);
                 doc.text(lines.slice(0, 3), x + 1, y + 2.6);
 
                 doc.setTextColor(2, 132, 199);
-                doc.setFontSize(cellW > 12.5 ? 6.5 : 5.5);
+                doc.setFontSize(cellW > 12.5 ? 6.0 : 5.2);
                 doc.text('>', x + cellW - 1.2, y + cellW - 1, { align: 'right' });
               } else if (cell.downWord) {
                 // Single Down Clue
                 doc.setFont('helvetica', 'bold');
-                doc.setFontSize(cellW > 12.5 ? 5.2 : 4.6);
+                doc.setFontSize(cellW > 12.5 ? 4.8 : 4.4);
                 doc.setTextColor(20, 20, 20);
                 const t = this.sanitizeText(cell.downWord.clue);
                 const lines = doc.splitTextToSize(t, cellW - 2.5);
                 doc.text(lines.slice(0, 3), x + 1, y + 2.6);
 
                 doc.setTextColor(2, 132, 199);
-                doc.setFontSize(cellW > 12.5 ? 6.5 : 5.5);
+                doc.setFontSize(cellW > 12.5 ? 6.0 : 5.2);
                 doc.text('v', x + cellW - 1.2, y + cellW - 1, { align: 'right' });
               } else {
-                // Emblem
-                doc.setFont('helvetica', 'bold');
-                doc.setFontSize(cellW > 12.5 ? 8 : 7);
-                doc.setTextColor(100, 100, 100);
-                doc.text(this.sanitizeText(cell.label || '*'), x + cellW / 2, y + cellW / 2 + 1, { align: 'center' });
+                // Hatched fallback
+                doc.setFillColor(255, 255, 255);
+                doc.rect(x, y, cellW, cellW, 'FD');
               }
             }
           }

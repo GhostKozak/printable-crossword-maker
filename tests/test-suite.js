@@ -97,9 +97,9 @@ const cengelRng = new SeededRandom(12345);
 const cGenDual = new CengelGenerator(RAW_WORD_BANK, { rows: 13, cols: 11, rng: cengelRng, clueLang: 'mixed' });
 const cDual = cGenDual.generate();
 
-console.log(`- Dual Layout (13x11): Placed ${cDual.words.length} words | Letter cells: ${cDual.letterCells} | Clue cells: ${cDual.clueCells} | Dual clues: ${cDual.dualClueCells}`);
-if (cDual.letterCells + cDual.clueCells !== 13 * 11) {
-  throw new Error(`Zero-waste violation: expected ${13 * 11} cells, got ${cDual.letterCells + cDual.clueCells}`);
+console.log(`- Dual Layout (13x11): Placed ${cDual.words.length} words | Letters: ${cDual.letterCells} | Clues: ${cDual.clueCells} | Blocked: ${cDual.blockedCells} | Dual clues: ${cDual.dualClueCells}`);
+if (cDual.letterCells + cDual.clueCells + cDual.blockedCells !== 13 * 11) {
+  throw new Error(`Total cells mismatch: expected ${13 * 11} cells, got ${cDual.letterCells + cDual.clueCells + cDual.blockedCells}`);
 }
 if (cDual.words.length < 20) {
   throw new Error(`Expected at least 20 words placed in 13x11, got ${cDual.words.length}`);
@@ -108,9 +108,9 @@ if (cDual.words.length < 20) {
 // Test 18x13 Full-Page Single Layout
 const cGenSingle = new CengelGenerator(RAW_WORD_BANK, { rows: 18, cols: 13, rng: new SeededRandom(54321), clueLang: 'mixed' });
 const cSingle = cGenSingle.generate();
-console.log(`- Full-Page Single Layout (18x13): Placed ${cSingle.words.length} words | Letter cells: ${cSingle.letterCells} | Clue cells: ${cSingle.clueCells} | Dual clues: ${cSingle.dualClueCells}`);
-if (cSingle.letterCells + cSingle.clueCells !== 18 * 13) {
-  throw new Error(`Zero-waste violation: expected ${18 * 13} cells, got ${cSingle.letterCells + cSingle.clueCells}`);
+console.log(`- Full-Page Single Layout (18x13): Placed ${cSingle.words.length} words | Letters: ${cSingle.letterCells} | Clues: ${cSingle.clueCells} | Blocked: ${cSingle.blockedCells} | Dual clues: ${cSingle.dualClueCells}`);
+if (cSingle.letterCells + cSingle.clueCells + cSingle.blockedCells !== 18 * 13) {
+  throw new Error(`Total cells mismatch: expected ${18 * 13} cells, got ${cSingle.letterCells + cSingle.clueCells + cSingle.blockedCells}`);
 }
 if (cSingle.words.length < 35) {
   throw new Error(`Expected at least 35 words placed in 18x13, got ${cSingle.words.length}`);

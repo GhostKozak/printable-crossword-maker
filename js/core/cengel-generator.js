@@ -222,28 +222,30 @@ export class CengelGenerator {
       }
     }
 
-    // 4. Zero-Waste Guarantee: Convert every unassigned cell into a Clue / Emblem cell
+    // 4. Convert every unassigned cell into a blocked (hatched/taralı) cell
     let letterCells = 0;
     let clueCells = 0;
     let dualClueCells = 0;
+    let blockedCells = 0;
 
     for (let r = 0; r < R; r++) {
       for (let c = 0; c < C; c++) {
         if (!grid[r][c]) {
           grid[r][c] = {
-            type: 'clue',
-            isBranding: true,
-            label: (r === 0 && c === 0) ? '🧩 EN' : (r === 0 && c === C - 1) ? '★' : '💡'
+            type: 'blocked',
+            isBlocked: true
           };
         }
 
         if (grid[r][c].type === 'letter') {
           letterCells++;
-        } else {
+        } else if (grid[r][c].type === 'clue') {
           clueCells++;
           if (grid[r][c].acrossWord && grid[r][c].downWord) {
             dualClueCells++;
           }
+        } else {
+          blockedCells++;
         }
       }
     }
@@ -266,6 +268,7 @@ export class CengelGenerator {
       letterCells,
       clueCells,
       dualClueCells,
+      blockedCells,
       intersections,
       density: Math.round((letterCells / (R * C)) * 100)
     };

@@ -122,6 +122,18 @@
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;
   }
+  .cengel-cell.blocked {
+    background-color: #ffffff !important;
+    background-image: repeating-linear-gradient(
+      45deg,
+      #000000 0,
+      #000000 1.2px,
+      transparent 1.2px,
+      transparent 4.5px
+    ) !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
   .clue-arrow {
     color: #0284c7 !important;
     -webkit-print-color-adjust: exact !important;
@@ -131,22 +143,24 @@
     border-top: 1px dashed #000000 !important;
   }
 
-  /* Single Full-Page Çengel Print Sizing */
+  /* Single Full-Page Çengel Print Sizing - Covers the entire page */
   .cengel-container.layout-single .cengel-board {
     max-width: 180mm !important;
+    width: 100% !important;
+    justify-content: center !important;
   }
   .cengel-container.layout-single .cengel-cell {
-    width: 12.2mm !important;
-    height: 12.2mm !important;
+    width: 14.2mm !important;
+    height: 14.2mm !important;
   }
   .cengel-container.layout-single .clue-text {
-    font-size: 5.8pt !important;
-    line-height: 1.1 !important;
+    font-size: 4.8pt !important;
+    line-height: 1.15 !important;
   }
   .cengel-container.layout-single .clue-arrow {
-    font-size: 8pt !important;
+    font-size: 7.0pt !important;
   }
   .cengel-container.layout-single .letter-cell {
-    font-size: 13.5pt !important;
+    font-size: 14.5pt !important;
   }
 }

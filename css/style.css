@@ -782,14 +782,34 @@ h1, h2, h3, .brand-name, .sheet-title, .clue-header {
 .letter-cell .letter-char {
   display: none;
 }
-.solution-visible .letter-cell .letter-char,
 .is-solution-sheet .letter-cell .letter-char {
   display: block !important;
   color: #1d4ed8;
 }
-[data-theme="dark"] .solution-visible .letter-cell .letter-char,
 [data-theme="dark"] .is-solution-sheet .letter-cell .letter-char {
   color: #60a5fa;
+}
+
+/* Hatched Blocked Cell (Taralı Kutu - Boş Kalan Hücreler) */
+.cengel-cell.blocked {
+  background-color: var(--card-bg, #ffffff);
+  background-image: repeating-linear-gradient(
+    45deg,
+    var(--border-dark, #000000) 0,
+    var(--border-dark, #000000) 1.2px,
+    transparent 1.2px,
+    transparent 4.5px
+  );
+}
+[data-theme="dark"] .cengel-cell.blocked {
+  background-color: #1e293b;
+  background-image: repeating-linear-gradient(
+    45deg,
+    #475569 0,
+    #475569 1.2px,
+    transparent 1.2px,
+    transparent 4.5px
+  );
 }
 
 /* In-Grid Clue Cell */
@@ -821,21 +841,25 @@ h1, h2, h3, .brand-name, .sheet-title, .clue-header {
 .cengel-cell.clue-cell.dual-clue .clue-sub:first-child {
   border-bottom: 1px solid #94a3b8;
 }
+.cengel-cell.clue-cell.dual-clue .clue-text {
+  font-size: 4.4pt;
+  line-height: 1.1;
+}
 
 .clue-text {
-  font-size: 5.6pt;
-  line-height: 1.05;
+  font-size: 5.0pt;
+  line-height: 1.15;
   font-weight: 700;
   text-align: center;
   word-break: break-word;
-  padding: 0 1px;
+  padding: 0 1.5px;
   font-family: system-ui, -apple-system, sans-serif;
   letter-spacing: -0.1px;
 }
 
 .clue-arrow {
   position: absolute;
-  font-size: 7.5pt;
+  font-size: 7.0pt;
   font-weight: 900;
   line-height: 1;
   color: #0284c7;
@@ -855,15 +879,15 @@ h1, h2, h3, .brand-name, .sheet-title, .clue-header {
 
 /* Layout Single (Tam Sayfa) Typography */
 .cengel-container.layout-single .clue-text {
-  font-size: 6.2pt;
-  line-height: 1.1;
+  font-size: 5.0pt;
+  line-height: 1.15;
   font-weight: 700;
 }
 .cengel-container.layout-single .clue-arrow {
-  font-size: 8.5pt;
+  font-size: 7.2pt;
 }
 .cengel-container.layout-single .cengel-cell.letter-cell {
-  font-size: 14pt;
+  font-size: 15pt;
 }
 
 /* Branding / Emblem Cell */

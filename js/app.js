@@ -327,7 +327,6 @@ export class CrosswordApp {
   resetSolutionKey() {
     this.isSolutionVisible = false;
     this.solutionSheet.classList.remove('visible');
-    if (this.cengelView) this.cengelView.classList.remove('solution-visible');
     this.btnToggleSolution.classList.remove('active');
     this.btnToggleSolution.innerHTML = '👁️ Show Answer Key';
     this.pageCountDisplays.forEach(el => el.textContent = '1');
@@ -411,16 +410,21 @@ export class CrosswordApp {
         if (this.solutionClassicView) this.solutionClassicView.style.display = 'none';
 
         // Dimension configurations (Full page single or stacked dual)
-        let rows = 18, cols = 13;
+        let rows = 16, cols = 12;
         if (this.cengelLayout === 'single') {
-          if (this.currentDifficulty === 'easy') { rows = 16; cols = 12; }
-          else if (this.currentDifficulty === 'medium') { rows = 18; cols = 13; }
-          else { rows = 21; cols = 14; }
+          if (this.currentDifficulty === 'easy') { rows = 14; cols = 11; }
+          else if (this.currentDifficulty === 'medium') { rows = 16; cols = 12; }
+          else { rows = 19; cols = 13; }
         } else {
           // Dual mode (2 puzzles stacked)
           if (this.currentDifficulty === 'easy') { rows = 11; cols = 11; }
           else if (this.currentDifficulty === 'medium') { rows = 13; cols = 11; }
           else { rows = 14; cols = 12; }
+        }
+
+        const titleEl = document.querySelector('.sheet-title');
+        if (titleEl && (titleEl.textContent === 'English Crossword' || titleEl.textContent === 'Çengel Bulmaca')) {
+          titleEl.textContent = 'Çengel Bulmaca';
         }
 
         const diffLabel = this.currentDifficulty === 'easy' ? 'Kolay Seviye' : (this.currentDifficulty === 'hard' ? 'Zor Seviye' : 'Orta Seviye');
@@ -502,14 +506,14 @@ export class CrosswordApp {
     this.solutionCengelView.classList.toggle('layout-single', !isDual);
     this.solutionCengelView.classList.toggle('layout-dual', isDual);
 
-    let cellSize = '42px';
+    let cellSize = '50px';
     if (isDual) {
-      cellSize = '34px';
+      cellSize = '36px';
     } else {
       const p = this.currentCengelPuzzles[0];
-      if (p.rows >= 21) cellSize = '38px';
-      else if (p.rows >= 18) cellSize = '42px';
-      else cellSize = '45px';
+      if (p.rows >= 19) cellSize = '46px';
+      else if (p.rows >= 16) cellSize = '50px';
+      else cellSize = '54px';
     }
     document.documentElement.style.setProperty('--cengel-cell-size', cellSize);
 
@@ -548,19 +552,7 @@ export class CrosswordApp {
     const block = document.createElement('div');
     block.className = 'cengel-puzzle-block';
 
-    // Newspaper Blue Banner
-    const banner = document.createElement('div');
-    banner.className = 'cengel-banner';
-    banner.innerHTML = `
-      <div class="cengel-banner-title">ÇENGEL BULMACA</div>
-      <div class="cengel-banner-meta">
-        <span class="cengel-banner-level">${puzzle.difficultyLabel || 'Orta Seviye'}</span>
-        <span class="cengel-banner-num">${puzzle.puzzleNumber || '#1'}</span>
-      </div>
-    `;
-    block.appendChild(banner);
-
-    // Board Grid
+    // Board Grid (No banner above grid)
     const board = document.createElement('div');
     board.className = 'cengel-board';
     board.style.setProperty('--cengel-rows', puzzle.rows);
@@ -573,7 +565,9 @@ export class CrosswordApp {
         const cell = puzzle.grid[r][c];
         const cellDiv = document.createElement('div');
 
-        if (cell.type === 'letter') {
+        if (cell.type === 'blocked') {
+          cellDiv.className = 'cengel-cell blocked';
+        } else if (cell.type === 'letter') {
           cellDiv.className = 'cengel-cell letter-cell';
           const span = document.createElement('span');
           span.className = 'letter-char';
@@ -585,10 +579,7 @@ export class CrosswordApp {
         } else {
           // Clue Cell
           cellDiv.className = 'cengel-cell clue-cell';
-          if (cell.isBranding) {
-            cellDiv.classList.add('emblem-cell');
-            cellDiv.textContent = cell.label || '★';
-          } else if (cell.acrossWord && cell.downWord) {
+          if (cell.acrossWord && cell.downWord) {
             cellDiv.classList.add('dual-clue');
             cellDiv.innerHTML = `
               <div class="clue-sub">
@@ -615,8 +606,7 @@ export class CrosswordApp {
               </div>
             `;
           } else {
-            cellDiv.classList.add('emblem-cell');
-            cellDiv.textContent = '★';
+            cellDiv.className = 'cengel-cell blocked';
           }
         }
 
@@ -632,13 +622,11 @@ export class CrosswordApp {
     this.isSolutionVisible = !this.isSolutionVisible;
     if (this.isSolutionVisible) {
       this.solutionSheet.classList.add('visible');
-      if (this.cengelView) this.cengelView.classList.add('solution-visible');
       this.btnToggleSolution.classList.add('active');
       this.btnToggleSolution.innerHTML = '🔒 Hide Answer Key';
       this.pageCountDisplays.forEach(el => el.textContent = '2');
     } else {
       this.solutionSheet.classList.remove('visible');
-      if (this.cengelView) this.cengelView.classList.remove('solution-visible');
       this.btnToggleSolution.classList.remove('active');
       this.btnToggleSolution.innerHTML = '👁️ Show Answer Key';
       this.pageCountDisplays.forEach(el => el.textContent = '1');
@@ -788,9 +776,9 @@ export class CrosswordApp {
       const diffLabel = this.currentDifficulty === 'easy' ? 'Kolay Seviye' : (this.currentDifficulty === 'hard' ? 'Zor Seviye' : 'Orta Seviye');
       let rows = 18, cols = 13;
       if (this.cengelLayout === 'single') {
-        if (this.currentDifficulty === 'easy') { rows = 16; cols = 12; }
-        else if (this.currentDifficulty === 'medium') { rows = 18; cols = 13; }
-        else { rows = 21; cols = 14; }
+        if (this.currentDifficulty === 'easy') { rows = 14; cols = 11; }
+        else if (this.currentDifficulty === 'medium') { rows = 16; cols = 12; }
+        else { rows = 19; cols = 13; }
       } else {
         if (this.currentDifficulty === 'easy') { rows = 11; cols = 11; }
         else if (this.currentDifficulty === 'medium') { rows = 13; cols = 11; }
