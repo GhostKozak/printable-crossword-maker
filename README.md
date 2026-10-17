@@ -1,84 +1,153 @@
-# 🧩 İngilizce Çengel Bulmaca Oluşturucu (Printable A4 Crossword Generator)
+# 🧩 Gazete Çengel & Kare Bulmaca Oluşturucu (Printable Arrowword & Crossword Maker)
 
-Tamamen rastgele İngilizce çengel bulmaca oluşturan, kağıt ve kalemle çözülmek üzere tasarlanmış, çok dilli ipucu destekli ve doğrudan **A4 kağıda baskı** alınabilen modern, modüler bir web uygulamasıdır.
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![Zero Dependencies](https://img.shields.io/badge/Dependencies-0%20(Pure%20Vanilla%20JS)-success.svg)](#)
+[![Print Ready A4](https://img.shields.io/badge/Print-Ready%20A4%20%26%20PDF-orange.svg)](#)
+[![GitHub Pages](https://img.shields.io/badge/Deploy-GitHub%20Pages%20Ready-brightgreen.svg)](#)
+[![Bilingual](https://img.shields.io/badge/Language-TR%20%7C%20EN%20%7C%20Mixed-purple.svg)](#)
+
+Gerçek **Türk gazetesi formatında çengel bulmaca (Arrowword / Scandinavian Crossword)** ve **klasik kare bulmaca** üreten; kağıda basılmak, PDF olarak indirilmek veya doğrudan tarayıcı üzerinden klavyeyle çözülmek üzere tasarlanmış, sıfır bağımlılıklı modern bir web uygulamasıdır.
 
 ---
 
-## 🌟 Temel Özellikler
+## 🌟 Öne Çıkan Özellikler
 
-- **📚 1000+ Kelimelik Zengin Hazne:** 3 harfliden 10+ harfliye kadar dengeli, 13 kategoride 1006 benzersiz kelime.
-- **🌐 Çok Dilli İpucu Desteği (Multi-Language):**
-  - 🇹🇷 **TR (Türkçe):** İpuçları Türkçe (doğrudan anlam, eş/zıt anlam, deyim), ızgara cevapları İngilizce (İngilizce kelime öğrenimi ve dersler için ideal).
-  - 🇬🇧 **EN (İngilizce):** Klasik İngilizce ipuçları ve tanımlar.
-  - 🔀 **Mix (Karışık):** Ezberi bozan rastgele Türkçe ve İngilizce ipucu kombinasyonu.
-- **🧩 Yüksek Yoğunluklu (Dense) Izgara Motoru:**
-  - **Easy:** 14 kelime (~14x14 grid)
-  - **Medium:** 21 kelime (~15x16 grid)
-  - **Hard:** 30 kelime (18x18 ızgarayı dolduran zengin bağlantılı yapı)
-  - Çoklu kesişim bonusu ve kompakt sınır optimizasyonu ile birbirine sıkıca kenetlenen bulmacalar.
-- **🖨️ Kusursuz A4 Baskı Düzeni:**
-  - `@media print` ve `@page { size: A4 portrait; }` ile optimize edilmiş sayfa ölçüleri.
-  - Baskı anında menüler ve kontroller gizlenir, grid ve ipuçları tek A4 sayfasına sığacak şekilde ölçeklenir.
-- **📄 Toplu Baskı (Batch Print):** Tek tıkla 2, 4, 6, 8 veya 10 farklı bulmacayı ve arkasındaki cevap anahtarlarını sıralı olarak yazdırma.
-- **🔒 Gizli Cevap Anahtarı (Solution Key):** İsteğe bağlı açılan, açıldığında 2. sayfa olarak basılan çözüm tablosu.
-- **🌙 Karanlık Mod (Dark Mode):** Göz yormayan koyu tema ve yerel depolama (`localStorage`) desteği.
-- **🔗 URL ile Paylaşım:** Her bulmacanın benzersiz seed'ini, zorluğunu, dilini ve kategorilerini içeren link kopyalama.
-- **📥 PDF İndirme:** Sayfayı doğrudan tek tıkla vektörel PDF olarak kaydetme.
+### 1. 📰 İki Farklı Bulmaca Modu
+- **📰 Gazete Çengel Bulmaca (Arrowword / Scandinavian):**
+  - Sorular kutuların doğrudan içinde yer alır.
+  - Soru kutularının sağ alt köşesinde net başlangıç yön okları (`→` Yatay / `↓` Dikey).
+  - İkili soru kutusu desteği (aynı kutudan hem sağa hem aşağıya soru çıkışı).
+  - Sıfır boşluklu yüksek aktif alan yoğunluğu (%85-90+).
+  - **Tekli Mod (Tam Sayfa):** Tüm A4 sayfasını kaplayan dev gazete çengel bulmacası.
+  - **İkili Mod (2'li Sayfa):** Tek A4 sayfasına alt alta yerleşen, ortasında kesim çizgisi (`✂️`) bulunan iki adet kompakt çengel bulmaca.
+- **🧩 Klasik Kare Bulmaca (Classic Crossword):**
+  - Geleneksel numaralandırılmış hücreler ve alt kısımda 2 sütunlu ipucu listesi.
+
+---
+
+### 2. 🔐 Şifreli Anahtar Kelime Bandı (Secret Keyword)
+- Gazetelerin geleneksel bulmaca sayfalarında olduğu gibi, tablodaki rastgele harflerin köşelerine numaralı küçük rozetler (`1`, `2`, `3`...) yerleştirilir.
+- Bulmacanın en altında bu numaraların karşılığı olan kutucuklar yatay olarak sıralanır.
+- Şifreli kelimenin de kendi ipucu metni bulunur (`🔐 ŞİFRELİ KELİME: İpucu`).
+- Ekranda klavyeyle numaralı bir hücreye harf yazdığınızda, alttaki şifreli kelime kutucuğu da otomatik dolar.
+
+---
+
+### 3. ⌨️ İnteraktif Klavye ile Çözüm & Doğrulama
+- **Klavye Desteği:** Herhangi bir harf kutusuna tıklayıp doğrudan harf yazabilirsiniz.
+  - **Harfler (`A-Z`):** Harfi yazar ve bir sonraki kutuya otomatik ilerler.
+  - **Space (Boşluk):** Yazma yönünü anında değiştirir (`→` Soldan Sağa / `↓` Yukarıdan Aşağıya).
+  - **Yön Tuşları (`↑ ↓ ← →`):** Tablo içinde serbestçe gezinme sağlar.
+  - **Backspace / Delete:** Harfi siler ve bir önceki kutuya döner.
+- **✅ Kontrol Et (`#btn-check`):** Yazdığınız harfleri doğrular; doğru harfleri yeşil (`.cell-correct`), hatalı harfleri kırmızı (`.cell-wrong`) vurgular ve özet skor bildirimi gösterir.
+- **💡 İpucu Harf (`#btn-hint`):** Takıldığınızda bulmacadaki harflerin ~%15'ini başlangıç ipucu olarak açıp kapatabilirsiniz.
+
+---
+
+### 4. 🌿 Toner Tasarruflu A4 Baskı & Vektörel PDF
+- **45° Köşegen Tarama (Hatched Cells):** Kullanılmayan siyah kutular simsiyah mürekkep basmak yerine 45 derecelik ince çizgilerle taranır. Bu sayede yazıcı tonerinden %80'e varan tasarruf sağlanır.
+- **Tek Sayfa A4 Garantisi:** `@media print` kuralları ile grid, başlık ve şifreli kelime bandı tam olarak A4 sayfasına sığacak şekilde ölçeklenir.
+- **📄 Toplu Baskı (Batch Print):** Tek tıkla 2, 4, 6, 8 veya 10 farklı bulmacayı ve arkasındaki cevap anahtarlarını sıralı olarak yazdırabilirsiniz (sınıflar, kurslar ve etkinlikler için ideal).
+- **📥 Vektörel PDF İndirme:** Sayfayı Türkçe karakter destekli, net çizgili PDF formatında tek tıkla kaydeder.
+
+---
+
+### 5. 🌐 1000+ Kelimelik Zengin Çok Dilli Veri Havuzu
+- 3 harfliden 10+ harfliye kadar dengeli 1006 benzersiz İngilizce kelime.
+- **13 Kategori:** Hayvanlar, Bilim, Coğrafya, Yemek, Teknoloji, Vücut & Meslekler, Genel, Spor, Ev, Hava Durumu, Taşıtlar, Kültür, Duygular.
+- **3 Dil Seçeneği:**
+  - 🇹🇷 **TR:** Türkçe ipuçları (İngilizce kelime öğrenimi için birebir).
+  - 🇬🇧 **EN:** İngilizce tanımlar ve eş anlamlılar.
+  - 🔀 **Mix:** Karışık Türkçe ve İngilizce ipucu kombinasyonu.
+- **Anında Dil Güncelleme:** Dil butonuna basıldığında bulmaca bozulmadan veya girilen harfler silinmeden ipuçları yerinde güncellenir.
+
+---
+
+### 6. 🔗 URL ile Paylaşım & Deterministic Seed
+- Her bulmaca `mulberry32` algoritması ile deterministik bir tohum (seed) üzerinden üretilir.
+- **🔗 Paylaş Butonu:** Bulmacanın tam halini içeren URL hash parametresini (`#seed=...&type=cengel&diff=medium&lang=tr`) kopyalar. Linki açan herkes **birebir aynı** bulmacayı görür.
 
 ---
 
 ## 🏗️ Modüler Proje Mimarisi
 
-Uygulama, hem insanlar hem de AI asistanlar için yüksek okunabilirlik ve bakım kolaylığı sağlayan modüler bir yapıya sahiptir:
+Uygulama, sıfır harici paket bağımlılığıyla modern JavaScript (ES Modules) prensiplerine göre yapılandırılmıştır:
 
 ```
 cengel-bulmaca/
-├── index.html                 # Ana HTML şablonu, baskı ve modül yükleyici (~150 satır)
+├── index.html                 # Ana HTML arayüzü, sidebar, butonlar ve A4 baskı şablonu
 │
 ├── css/
-│   ├── style.css              # Arayüz, butonlar, kontroller, animasyon ve dark mode
-│   └── print.css              # A4 baskı kuralları (@media print)
+│   ├── style.css              # UI stilleri, gazete gridi, şifreli kelime barı, dark mode
+│   └── print.css              # @media print kuralları, A4 ölçekleme, toner tarama
 │
 ├── js/
-│   ├── main.js                # Uygulama giriş noktası (entrypoint)
-│   ├── app.js                 # CrosswordApp (UI durum yönetimi, event listener'lar)
+│   ├── main.js                # Uygulama giriş noktası (bootstrap)
+│   ├── app.js                 # CrosswordApp (UI durum yönetimi, klavye dinleyicileri)
+│   │
 │   ├── core/
-│   │   └── generator.js       # CrosswordGenerator (yüksek yoğunluklu iki aşamalı ızgara motoru)
+│   │   ├── cengel-generator.js # Gazete tipi Çengel Bulmaca motoru (in-grid clues, secret word)
+│   │   └── generator.js        # Klasik yüksek yoğunluklu Crossword motoru
+│   │
 │   ├── data/
-│   │   └── words.js           # 1006 kelimelik zengin TR/EN veri tabanı (RAW_WORD_BANK)
+│   │   └── words.js            # 1006 kelimelik kategorize edilmiş zengin TR/EN veri tabanı
+│   │
 │   └── utils/
-│       ├── seeded-random.js   # SeededRandom (mulberry32 PRNG)
-│       └── pdf-exporter.js    # PdfExporter (Türkçe karakter korumalı vektörel PDF motoru)
+│       ├── seeded-random.js    # Tohum tabanlı rastgele sayı üreticisi (PRNG)
+│       └── pdf-exporter.js     # jsPDF tabanlı vektörel A4 PDF dışa aktarıcı
 │
 ├── tests/
-│   └── test-suite.js          # Otomatik doğrulama testleri (kelime, ızgara, seed, PDF)
+│   └── test-suite.js           # Kelime haznesi, tohum determinizmi ve çengel doğrulama testleri
 │
-└── README.md                  # Proje dokümantasyonu
+└── README.md                   # Proje dokümantasyonu
 ```
 
 ---
 
-## 🚀 Nasıl Çalıştırılır?
+## 🚀 Canlı Yayına Alma (GitHub Pages)
 
-Modern ES Modülleri (`type="module"`) kullanıldığı için uygulamayı yerel bir statik sunucuyla açabilirsiniz:
+Bu proje statik bir web uygulaması olduğu için **GitHub Pages üzerinde 1 dakikada ücretsiz** yayınlanabilir:
+
+1. **Reponuzu GitHub'a Gönderin:**
+   ```bash
+   git remote add origin https://github.com/<kullanici-adiniz>/<repo-adi>.git
+   git branch -M main
+   git push -u origin main
+   ```
+2. **GitHub Pages'i Açın:**
+   - GitHub'da reponuzun **Settings** sekmesine tıklayın.
+   - Sol menüden **Pages** seçeneğine gidin.
+   - **Branch:** `main` ve klasör olarak `/(root)` seçip **Save** butonuna basın.
+   - 30 saniye içinde siteniz `https://<kullanici-adiniz>.github.io/<repo-adi>/` adresinde canlıya geçer!
+
+---
+
+## 💻 Yerel Ortamda Çalıştırma
+
+Modern ES Modülleri (`type="module"`) kullanıldığı için uygulamayı herhangi bir yerel sunucuyla açabilirsiniz:
 
 ```bash
-# Python ile anında çalıştırmak için:
+# Python 3 ile:
 python3 -m http.server 8000
 
-# Veya Node.js / npx ile:
-npx serve
+# veya Node.js npx ile:
+npx serve .
 ```
 
-Ardından tarayıcınızda `http://localhost:8000` adresine gidin.
+Tarayıcınızda `http://localhost:8000` adresine gidin.
 
 ---
 
-## 🧪 Otomatik Testleri Çalıştırma
+## 🧪 Testleri Çalıştırma
 
-Projedeki tüm kelime haznesi, ızgara motoru, tohum determinizmi ve PDF dönüştürücüyü tek komutla test edebilirsiniz:
+Projede kelime haznesini, tekrarlayan sözcükleri, tohum determinizmini ve Çengel kelime uzunluk sınırlarını doğrulayan otomatik test paketi bulunmaktadır:
 
 ```bash
 node tests/test-suite.js
 ```
 
+---
+
+## 📜 Lisans
+
+Bu proje [MIT Lisansı](LICENSE) kapsamında açık kaynak olarak sunulmaktadır. Ticari ve kişisel projelerinizde serbestçe kullanabilir, çatallayabilir (fork) ve geliştirebilirsiniz.
