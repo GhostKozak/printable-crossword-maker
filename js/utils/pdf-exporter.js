@@ -315,7 +315,7 @@ export class PdfExporter {
 
                 doc.setTextColor(2, 132, 199);
                 doc.setFontSize(cellW > 12.5 ? 5.2 : 4.6);
-                doc.text('>', x + cellW - 0.8, y + cellW / 4 + 0.5, { align: 'right' });
+                doc.text('>', x + cellW - 0.8, y + cellW / 2 - 0.8, { align: 'right' });
 
                 // Divider line
                 doc.setDrawColor(180, 180, 180);
@@ -334,7 +334,7 @@ export class PdfExporter {
 
                 doc.setTextColor(2, 132, 199);
                 doc.setFontSize(cellW > 12.5 ? 5.2 : 4.6);
-                doc.text('v', x + cellW / 2, y + cellW - 0.6, { align: 'center' });
+                doc.text('v', x + cellW - 0.8, y + cellW - 0.8, { align: 'right' });
               } else if (cell.acrossWord) {
                 // Single Across Clue
                 doc.setFont('helvetica', 'bold');
@@ -346,19 +346,19 @@ export class PdfExporter {
 
                 doc.setTextColor(2, 132, 199);
                 doc.setFontSize(cellW > 12.5 ? 6.0 : 5.2);
-                doc.text('>', x + cellW - 0.8, y + cellW / 2 + 1, { align: 'right' });
+                doc.text('>', x + cellW - 0.8, y + cellW - 0.8, { align: 'right' });
               } else if (cell.downWord) {
                 // Single Down Clue
                 doc.setFont('helvetica', 'bold');
                 doc.setFontSize(cellW > 12.5 ? 4.8 : 4.4);
                 doc.setTextColor(20, 20, 20);
                 const t = this.sanitizeText(cell.downWord.clue);
-                const lines = doc.splitTextToSize(t, cellW - 2.2);
+                const lines = doc.splitTextToSize(t, cellW - 2.8);
                 doc.text(lines.slice(0, 3), x + 1, y + 2.8);
 
                 doc.setTextColor(2, 132, 199);
                 doc.setFontSize(cellW > 12.5 ? 6.0 : 5.2);
-                doc.text('v', x + cellW / 2, y + cellW - 0.8, { align: 'center' });
+                doc.text('v', x + cellW - 0.8, y + cellW - 0.8, { align: 'right' });
               } else {
                 this.drawHatchedCell(doc, x, y, cellW, 2.2);
                 doc.setDrawColor(0, 0, 0);

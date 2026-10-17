@@ -878,7 +878,7 @@ h1, h2, h3, .brand-name, .sheet-title, .clue-header {
   justify-content: center;
   align-items: center;
   position: relative;
-  padding: 1px;
+  padding: 1px 4px 2px 2px;
 }
 
 /* Dual Clue (Split top/bottom) */
@@ -896,7 +896,7 @@ h1, h2, h3, .brand-name, .sheet-title, .clue-header {
   font-weight: 700;
   text-align: center;
   word-break: break-word;
-  padding: 0 2px;
+  padding: 0 2px 1px 2px;
   font-family: system-ui, -apple-system, sans-serif;
   letter-spacing: -0.1px;
 }
@@ -908,27 +908,26 @@ h1, h2, h3, .brand-name, .sheet-title, .clue-header {
 
 .clue-arrow {
   position: absolute;
-  font-size: 7.2pt;
+  font-size: 6.8pt;
   font-weight: 900;
   line-height: 1;
   color: #0284c7;
   pointer-events: none;
+  bottom: 1px;
+  right: 2px;
 }
 [data-theme="dark"] .clue-arrow {
   color: #38bdf8;
 }
 
-/* Across arrow sits on the right edge pointing right */
+/* Both Across & Down arrows sit in the bottom-right corner */
 .clue-arrow.arrow-right {
-  right: 1px;
-  top: 50%;
-  transform: translateY(-50%);
+  bottom: 1px;
+  right: 2px;
 }
-/* Down arrow sits on the bottom edge pointing down */
 .clue-arrow.arrow-down {
-  bottom: 0px;
-  left: 50%;
-  transform: translateX(-50%);
+  bottom: 1px;
+  right: 2px;
 }
 
 /* Layout Single (Tam Sayfa) Typography */
