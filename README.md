@@ -33,7 +33,7 @@ Uygulama, hem insanlar hem de AI asistanlar için yüksek okunabilirlik ve bakı
 
 ```
 cengel-bulmaca/
-├── index.html                 # Ana HTML şablonu ve modül yükleyicisi (~150 satır)
+├── index.html                 # Ana HTML şablonu, baskı ve modül yükleyici (~150 satır)
 │
 ├── css/
 │   ├── style.css              # Arayüz, butonlar, kontroller, animasyon ve dark mode
@@ -43,11 +43,15 @@ cengel-bulmaca/
 │   ├── main.js                # Uygulama giriş noktası (entrypoint)
 │   ├── app.js                 # CrosswordApp (UI durum yönetimi, event listener'lar)
 │   ├── core/
-│   │   └── generator.js       # CrosswordGenerator (yüksek yoğunluklu ızgara algoritması)
+│   │   └── generator.js       # CrosswordGenerator (yüksek yoğunluklu iki aşamalı ızgara motoru)
 │   ├── data/
-│   │   └── words.js           # 1006 kelimelik çok dilli veri tabanı (RAW_WORD_BANK)
+│   │   └── words.js           # 1006 kelimelik zengin TR/EN veri tabanı (RAW_WORD_BANK)
 │   └── utils/
-│       └── seeded-random.js   # SeededRandom (mulberry32 PRNG)
+│       ├── seeded-random.js   # SeededRandom (mulberry32 PRNG)
+│       └── pdf-exporter.js    # PdfExporter (Türkçe karakter korumalı vektörel PDF motoru)
+│
+├── tests/
+│   └── test-suite.js          # Otomatik doğrulama testleri (kelime, ızgara, seed, PDF)
 │
 └── README.md                  # Proje dokümantasyonu
 ```
@@ -56,7 +60,7 @@ cengel-bulmaca/
 
 ## 🚀 Nasıl Çalıştırılır?
 
-Modern ES Modülleri (`type="module"`) kullanıldığı için uygulamayı yerel bir statik sunucuyla (veya modern tarayıcılarda doğrudan) açabilirsiniz:
+Modern ES Modülleri (`type="module"`) kullanıldığı için uygulamayı yerel bir statik sunucuyla açabilirsiniz:
 
 ```bash
 # Python ile anında çalıştırmak için:
@@ -67,3 +71,14 @@ npx serve
 ```
 
 Ardından tarayıcınızda `http://localhost:8000` adresine gidin.
+
+---
+
+## 🧪 Otomatik Testleri Çalıştırma
+
+Projedeki tüm kelime haznesi, ızgara motoru, tohum determinizmi ve PDF dönüştürücüyü tek komutla test edebilirsiniz:
+
+```bash
+node tests/test-suite.js
+```
+

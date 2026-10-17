@@ -1,6 +1,7 @@
 import { WORD_BANK } from "./data/words.js";
 import { SeededRandom } from "./utils/seeded-random.js";
 import { CrosswordGenerator } from "./core/generator.js";
+import { PdfExporter } from "./utils/pdf-exporter.js";
 
 export class CrosswordApp {
   constructor() {
@@ -9,6 +10,21 @@ export class CrosswordApp {
     this.isSolutionVisible = false;
     this.targetCounts = { easy: 14, medium: 21, hard: 30 };
     this.categories = ['animals', 'science', 'geography', 'food', 'technology', 'body', 'general', 'sports', 'household', 'weather', 'vehicles', 'culture', 'emotions'];
+    this.categoryMeta = {
+      animals: { icon: '🐾', label: 'Animals' },
+      science: { icon: '🔬', label: 'Science' },
+      geography: { icon: '🌍', label: 'Geography' },
+      food: { icon: '🍕', label: 'Food' },
+      technology: { icon: '💻', label: 'Tech' },
+      body: { icon: '🧑‍⚕️', label: 'Body/Jobs' },
+      general: { icon: '✨', label: 'General' },
+      sports: { icon: '⚽', label: 'Sports' },
+      household: { icon: '🏠', label: 'Home' },
+      weather: { icon: '🌤️', label: 'Weather' },
+      vehicles: { icon: '🚀', label: 'Vehicles' },
+      culture: { icon: '🏛️', label: 'Culture' },
+      emotions: { icon: '❤️', label: 'Emotions' }
+    };
     this.selectedCategories = new Set(this.categories);
     this.clueLang = 'mixed';
     try { this.clueLang = localStorage.getItem('clueLang') || 'mixed'; } catch(e){}
@@ -57,11 +73,42 @@ export class CrosswordApp {
     this.statsIntersections = document.getElementById('stats-intersections');
     this.statsLongest = document.getElementById('stats-longest');
 
-    // Create Category Chips
+    // Quick Category Selection Controls
+    const quickControls = document.createElement('div');
+    quickControls.className = 'cat-quick-actions';
+    quickControls.innerHTML = `
+      <button type="button" class="cat-quick-btn" id="btn-cat-all" title="Select all categories">✅ All</button>
+      <button type="button" class="cat-quick-btn" id="btn-cat-clear" title="Keep minimum 2 categories">❌ Clear</button>
+    `;
+    this.catContainer.appendChild(quickControls);
+
+    quickControls.querySelector('#btn-cat-all').addEventListener('click', () => {
+      this.selectedCategories = new Set(this.categories);
+      document.querySelectorAll('.cat-chip').forEach(c => c.classList.add('selected'));
+      this.resetSolutionKey();
+      this.generateNewPuzzle();
+    });
+
+    quickControls.querySelector('#btn-cat-clear').addEventListener('click', () => {
+      this.selectedCategories = new Set(this.categories.slice(0, 2));
+      document.querySelectorAll('.cat-chip').forEach(c => {
+        if (this.selectedCategories.has(c.dataset.cat)) {
+          c.classList.add('selected');
+        } else {
+          c.classList.remove('selected');
+        }
+      });
+      this.showToast('Selected minimum 2 categories (Animals, Science)');
+      this.resetSolutionKey();
+      this.generateNewPuzzle();
+    });
+
+    // Create Category Chips with icons
     this.categories.forEach(cat => {
+      const info = this.categoryMeta[cat] || { icon: '🏷️', label: cat };
       const chip = document.createElement('div');
       chip.className = 'cat-chip selected';
-      chip.textContent = cat.charAt(0).toUpperCase() + cat.slice(1);
+      chip.innerHTML = `<span class="chip-icon">${info.icon}</span> <span>${info.label}</span>`;
       chip.dataset.cat = cat;
       chip.addEventListener('click', () => this.toggleCategory(chip, cat));
       this.catContainer.appendChild(chip);
@@ -302,24 +349,7 @@ export class CrosswordApp {
       const today = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
 
       // Difficulty Score (YEN-8)
-      let scoreLabel = '';
-      if (this.currentPuzzle) {
-        let avgLen = 0, rarePoints = 0;
-        this.currentPuzzle.allWords.forEach(w => {
-          avgLen += w.word.length;
-          for(const c of w.word) {
-            if (['Q','X','Z','J','K'].includes(c)) rarePoints++;
-          }
-        });
-        avgLen /= this.currentPuzzle.allWords.length;
-        const numWords = this.currentPuzzle.allWords.length;
-        const intersections = this.currentPuzzle.intersections || 1;
-        const diffScore = (avgLen * 0.5) + (rarePoints * 1.5) + (numWords * 0.3) - (intersections * 0.2);
-        const score = Math.max(1, Math.min(10, Math.round(diffScore)));
-        const stars = score <= 3 ? '⭐ Easy' : (score <= 6 ? '⭐⭐ Medium' : '⭐⭐⭐ Hard');
-        const diffTitle = this.currentDifficulty.charAt(0).toUpperCase() + this.currentDifficulty.slice(1);
-        scoreLabel = `${diffTitle} — ${stars} (${score}/10)`;
-      }
+      const scoreLabel = this.calculateDifficultyScore(this.currentPuzzle);
 
       this.puzzleIdDisplay.textContent = puzzleId;
       this.solutionPuzzleIdDisplay.textContent = puzzleId;
@@ -471,6 +501,25 @@ export class CrosswordApp {
     }, 3000);
   }
 
+  calculateDifficultyScore(puzzle) {
+    if (!puzzle || !puzzle.allWords || puzzle.allWords.length === 0) return '';
+    let avgLen = 0, rarePoints = 0;
+    puzzle.allWords.forEach(w => {
+      avgLen += w.word.length;
+      for (const c of w.word) {
+        if (['Q','X','Z','J','K'].includes(c)) rarePoints++;
+      }
+    });
+    avgLen /= puzzle.allWords.length;
+    const numWords = puzzle.allWords.length;
+    const intersections = puzzle.intersections || 1;
+    const diffScore = (avgLen * 0.5) + (rarePoints * 1.5) + (numWords * 0.3) - (intersections * 0.2);
+    const score = Math.max(1, Math.min(10, Math.round(diffScore)));
+    const stars = score <= 3 ? '⭐ Easy' : (score <= 6 ? '⭐⭐ Medium' : '⭐⭐⭐ Hard');
+    const diffTitle = this.currentDifficulty.charAt(0).toUpperCase() + this.currentDifficulty.slice(1);
+    return `${diffTitle} — ${stars} (${score}/10)`;
+  }
+
   batchPrint(count) {
     const container = document.getElementById('batch-container');
     container.innerHTML = '';
@@ -493,7 +542,15 @@ export class CrosswordApp {
       sheet.id = '';
       sheet.querySelector('#puzzle-id').textContent = `Batch #${idx+1}`;
       
+      const maxDim = Math.max(puzzle.rows, puzzle.cols);
+      let cellSizePx = 28;
+      if (maxDim > 18) cellSizePx = 21;
+      else if (maxDim > 15) cellSizePx = 24;
+      else if (maxDim > 12) cellSizePx = 27;
+      else cellSizePx = 30;
+
       const pGrid = sheet.querySelector('#crossword-grid');
+      pGrid.style.setProperty('--cell-size', `${cellSizePx}px`);
       this.renderGrid(pGrid, puzzle.grid, false, false);
       
       const acList = sheet.querySelector('#across-clues');
@@ -501,6 +558,9 @@ export class CrosswordApp {
       this.renderClues(acList, puzzle.acrossClues);
       this.renderClues(dnList, puzzle.downClues);
       
+      const batchDiffLabel = this.calculateDifficultyScore(puzzle);
+      sheet.querySelector('#puzzle-diff-label').textContent = batchDiffLabel;
+
       sheet.querySelector('.page-count-display').textContent = `${count*2}`;
       // Footer text modification
       const footer = sheet.querySelector('.sheet-footer');
@@ -515,9 +575,20 @@ export class CrosswordApp {
       sheet.id = '';
       sheet.classList.add('visible');
       sheet.querySelector('#solution-puzzle-id').textContent = `Batch #${idx+1}`;
+
+      const maxDim = Math.max(puzzle.rows, puzzle.cols);
+      let cellSizePx = 28;
+      if (maxDim > 18) cellSizePx = 21;
+      else if (maxDim > 15) cellSizePx = 24;
+      else if (maxDim > 12) cellSizePx = 27;
+      else cellSizePx = 30;
       
       const sGrid = sheet.querySelector('#solution-grid');
+      sGrid.style.setProperty('--cell-size', `${cellSizePx}px`);
       this.renderGrid(sGrid, puzzle.grid, true, false);
+
+      const batchDiffLabel = this.calculateDifficultyScore(puzzle);
+      sheet.querySelector('#solution-diff-label').textContent = batchDiffLabel;
       
       const sSummary = sheet.querySelector('#solution-words-summary');
       sSummary.innerHTML = '';
@@ -561,90 +632,19 @@ export class CrosswordApp {
   }
 
   _generatePdf() {
-    const { jsPDF } = window.jspdf;
-    const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
-    
-    const puzzle = this.currentPuzzle;
-    if(!puzzle) return;
+    if (!this.currentPuzzle) return;
+    const titleEl = document.querySelector('.sheet-title');
+    const subtitleEl = document.querySelector('.sheet-subtitle');
+    const title = titleEl ? titleEl.textContent.trim() : 'English Crossword';
+    const subtitle = subtitleEl ? subtitleEl.textContent.trim() : 'Vocabulary & General Knowledge';
 
-    const renderPage = (isSol) => {
-      doc.setFont("helvetica", "bold");
-      doc.setFontSize(22);
-      doc.text(isSol ? "Answer Key" : "English Crossword", 15, 25);
-      
-      doc.setFont("helvetica", "normal");
-      doc.setFontSize(10);
-      doc.text(`ID: ${this.puzzleIdDisplay.textContent}`, 195, 20, { align: 'right' });
-      doc.text(`Difficulty: ${this.currentDifficulty}`, 195, 25, { align: 'right' });
-
-      // Grid
-      const cellW = 8;
-      const gridW = puzzle.cols * cellW;
-      const startX = (210 - gridW) / 2;
-      const startY = 35;
-
-      doc.setLineWidth(0.5);
-      
-      for(let r=0; r<puzzle.rows; r++) {
-        for(let c=0; c<puzzle.cols; c++) {
-          const cell = puzzle.grid[r][c];
-          const x = startX + c*cellW;
-          const y = startY + r*cellW;
-          
-          if(cell.isBlocked) {
-            doc.setFillColor(0, 0, 0);
-            doc.rect(x, y, cellW, cellW, "F");
-          } else {
-            doc.setFillColor(255, 255, 255);
-            doc.rect(x, y, cellW, cellW, "FD");
-            if(cell.number) {
-              doc.setFontSize(6);
-              doc.text(cell.number.toString(), x + 1, y + 2.5);
-            }
-            if(isSol && cell.letter) {
-              doc.setFontSize(12);
-              doc.text(cell.letter, x + cellW/2, y + cellW/2 + 1.5, { align: 'center' });
-            }
-          }
-        }
-      }
-
-      // Clues
-      let currentY = startY + puzzle.rows * cellW + 15;
-      doc.setFontSize(12);
-      doc.setFont("helvetica", "bold");
-      doc.text("Across", 15, currentY);
-      doc.text("Down", 110, currentY);
-      
-      currentY += 6;
-      doc.setFont("helvetica", "normal");
-      doc.setFontSize(9);
-      
-      const startYClues = currentY;
-      let yA = currentY;
-      puzzle.acrossClues.forEach(clue => {
-        const text = `${clue.number}. ${clue.clue} (${clue.word.length})`;
-        const lines = doc.splitTextToSize(text, 90);
-        doc.text(lines, 15, yA);
-        yA += lines.length * 4.5;
-      });
-      
-      let yD = startYClues;
-      puzzle.downClues.forEach(clue => {
-        const text = `${clue.number}. ${clue.clue} (${clue.word.length})`;
-        const lines = doc.splitTextToSize(text, 90);
-        doc.text(lines, 110, yD);
-        yD += lines.length * 4.5;
-      });
-    };
-
-    renderPage(false);
-    
-    if (this.isSolutionVisible) {
-      doc.addPage();
-      renderPage(true);
-    }
-
-    doc.save(`crossword-${this.puzzleIdDisplay.textContent.replace('#', '')}.pdf`);
+    PdfExporter.export(this.currentPuzzle, {
+      puzzleId: this.puzzleIdDisplay.textContent,
+      difficulty: this.puzzleDiffDisplay.textContent,
+      title: title,
+      subtitle: subtitle,
+      isSolutionVisible: this.isSolutionVisible,
+      date: this.puzzleDateDisplay.textContent
+    });
   }
 }

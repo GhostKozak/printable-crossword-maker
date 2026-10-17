@@ -199,9 +199,35 @@
     .categories-panel {
       display: flex;
       flex-wrap: wrap;
+      align-items: center;
       gap: 6px;
       padding-top: 12px;
       border-top: 1px solid var(--border-light);
+    }
+
+    .cat-quick-actions {
+      display: flex;
+      gap: 6px;
+      margin-right: 6px;
+      padding-right: 8px;
+      border-right: 1px solid var(--border-light);
+    }
+
+    .cat-quick-btn {
+      padding: 4px 8px;
+      border-radius: 8px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      cursor: pointer;
+      border: 1px solid var(--border-light);
+      background: var(--card-bg);
+      color: var(--text-main);
+      transition: all 0.2s ease;
+    }
+    .cat-quick-btn:hover {
+      background: var(--primary);
+      color: #fff;
+      border-color: var(--primary);
     }
 
     .cat-chip {
@@ -215,11 +241,59 @@
       color: var(--text-muted);
       transition: all 0.2s ease;
       user-select: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
     }
     .cat-chip.selected {
       background: var(--primary);
       color: #fff;
       border-color: var(--primary);
+    }
+    .chip-icon {
+      font-size: 0.85rem;
+    }
+
+    .student-info-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      font-size: 0.85rem;
+      margin-top: 8px;
+      color: var(--text-muted);
+    }
+
+    .sheet-title[contenteditable="true"]:hover,
+    .sheet-subtitle[contenteditable="true"]:hover {
+      outline: 1px dashed var(--primary);
+      cursor: text;
+    }
+    .sheet-title[contenteditable="true"]:focus,
+    .sheet-subtitle[contenteditable="true"]:focus {
+      outline: 2px solid var(--primary);
+      background: rgba(59, 130, 246, 0.05);
+      border-radius: 4px;
+    }
+
+    .file-protocol-banner {
+      width: 100%;
+      max-width: 900px;
+      background: #fef3c7;
+      color: #92400e;
+      border: 1px solid #f59e0b;
+      border-radius: 8px;
+      padding: 10px 16px;
+      margin-bottom: 12px;
+      font-size: 0.85rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+    }
+    [data-theme="dark"] .file-protocol-banner {
+      background: #451a03;
+      color: #fde68a;
+      border-color: #b45309;
     }
 
     .stats-bar {

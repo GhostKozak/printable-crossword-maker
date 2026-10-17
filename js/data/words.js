@@ -3360,33 +3360,33 @@ export const RAW_WORD_BANK = [
     "cat": "household"
   },
   {
-    "word": "CUP",
-    "clues": {
-      "en": [
-        "Vessel for drinking",
-        "Coffee cup"
-      ],
-      "tr": [
-        "İçmek için kap",
-        "Kahve fincanı"
-      ]
-    },
-    "cat": "household"
+  "word": "CUP",
+  "clues": {
+    "en": [
+      "Vessel for hot drinks",
+      "Small bowl-shaped drinking container"
+    ],
+    "tr": [
+      "Sıcak içecek kabı",
+      "Küçük fincan veya kupa"
+    ]
   },
+  "cat": "household"
+},
   {
-    "word": "GLASS",
-    "clues": {
-      "en": [
-        "Drinking vessel made of glass",
-        "Holds water"
-      ],
-      "tr": [
-        "Camdan yapılmış içme kabı",
-        "Su tutar"
-      ]
-    },
-    "cat": "household"
+  "word": "GLASS",
+  "clues": {
+    "en": [
+      "Transparent drinking vessel",
+      "Window pane material"
+    ],
+    "tr": [
+      "Şeffaf su bardağı",
+      "Pencere camı malzemesi"
+    ]
   },
+  "cat": "household"
+},
   {
     "word": "MUG",
     "clues": {
@@ -5384,7 +5384,7 @@ export const RAW_WORD_BANK = [
       ],
       "tr": [
         "Strateji",
-        "Hedefe ulaşmak için plan"
+        "Hedefe ulaşmak için tasarı"
       ]
     },
     "cat": "general"
@@ -6664,19 +6664,19 @@ export const RAW_WORD_BANK = [
     "cat": "geography"
   },
   {
-    "word": "GULF",
-    "clues": {
-      "en": [
-        "Large bay",
-        "Gulf of Mexico"
-      ],
-      "tr": [
-        "Büyük körfez",
-        "Meksika Körfezi"
-      ]
-    },
-    "cat": "geography"
+  "word": "GULF",
+  "clues": {
+    "en": [
+      "Large sea inlet deep into land",
+      "Wide ocean bay"
+    ],
+    "tr": [
+      "Büyük deniz körfezi",
+      "Karaya sokulmuş geniş koy"
+    ]
   },
+  "cat": "geography"
+},
   {
     "word": "PENINSULA",
     "clues": {
@@ -6692,19 +6692,19 @@ export const RAW_WORD_BANK = [
     "cat": "geography"
   },
   {
-    "word": "CAPE",
-    "clues": {
-      "en": [
-        "Point of land extending into water",
-        "Cape of Good Hope"
-      ],
-      "tr": [
-        "Suya uzanan kara noktası",
-        "Ümit Burnu"
-      ]
-    },
-    "cat": "geography"
+  "word": "CAPE",
+  "clues": {
+    "en": [
+      "Point of land extending into water",
+      "Promontory projecting into the sea"
+    ],
+    "tr": [
+      "Suya uzanan kara noktası",
+      "Denize uzanan yüksek burun"
+    ]
   },
+  "cat": "geography"
+},
   {
     "word": "OASIS",
     "clues": {
@@ -7154,19 +7154,19 @@ export const RAW_WORD_BANK = [
     "cat": "general"
   },
   {
-    "word": "UP",
-    "clues": {
-      "en": [
-        "Towards the sky",
-        "Opposite of down"
-      ],
-      "tr": [
-        "Gökyüzüne doğru",
-        "Aşağının zıttı"
-      ]
-    },
-    "cat": "general"
+  "word": "CAP",
+  "clues": {
+    "en": [
+      "Brimless headwear",
+      "Visor hat or bottle top"
+    ],
+    "tr": [
+      "Siperlikli şapka",
+      "Başlık veya şişe kapağı"
+    ]
   },
+  "cat": "household"
+},
   {
     "word": "DOWN",
     "clues": {
@@ -13286,19 +13286,19 @@ export const RAW_WORD_BANK = [
     "cat": "general"
   },
   {
-    "word": "SHIRT",
-    "clues": {
-      "en": [
-        "Top garment",
-        "T-shirt"
-      ],
-      "tr": [
-        "Üst giysi",
-        "Tişört"
-      ]
-    },
-    "cat": "general"
+  "word": "SHIRT",
+  "clues": {
+    "en": [
+      "Upper body garment with collar",
+      "Buttoned cloth top"
+    ],
+    "tr": [
+      "Yakalı üst giysi",
+      "Düğmeli kumaş giyecek"
+    ]
   },
+  "cat": "general"
+},
   {
     "word": "PANTS",
     "clues": {

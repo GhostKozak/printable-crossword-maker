@@ -99,6 +99,27 @@ export class CrosswordGenerator {
       }
     }
 
+    // Secondary pass: Dense gap filling using remaining 3-5 letter words from the full bank
+    if (placedWords.length < this.targetCount) {
+      const placedSet = new Set(placedWords.map(p => p.word));
+      const remainingShorts = shuffled.filter(w => !placedSet.has(w.word) && w.word.length <= 5);
+      for (const item of remainingShorts) {
+        if (placedWords.length >= this.targetCount) break;
+        const bestPos = this._findBestPlacement(grid, item.word, placedWords, minRow, maxRow, minCol, maxCol);
+        if (bestPos) {
+          this._placeWordOnGrid(grid, item.word, bestPos.row, bestPos.col, bestPos.direction);
+          placedWords.push({ word: item.word, clues: item.clues, row: bestPos.row, col: bestPos.col, direction: bestPos.direction });
+          if (bestPos.direction === 'across') {
+            minRow = Math.min(minRow, bestPos.row); maxRow = Math.max(maxRow, bestPos.row);
+            minCol = Math.min(minCol, bestPos.col); maxCol = Math.max(maxCol, bestPos.col + item.word.length - 1);
+          } else {
+            minRow = Math.min(minRow, bestPos.row); maxRow = Math.max(maxRow, bestPos.row + item.word.length - 1);
+            minCol = Math.min(minCol, bestPos.col); maxCol = Math.max(maxCol, bestPos.col);
+          }
+        }
+      }
+    }
+
     if (placedWords.length < 5) return null;
     return this._formatPuzzle(grid, placedWords);
   }
@@ -217,11 +238,6 @@ export class CrosswordGenerator {
       }
     }
 
-    minR = Math.max(0, minR - 1);
-    minC = Math.max(0, minC - 1);
-    maxR = Math.min(gridRows - 1, maxR + 1);
-    maxC = Math.min(gridCols - 1, maxC + 1);
-
     const rows = maxR - minR + 1;
     const cols = maxC - minC + 1;
 
@@ -236,7 +252,8 @@ export class CrosswordGenerator {
               let combined = [...(w.clues && w.clues.tr ? w.clues.tr : []), ...(w.clues && w.clues.en ? w.clues.en : [])];
               availableClues = combined.length ? combined : ["No clue"];
             }
-            let randomClue = availableClues[Math.floor(Math.random() * availableClues.length)];
+            const randVal = this.rng ? this.rng.next() : Math.random();
+            let randomClue = availableClues[Math.floor(randVal * availableClues.length)];
             return {
                 ...w,
                 clue: randomClue,
