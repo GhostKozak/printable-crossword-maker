@@ -155,37 +155,81 @@ h1, h2, h3, .brand-name, .sheet-title, .clue-header {
   border-radius: 8px;
 }
 
-/* Segmented Buttons */
-.difficulty-selector {
+/* Segmented Controls & Buttons */
+.difficulty-selector,
+.segmented-control {
   display: flex;
   background: var(--border-light);
   border-radius: 8px;
   padding: 3px;
-  gap: 2px;
-}
-.segmented-control {
+  gap: 3px;
   width: 100%;
 }
+[data-theme="dark"] .segmented-control,
+[data-theme="dark"] .difficulty-selector {
+  background: #0f172a;
+  border: 1px solid #334155;
+}
 
-.diff-btn, .lang-btn {
+.segmented-control button,
+.diff-btn, 
+.lang-btn,
+.type-btn,
+.cengel-layout-btn {
   flex: 1;
   text-align: center;
   border: none;
   background: transparent;
-  padding: 7px 6px;
+  padding: 8px 6px;
   border-radius: 6px;
-  font-size: 0.82rem;
+  font-size: 0.80rem;
   font-weight: 600;
   cursor: pointer;
   color: var(--text-muted);
-  transition: all 0.15s ease;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  font-family: inherit;
+  line-height: 1.2;
 }
 
-.diff-btn.active, .lang-btn.active {
+.segmented-control button:hover:not(.active),
+.diff-btn:hover:not(.active),
+.lang-btn:hover:not(.active),
+.type-btn:hover:not(.active),
+.cengel-layout-btn:hover:not(.active) {
+  color: var(--text-main);
+  background: rgba(0, 0, 0, 0.04);
+}
+[data-theme="dark"] .segmented-control button:hover:not(.active),
+[data-theme="dark"] .diff-btn:hover:not(.active),
+[data-theme="dark"] .lang-btn:hover:not(.active),
+[data-theme="dark"] .type-btn:hover:not(.active),
+[data-theme="dark"] .cengel-layout-btn:hover:not(.active) {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.segmented-control button.active,
+.diff-btn.active, 
+.lang-btn.active,
+.type-btn.active,
+.cengel-layout-btn.active {
   background: var(--card-bg);
   color: var(--primary);
+  font-weight: 700;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+[data-theme="dark"] .segmented-control button.active,
+[data-theme="dark"] .diff-btn.active,
+[data-theme="dark"] .lang-btn.active,
+[data-theme="dark"] .type-btn.active,
+[data-theme="dark"] .cengel-layout-btn.active {
+  background: #1e293b;
+  color: #60a5fa;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
 }
 
 /* Action Buttons */
