@@ -105,15 +105,15 @@ if (cDual.words.length < 20) {
   throw new Error(`Expected at least 20 words placed in 13x11, got ${cDual.words.length}`);
 }
 
-// Test 15x13 Single Layout
-const cGenSingle = new CengelGenerator(RAW_WORD_BANK, { rows: 15, cols: 13, rng: new SeededRandom(54321), clueLang: 'mixed' });
+// Test 18x13 Full-Page Single Layout
+const cGenSingle = new CengelGenerator(RAW_WORD_BANK, { rows: 18, cols: 13, rng: new SeededRandom(54321), clueLang: 'mixed' });
 const cSingle = cGenSingle.generate();
-console.log(`- Single Layout (15x13): Placed ${cSingle.words.length} words | Letter cells: ${cSingle.letterCells} | Clue cells: ${cSingle.clueCells} | Dual clues: ${cSingle.dualClueCells}`);
-if (cSingle.letterCells + cSingle.clueCells !== 15 * 13) {
-  throw new Error(`Zero-waste violation: expected ${15 * 13} cells, got ${cSingle.letterCells + cSingle.clueCells}`);
+console.log(`- Full-Page Single Layout (18x13): Placed ${cSingle.words.length} words | Letter cells: ${cSingle.letterCells} | Clue cells: ${cSingle.clueCells} | Dual clues: ${cSingle.dualClueCells}`);
+if (cSingle.letterCells + cSingle.clueCells !== 18 * 13) {
+  throw new Error(`Zero-waste violation: expected ${18 * 13} cells, got ${cSingle.letterCells + cSingle.clueCells}`);
 }
-if (cSingle.words.length < 25) {
-  throw new Error(`Expected at least 25 words placed in 15x13, got ${cSingle.words.length}`);
+if (cSingle.words.length < 35) {
+  throw new Error(`Expected at least 35 words placed in 18x13, got ${cSingle.words.length}`);
 }
 
 // Test Seed Reproducibility

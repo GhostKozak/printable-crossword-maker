@@ -7,7 +7,7 @@ import { PdfExporter } from "./utils/pdf-exporter.js";
 export class CrosswordApp {
   constructor() {
     this.puzzleType = 'cengel'; // 'cengel' | 'classic'
-    this.cengelLayout = 'dual'; // 'dual' | 'single'
+    this.cengelLayout = 'single'; // 'single' | 'dual'
     this.currentDifficulty = 'medium';
     this.currentPuzzle = null;
     this.currentCengelPuzzles = [];
@@ -410,12 +410,12 @@ export class CrosswordApp {
         this.solutionCengelView.style.display = 'flex';
         if (this.solutionClassicView) this.solutionClassicView.style.display = 'none';
 
-        // Dimension configurations
-        let rows = 13, cols = 11;
+        // Dimension configurations (Full page single or stacked dual)
+        let rows = 18, cols = 13;
         if (this.cengelLayout === 'single') {
-          if (this.currentDifficulty === 'easy') { rows = 13; cols = 11; }
-          else if (this.currentDifficulty === 'medium') { rows = 15; cols = 13; }
-          else { rows = 16; cols = 14; }
+          if (this.currentDifficulty === 'easy') { rows = 16; cols = 12; }
+          else if (this.currentDifficulty === 'medium') { rows = 18; cols = 13; }
+          else { rows = 21; cols = 14; }
         } else {
           // Dual mode (2 puzzles stacked)
           if (this.currentDifficulty === 'easy') { rows = 11; cols = 11; }
@@ -497,7 +497,20 @@ export class CrosswordApp {
     this.solutionCengelView.innerHTML = '';
 
     const isDual = this.currentCengelPuzzles.length > 1;
-    const cellSize = isDual ? '34px' : '40px';
+    this.cengelView.classList.toggle('layout-single', !isDual);
+    this.cengelView.classList.toggle('layout-dual', isDual);
+    this.solutionCengelView.classList.toggle('layout-single', !isDual);
+    this.solutionCengelView.classList.toggle('layout-dual', isDual);
+
+    let cellSize = '42px';
+    if (isDual) {
+      cellSize = '34px';
+    } else {
+      const p = this.currentCengelPuzzles[0];
+      if (p.rows >= 21) cellSize = '38px';
+      else if (p.rows >= 18) cellSize = '42px';
+      else cellSize = '45px';
+    }
     document.documentElement.style.setProperty('--cengel-cell-size', cellSize);
 
     this.currentCengelPuzzles.forEach((puzzle, idx) => {
@@ -773,11 +786,11 @@ export class CrosswordApp {
 
     if (this.puzzleType === 'cengel') {
       const diffLabel = this.currentDifficulty === 'easy' ? 'Kolay Seviye' : (this.currentDifficulty === 'hard' ? 'Zor Seviye' : 'Orta Seviye');
-      let rows = 13, cols = 11;
+      let rows = 18, cols = 13;
       if (this.cengelLayout === 'single') {
-        if (this.currentDifficulty === 'easy') { rows = 13; cols = 11; }
-        else if (this.currentDifficulty === 'medium') { rows = 15; cols = 13; }
-        else { rows = 16; cols = 14; }
+        if (this.currentDifficulty === 'easy') { rows = 16; cols = 12; }
+        else if (this.currentDifficulty === 'medium') { rows = 18; cols = 13; }
+        else { rows = 21; cols = 14; }
       } else {
         if (this.currentDifficulty === 'easy') { rows = 11; cols = 11; }
         else if (this.currentDifficulty === 'medium') { rows = 13; cols = 11; }

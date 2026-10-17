@@ -853,6 +853,19 @@ h1, h2, h3, .brand-name, .sheet-title, .clue-header {
   bottom: 1px;
 }
 
+/* Layout Single (Tam Sayfa) Typography */
+.cengel-container.layout-single .clue-text {
+  font-size: 6.2pt;
+  line-height: 1.1;
+  font-weight: 700;
+}
+.cengel-container.layout-single .clue-arrow {
+  font-size: 8.5pt;
+}
+.cengel-container.layout-single .cengel-cell.letter-cell {
+  font-size: 14pt;
+}
+
 /* Branding / Emblem Cell */
 .cengel-cell.clue-cell.emblem-cell {
   background-color: #e2e8f0;

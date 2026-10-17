@@ -246,26 +246,35 @@ export class PdfExporter {
         const subTitle = isDual ? `${difficulty} - Gazete Cengel #${pIdx + 1}` : `${difficulty} - Gazete Cengel Bulmacasi`;
 
         // Banner width & grid calculation
-        const cellW = isDual ? 13.0 : 11.5;
+        let cellW;
+        if (isDual) {
+          cellW = 13.0;
+        } else {
+          // Single full-page puzzle: dynamically scale to fill A4 page
+          const maxAvailW = 180;
+          const maxAvailH = 242;
+          cellW = Math.min(maxAvailW / puzzle.cols, maxAvailH / puzzle.rows);
+        }
         const gridW = puzzle.cols * cellW;
         const startX = (210 - gridW) / 2;
+        const bannerH = isDual ? 7 : 8;
 
         // Draw Newspaper Blue Banner
         doc.setFillColor(2, 132, 199);
-        doc.rect(startX, currentY, gridW, 7, 'F');
+        doc.rect(startX, currentY, gridW, bannerH, 'F');
 
         doc.setFont('helvetica', 'bold');
-        doc.setFontSize(10.5);
+        doc.setFontSize(isDual ? 10.5 : 11.5);
         doc.setTextColor(255, 255, 255);
-        doc.text(this.sanitizeText(subTitle), startX + 3, currentY + 5);
+        doc.text(this.sanitizeText(subTitle), startX + 3, currentY + (isDual ? 5 : 5.5));
 
         // Number Badge
         doc.setFillColor(3, 105, 161);
-        doc.rect(startX + gridW - 20, currentY + 1, 18, 5, 'F');
-        doc.setFontSize(9);
-        doc.text(this.sanitizeText(subId), startX + gridW - 11, currentY + 4.5, { align: 'center' });
+        doc.rect(startX + gridW - 22, currentY + 1, 20, bannerH - 2, 'F');
+        doc.setFontSize(isDual ? 9 : 10);
+        doc.text(this.sanitizeText(subId), startX + gridW - 12, currentY + (isDual ? 4.8 : 5.2), { align: 'center' });
 
-        currentY += 7;
+        currentY += bannerH;
 
         // Draw Board
         doc.setDrawColor(0, 0, 0);
@@ -295,7 +304,7 @@ export class PdfExporter {
               if (cell.acrossWord && cell.downWord) {
                 // Dual Clue
                 doc.setFont('helvetica', 'bold');
-                doc.setFontSize(4.2);
+                doc.setFontSize(cellW > 12.5 ? 4.6 : 4.0);
                 doc.setTextColor(20, 20, 20);
 
                 const tAcross = this.sanitizeText(cell.acrossWord.clue);
@@ -303,7 +312,7 @@ export class PdfExporter {
                 doc.text(lA.slice(0, 2), x + 1, y + 2.2);
 
                 doc.setTextColor(2, 132, 199);
-                doc.setFontSize(5);
+                doc.setFontSize(cellW > 12.5 ? 5.8 : 5.0);
                 doc.text('>', x + cellW - 1.2, y + cellW / 2 - 0.6, { align: 'right' });
 
                 // Divider line
@@ -315,43 +324,43 @@ export class PdfExporter {
 
                 // Down Clue
                 doc.setFont('helvetica', 'bold');
-                doc.setFontSize(4.2);
+                doc.setFontSize(cellW > 12.5 ? 4.6 : 4.0);
                 doc.setTextColor(20, 20, 20);
                 const tDown = this.sanitizeText(cell.downWord.clue);
                 const lD = doc.splitTextToSize(tDown, cellW - 2.8);
                 doc.text(lD.slice(0, 2), x + 1, y + cellW / 2 + 2.2);
 
                 doc.setTextColor(2, 132, 199);
-                doc.setFontSize(5);
+                doc.setFontSize(cellW > 12.5 ? 5.8 : 5.0);
                 doc.text('v', x + cellW - 1.2, y + cellW - 0.8, { align: 'right' });
               } else if (cell.acrossWord) {
                 // Single Across Clue
                 doc.setFont('helvetica', 'bold');
-                doc.setFontSize(4.6);
+                doc.setFontSize(cellW > 12.5 ? 5.2 : 4.6);
                 doc.setTextColor(20, 20, 20);
                 const t = this.sanitizeText(cell.acrossWord.clue);
                 const lines = doc.splitTextToSize(t, cellW - 2.5);
                 doc.text(lines.slice(0, 3), x + 1, y + 2.6);
 
                 doc.setTextColor(2, 132, 199);
-                doc.setFontSize(5.5);
+                doc.setFontSize(cellW > 12.5 ? 6.5 : 5.5);
                 doc.text('>', x + cellW - 1.2, y + cellW - 1, { align: 'right' });
               } else if (cell.downWord) {
                 // Single Down Clue
                 doc.setFont('helvetica', 'bold');
-                doc.setFontSize(4.6);
+                doc.setFontSize(cellW > 12.5 ? 5.2 : 4.6);
                 doc.setTextColor(20, 20, 20);
                 const t = this.sanitizeText(cell.downWord.clue);
                 const lines = doc.splitTextToSize(t, cellW - 2.5);
                 doc.text(lines.slice(0, 3), x + 1, y + 2.6);
 
                 doc.setTextColor(2, 132, 199);
-                doc.setFontSize(5.5);
+                doc.setFontSize(cellW > 12.5 ? 6.5 : 5.5);
                 doc.text('v', x + cellW - 1.2, y + cellW - 1, { align: 'right' });
               } else {
                 // Emblem
                 doc.setFont('helvetica', 'bold');
-                doc.setFontSize(7);
+                doc.setFontSize(cellW > 12.5 ? 8 : 7);
                 doc.setTextColor(100, 100, 100);
                 doc.text(this.sanitizeText(cell.label || '*'), x + cellW / 2, y + cellW / 2 + 1, { align: 'center' });
               }

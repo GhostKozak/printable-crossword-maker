@@ -130,4 +130,23 @@
   .cengel-dual-divider {
     border-top: 1px dashed #000000 !important;
   }
+
+  /* Single Full-Page Çengel Print Sizing */
+  .cengel-container.layout-single .cengel-board {
+    max-width: 180mm !important;
+  }
+  .cengel-container.layout-single .cengel-cell {
+    width: 12.2mm !important;
+    height: 12.2mm !important;
+  }
+  .cengel-container.layout-single .clue-text {
+    font-size: 5.8pt !important;
+    line-height: 1.1 !important;
+  }
+  .cengel-container.layout-single .clue-arrow {
+    font-size: 8pt !important;
+  }
+  .cengel-container.layout-single .letter-cell {
+    font-size: 13.5pt !important;
+  }
 }
