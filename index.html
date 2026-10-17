@@ -11,38 +11,36 @@
   <div class="app-layout">
     <!-- SIDEBAR: CONTROLS & SETTINGS -->
     <aside class="app-sidebar no-print">
+      <!-- BRAND & TOP UTILITY BAR -->
       <div class="sidebar-brand">
         <div class="brand-title">
-          <span class="brand-icon">🧩</span>
+          <div class="brand-icon-wrap">🧩</div>
           <div>
             <div class="brand-name" id="brand-name">Crossword Maker</div>
-            <div class="brand-sub" id="brand-sub">Printable A4 Generator</div>
+            <div class="brand-sub" id="brand-sub">Printable A4 Studio</div>
           </div>
         </div>
         <div class="sidebar-top-actions">
-          <button id="btn-ui-lang" class="action-btn btn-outline" style="font-weight: 700; min-width: 58px;" title="Switch UI Language / Arayüz Dilini Değiştir">🌐 TR</button>
-          <button id="btn-theme" class="action-btn btn-outline btn-icon" title="Toggle Dark/Light Mode">🌙</button>
-          <button id="btn-share" class="action-btn btn-outline btn-icon" title="Copy sharing link">🔗</button>
+          <button id="btn-ui-lang" class="top-icon-btn lang-pill" title="Switch UI Language / Arayüz Dilini Değiştir">🌐 TR</button>
+          <button id="btn-theme" class="top-icon-btn" title="Toggle Dark/Light Mode">🌙</button>
+          <button id="btn-share" class="top-icon-btn" title="Copy sharing link">🔗</button>
         </div>
       </div>
 
-      <!-- MAIN ACTIONS -->
-      <div class="sidebar-section">
-        <button id="btn-generate" class="action-btn btn-primary btn-block" title="Generate New Puzzle">🔄 New Puzzle</button>
-        <div class="sidebar-btn-row">
-          <button id="btn-hint" class="action-btn btn-outline" title="Toggle Starter Hint Letters">💡 Hint Letter</button>
-          <button id="btn-check" class="action-btn btn-outline" title="Check Answers on Grid">✅ Check Answers</button>
-        </div>
-        <button id="btn-toggle-solution" class="action-btn btn-outline btn-block" title="Show or Hide Answer Key">👁️ Show Answer Key</button>
-      </div>
+      <!-- PRIMARY ACTIONS & SOLVER DOCK -->
+      <div class="sidebar-card action-dock">
+        <button id="btn-generate" class="action-btn btn-primary btn-block btn-hero" title="Generate New Puzzle">🔄 New Puzzle</button>
 
-      <!-- EXPORT & PRINT -->
-      <div class="sidebar-section">
-        <div class="sidebar-heading" id="heading-export">PRINT</div>
-        <div class="sidebar-btn-row">
+        <div class="solver-toolbar">
+          <button id="btn-hint" class="solver-btn" title="Toggle Starter Hint Letters">💡 Hint</button>
+          <button id="btn-check" class="solver-btn" title="Check Answers on Grid">✅ Check</button>
+          <button id="btn-toggle-solution" class="solver-btn" title="Show or Hide Answer Key">👁️ Solution</button>
+        </div>
+
+        <div class="print-toolbar">
           <button id="btn-print" class="action-btn btn-print" title="Print to A4 paper">🖨️ Print (A4)</button>
           <div class="dropdown-container">
-            <button id="btn-batch-print" class="action-btn btn-outline btn-block" title="Batch Print">📄 Batch Print ▾</button>
+            <button id="btn-batch-print" class="action-btn btn-batch btn-block" title="Batch Print">📄 Batch Print ▾</button>
             <div class="dropdown-content" id="batch-dropdown">
               <button data-count="2">2 Puzzles</button>
               <button data-count="4">4 Puzzles</button>
@@ -54,56 +52,67 @@
         </div>
       </div>
 
-      <!-- PUZZLE TYPE -->
-      <div class="sidebar-section">
-        <div class="sidebar-heading" id="heading-type">PUZZLE TYPE</div>
-        <div class="difficulty-selector segmented-control" id="puzzle-type-selector">
-          <button class="type-btn active" data-type="cengel" id="type-btn-cengel" title="Gazete tipi sıfır boşluk çengel bulmaca">📰 Çengel</button>
-          <button class="type-btn" data-type="classic" id="type-btn-classic" title="Geleneksel numaralı kare bulmaca">🧩 Klasik</button>
+      <!-- PUZZLE CONFIGURATION CARD -->
+      <div class="sidebar-card config-card">
+        <div class="config-grid-2col" id="type-layout-grid">
+          <!-- PUZZLE TYPE -->
+          <div class="config-field">
+            <div class="sidebar-heading" id="heading-type">PUZZLE TYPE</div>
+            <div class="difficulty-selector segmented-control" id="puzzle-type-selector">
+              <button class="type-btn active" data-type="cengel" id="type-btn-cengel" title="Gazete tipi sıfır boşluk çengel bulmaca">📰 Çengel</button>
+              <button class="type-btn" data-type="classic" id="type-btn-classic" title="Geleneksel numaralı kare bulmaca">🧩 Klasik</button>
+            </div>
+          </div>
+
+          <!-- ÇENGEL LAYOUT -->
+          <div class="config-field" id="cengel-layout-section">
+            <div class="sidebar-heading" id="heading-layout">LAYOUT</div>
+            <div class="difficulty-selector segmented-control" id="cengel-layout-selector">
+              <button class="cengel-layout-btn active" data-layout="single" id="layout-btn-single" title="Bütün sayfayı kaplayan tek büyük bulmaca">📄 Tam</button>
+              <button class="cengel-layout-btn" data-layout="dual" id="layout-btn-dual" title="Sayfayı ikiye bölen 2 bulmaca">📑 İkili</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- DIFFICULTY -->
+        <div class="config-field">
+          <div class="sidebar-heading" id="heading-diff">DIFFICULTY & LEVEL</div>
+          <div class="difficulty-selector segmented-control">
+            <button class="diff-btn" data-diff="easy" id="diff-btn-easy" title="A1-A2 Vocabulary">Easy</button>
+            <button class="diff-btn active" data-diff="medium" id="diff-btn-medium" title="B1-B2 Vocabulary">Medium</button>
+            <button class="diff-btn" data-diff="hard" id="diff-btn-hard" title="C1 Advanced Vocabulary">Hard</button>
+          </div>
+        </div>
+
+        <div class="config-divider"></div>
+
+        <!-- LANGUAGE SETTINGS (ANSWER & CLUE) -->
+        <div class="config-lang-group">
+          <div class="config-lang-row">
+            <span class="config-inline-label" id="heading-answer-lang">ANSWER LANG</span>
+            <div class="difficulty-selector segmented-control compact-seg" id="answer-lang-selector">
+              <button class="ans-lang-btn active" data-ans-lang="en" id="ans-lang-btn-en" title="English vocabulary answers (Default)">🇬🇧 EN</button>
+              <button class="ans-lang-btn" data-ans-lang="tr" id="ans-lang-btn-tr" title="Turkish crossword answers">🇹🇷 TR</button>
+            </div>
+          </div>
+
+          <div class="config-lang-row">
+            <span class="config-inline-label" id="heading-clue-lang">CLUE LANG</span>
+            <div class="difficulty-selector segmented-control compact-seg" id="clue-lang-selector">
+              <button class="lang-btn active" data-lang="mixed">🔀 Mix</button>
+              <button class="lang-btn" data-lang="tr">🇹🇷 TR</button>
+              <button class="lang-btn" data-lang="en">🇬🇧 EN</button>
+            </div>
+          </div>
         </div>
       </div>
 
-      <!-- ÇENGEL LAYOUT -->
-      <div class="sidebar-section" id="cengel-layout-section">
-        <div class="sidebar-heading" id="heading-layout">ÇENGEL DÜZENİ</div>
-        <div class="difficulty-selector segmented-control" id="cengel-layout-selector">
-          <button class="cengel-layout-btn active" data-layout="single" id="layout-btn-single" title="Bütün sayfayı kaplayan tek büyük bulmaca">📄 Tam Sayfa</button>
-          <button class="cengel-layout-btn" data-layout="dual" id="layout-btn-dual" title="Sayfayı ikiye bölen 2 bulmaca">📑 İkili (Dual)</button>
+      <!-- CATEGORIES CARD -->
+      <div class="sidebar-card categories-section">
+        <div class="categories-header-row">
+          <div class="sidebar-heading" id="heading-categories">CATEGORIES</div>
+          <span class="cat-count-badge" id="cat-count-badge">19 / 19</span>
         </div>
-      </div>
-
-      <!-- DIFFICULTY -->
-      <div class="sidebar-section">
-        <div class="sidebar-heading" id="heading-diff">DIFFICULTY</div>
-        <div class="difficulty-selector segmented-control">
-          <button class="diff-btn" data-diff="easy" id="diff-btn-easy">Easy</button>
-          <button class="diff-btn active" data-diff="medium" id="diff-btn-medium">Medium</button>
-          <button class="diff-btn" data-diff="hard" id="diff-btn-hard">Hard</button>
-        </div>
-      </div>
-
-      <!-- ANSWER LANGUAGE -->
-      <div class="sidebar-section">
-        <div class="sidebar-heading" id="heading-answer-lang">ANSWER LANGUAGE</div>
-        <div class="difficulty-selector segmented-control" id="answer-lang-selector">
-          <button class="ans-lang-btn active" data-ans-lang="en" id="ans-lang-btn-en" title="English vocabulary answers (Default)">🇬🇧 EN</button>
-          <button class="ans-lang-btn" data-ans-lang="tr" id="ans-lang-btn-tr" title="Turkish crossword answers">🇹🇷 TR</button>
-        </div>
-      </div>
-
-      <!-- CLUE LANGUAGE -->
-      <div class="sidebar-section">
-        <div class="sidebar-heading" id="heading-clue-lang">CLUE LANGUAGE</div>
-        <div class="difficulty-selector segmented-control" id="clue-lang-selector">
-          <button class="lang-btn active" data-lang="mixed">🔀 Mix</button>
-          <button class="lang-btn" data-lang="tr">🇹🇷 TR</button>
-          <button class="lang-btn" data-lang="en">🇬🇧 EN</button>
-        </div>
-      </div>
-
-      <!-- CATEGORIES -->
-      <div class="sidebar-section categories-section">
-        <div class="sidebar-heading" id="heading-categories">CATEGORIES</div>
         <div id="cat-container" class="categories-panel">
           <!-- Categories & quick actions injected dynamically -->
         </div>

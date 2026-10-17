@@ -112,6 +112,8 @@ export class CrosswordApp {
     this.btnPdf = document.getElementById('btn-pdf');
     this.btnTheme = document.getElementById('btn-theme');
     this.catContainer = document.getElementById('cat-container');
+    this.catCountBadge = document.getElementById('cat-count-badge');
+    this.typeLayoutGrid = document.getElementById('type-layout-grid');
     
     // Stats
     this.statsWords = document.getElementById('stats-words');
@@ -133,6 +135,7 @@ export class CrosswordApp {
     quickControls.querySelector('#btn-cat-all').addEventListener('click', () => {
       this.selectedCategories = new Set(this.categories);
       document.querySelectorAll('.cat-chip').forEach(c => c.classList.add('selected'));
+      this.updateCategoryCountBadge();
       this.resetSolutionKey();
       this.generateNewPuzzle();
     });
@@ -142,6 +145,7 @@ export class CrosswordApp {
       document.querySelectorAll('.cat-chip').forEach(c => {
         c.classList.toggle('selected', c.dataset.cat === 'top1000');
       });
+      this.updateCategoryCountBadge();
       const tr = TRANSLATIONS[this.uiLang] || TRANSLATIONS.tr;
       this.showToast(tr.toastTop1000Selected);
       this.resetSolutionKey();
@@ -157,6 +161,7 @@ export class CrosswordApp {
           c.classList.remove('selected');
         }
       });
+      this.updateCategoryCountBadge();
       const tr = TRANSLATIONS[this.uiLang] || TRANSLATIONS.tr;
       this.showToast(tr.toastMinCategories);
       this.resetSolutionKey();
@@ -174,6 +179,13 @@ export class CrosswordApp {
       chip.addEventListener('click', () => this.toggleCategory(chip, cat));
       this.catContainer.appendChild(chip);
     });
+    this.updateCategoryCountBadge();
+  }
+
+  updateCategoryCountBadge() {
+    if (this.catCountBadge) {
+      this.catCountBadge.textContent = `${this.selectedCategories.size} / ${this.categories.length}`;
+    }
   }
 
   bindEvents() {
@@ -184,7 +196,10 @@ export class CrosswordApp {
         btn.classList.add('active');
         this.puzzleType = btn.dataset.type;
         if (this.cengelLayoutSection) {
-          this.cengelLayoutSection.style.display = this.puzzleType === 'cengel' ? 'block' : 'none';
+          this.cengelLayoutSection.style.display = this.puzzleType === 'cengel' ? 'flex' : 'none';
+        }
+        if (this.typeLayoutGrid) {
+          this.typeLayoutGrid.classList.toggle('single-col', this.puzzleType !== 'cengel');
         }
         this.resetSolutionKey();
         this.generateNewPuzzle();
@@ -540,6 +555,7 @@ export class CrosswordApp {
       this.selectedCategories.add(cat);
       chip.classList.add('selected');
     }
+    this.updateCategoryCountBadge();
     this.resetSolutionKey();
     this.generateNewPuzzle();
   }
@@ -568,7 +584,10 @@ export class CrosswordApp {
         this.puzzleType = pType;
         this.typeButtons.forEach(b => b.classList.toggle('active', b.dataset.type === pType));
         if (this.cengelLayoutSection) {
-          this.cengelLayoutSection.style.display = this.puzzleType === 'cengel' ? 'block' : 'none';
+          this.cengelLayoutSection.style.display = this.puzzleType === 'cengel' ? 'flex' : 'none';
+        }
+        if (this.typeLayoutGrid) {
+          this.typeLayoutGrid.classList.toggle('single-col', this.puzzleType !== 'cengel');
         }
       }
 
@@ -608,6 +627,7 @@ export class CrosswordApp {
             chip.classList.remove('selected');
           }
         });
+        this.updateCategoryCountBadge();
       }
       if (seed) {
         this.generateNewPuzzle(parseInt(seed));
