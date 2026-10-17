@@ -3,6 +3,7 @@ import { SeededRandom } from "./utils/seeded-random.js";
 import { CrosswordGenerator } from "./core/generator.js";
 import { CengelGenerator } from "./core/cengel-generator.js";
 import { PdfExporter } from "./utils/pdf-exporter.js";
+import { TRANSLATIONS } from "./utils/i18n.js";
 
 export class CrosswordApp {
   constructor() {
@@ -17,27 +18,34 @@ export class CrosswordApp {
     this.targetCounts = { easy: 14, medium: 21, hard: 30 };
     this.categories = ['animals', 'science', 'geography', 'food', 'technology', 'body', 'general', 'sports', 'household', 'weather', 'vehicles', 'culture', 'emotions'];
     this.categoryMeta = {
-      animals: { icon: '🐾', label: 'Animals' },
-      science: { icon: '🔬', label: 'Science' },
-      geography: { icon: '🌍', label: 'Geography' },
-      food: { icon: '🍕', label: 'Food' },
-      technology: { icon: '💻', label: 'Tech' },
-      body: { icon: '🧑‍⚕️', label: 'Body/Jobs' },
-      general: { icon: '✨', label: 'General' },
-      sports: { icon: '⚽', label: 'Sports' },
-      household: { icon: '🏠', label: 'Home' },
-      weather: { icon: '🌤️', label: 'Weather' },
-      vehicles: { icon: '🚀', label: 'Vehicles' },
-      culture: { icon: '🏛️', label: 'Culture' },
-      emotions: { icon: '❤️', label: 'Emotions' }
+      animals: { icon: '🐾', en: 'Animals', tr: 'Hayvanlar' },
+      science: { icon: '🔬', en: 'Science', tr: 'Bilim' },
+      geography: { icon: '🌍', en: 'Geography', tr: 'Coğrafya' },
+      food: { icon: '🍕', en: 'Food', tr: 'Yiyecekler' },
+      technology: { icon: '💻', en: 'Tech', tr: 'Teknoloji' },
+      body: { icon: '🧑‍⚕️', en: 'Body/Jobs', tr: 'Vücut/Meslek' },
+      general: { icon: '✨', en: 'General', tr: 'Genel' },
+      sports: { icon: '⚽', en: 'Sports', tr: 'Spor' },
+      household: { icon: '🏠', en: 'Home', tr: 'Ev/Eşya' },
+      weather: { icon: '🌤️', en: 'Weather', tr: 'Hava' },
+      vehicles: { icon: '🚀', en: 'Vehicles', tr: 'Taşıtlar' },
+      culture: { icon: '🏛️', en: 'Culture', tr: 'Kültür' },
+      emotions: { icon: '❤️', en: 'Emotions', tr: 'Duygular' }
     };
     this.selectedCategories = new Set(this.categories);
+    
+    this.uiLang = 'tr';
+    try {
+      this.uiLang = localStorage.getItem('uiLang') || (navigator.language.startsWith('tr') ? 'tr' : 'en');
+    } catch(e){}
+
     this.clueLang = 'mixed';
     try { this.clueLang = localStorage.getItem('clueLang') || 'mixed'; } catch(e){}
 
     this.initDOMElements();
     this.bindEvents();
     this.applyTheme();
+    this.applyUiLanguage();
     
     // YEN-3: URL Hash parsing
     this.checkHash();
@@ -51,6 +59,7 @@ export class CrosswordApp {
 
     this.diffButtons = document.querySelectorAll('.diff-btn');
     this.langButtons = document.querySelectorAll('.lang-btn');
+    this.btnUiLang = document.getElementById('btn-ui-lang');
     this.btnGenerate = document.getElementById('btn-generate');
     this.btnToggleSolution = document.getElementById('btn-toggle-solution');
     this.btnHint = document.getElementById('btn-hint');
@@ -96,9 +105,10 @@ export class CrosswordApp {
     // Quick Category Selection Controls
     const quickControls = document.createElement('div');
     quickControls.className = 'cat-quick-actions';
+    const t = TRANSLATIONS[this.uiLang] || TRANSLATIONS.tr;
     quickControls.innerHTML = `
-      <button type="button" class="cat-quick-btn" id="btn-cat-all" title="Select all categories">✅ All</button>
-      <button type="button" class="cat-quick-btn" id="btn-cat-clear" title="Keep minimum 2 categories">❌ Clear</button>
+      <button type="button" class="cat-quick-btn" id="btn-cat-all" title="Select all categories">${t.catAll}</button>
+      <button type="button" class="cat-quick-btn" id="btn-cat-clear" title="Keep minimum 2 categories">${t.catClear}</button>
     `;
     this.catContainer.appendChild(quickControls);
 
@@ -118,17 +128,19 @@ export class CrosswordApp {
           c.classList.remove('selected');
         }
       });
-      this.showToast('Selected minimum 2 categories (Animals, Science)');
+      const t = TRANSLATIONS[this.uiLang] || TRANSLATIONS.tr;
+      this.showToast(t.toastMinCategories);
       this.resetSolutionKey();
       this.generateNewPuzzle();
     });
 
     // Create Category Chips with icons
     this.categories.forEach(cat => {
-      const info = this.categoryMeta[cat] || { icon: '🏷️', label: cat };
+      const info = this.categoryMeta[cat] || { icon: '🏷️', tr: cat, en: cat };
+      const label = info[this.uiLang] || cat;
       const chip = document.createElement('div');
       chip.className = 'cat-chip selected';
-      chip.innerHTML = `<span class="chip-icon">${info.icon}</span> <span>${info.label}</span>`;
+      chip.innerHTML = `<span class="chip-icon">${info.icon}</span> <span>${label}</span>`;
       chip.dataset.cat = cat;
       chip.addEventListener('click', () => this.toggleCategory(chip, cat));
       this.catContainer.appendChild(chip);
@@ -190,6 +202,15 @@ export class CrosswordApp {
     this.btnToggleSolution.addEventListener('click', () => {
       this.toggleSolution();
     });
+
+    if (this.btnUiLang) {
+      this.btnUiLang.addEventListener('click', () => {
+        this.uiLang = this.uiLang === 'tr' ? 'en' : 'tr';
+        try { localStorage.setItem('uiLang', this.uiLang); } catch(e){}
+        this.applyUiLanguage();
+        this.showToast(this.uiLang === 'tr' ? '🌐 Arayüz dili: Türkçe' : '🌐 UI Language: English');
+      });
+    }
 
     if (this.btnHint) {
       this.btnHint.addEventListener('click', () => {
@@ -262,7 +283,7 @@ export class CrosswordApp {
           const successful = document.execCommand('copy');
           document.body.removeChild(textArea);
           if (successful) {
-            this.showToast('🔗 Link copied!');
+            this.showToast(this.uiLang === 'tr' ? '🔗 Bulmaca linki kopyalandı!' : '🔗 Puzzle link copied!');
           } else {
             prompt('Copy this puzzle link:', text);
           }
@@ -274,7 +295,7 @@ export class CrosswordApp {
       if (navigator.clipboard && window.isSecureContext) {
         navigator.clipboard.writeText(shareUrl)
           .then(() => {
-            this.showToast('🔗 Link copied!');
+            this.showToast(this.uiLang === 'tr' ? '🔗 Bulmaca linki kopyalandı!' : '🔗 Puzzle link copied!');
           })
           .catch(() => {
             copyFallback(shareUrl);
@@ -300,6 +321,101 @@ export class CrosswordApp {
     this.langButtons.forEach(b => {
       b.classList.toggle('active', b.dataset.lang === this.clueLang);
     });
+  }
+
+  applyUiLanguage() {
+    const t = TRANSLATIONS[this.uiLang] || TRANSLATIONS.tr;
+    if (this.btnUiLang) this.btnUiLang.textContent = this.uiLang === 'tr' ? '🌐 TR' : '🌐 EN';
+
+    const setText = (id, text) => {
+      const el = document.getElementById(id);
+      if (el) el.textContent = text;
+    };
+    const setHTML = (id, html) => {
+      const el = document.getElementById(id);
+      if (el) el.innerHTML = html;
+    };
+
+    setText('brand-name', t.brandName);
+    setText('brand-sub', t.brandSub);
+    setText('heading-export', t.headingExport);
+    setText('btn-print', t.btnPrint);
+    setText('btn-pdf', t.btnPdf);
+    setText('btn-batch-print', t.btnBatchPrint);
+    setText('heading-type', t.headingType);
+    setText('type-btn-cengel', t.typeCengel);
+    setText('type-btn-classic', t.typeClassic);
+    setText('heading-layout', t.headingLayout);
+    setText('layout-btn-single', t.layoutSingle);
+    setText('layout-btn-dual', t.layoutDual);
+    setText('heading-diff', t.headingDiff);
+    setText('diff-btn-easy', t.diffEasy);
+    setText('diff-btn-medium', t.diffMedium);
+    setText('diff-btn-hard', t.diffHard);
+    setText('heading-clue-lang', t.headingClueLang);
+    setText('heading-categories', t.headingCategories);
+    setText('btn-cat-all', t.catAll);
+    setText('btn-cat-clear', t.catClear);
+    setHTML('screen-tip', t.screenTip);
+
+    setText('label-student-name', t.labelName);
+    setText('label-student-score', t.labelScore);
+    setText('meta-puzzle-id-label', t.labelPuzzleId);
+    setText('meta-puzzle-diff-label', t.labelDiff);
+    setText('meta-puzzle-date-label', t.labelDate);
+
+    setText('btn-generate', t.btnNewPuzzle);
+    if (this.btnHint) {
+      this.btnHint.innerHTML = this.isHintsActive ? t.btnHintHide : t.btnHint;
+    }
+    if (this.btnCheck) this.btnCheck.innerHTML = t.btnCheck;
+    if (this.btnToggleSolution) {
+      this.btnToggleSolution.innerHTML = this.isSolutionVisible ? t.btnHideSolution : t.btnShowSolution;
+    }
+
+    setText('solution-sheet-title', this.uiLang === 'tr' ? 'Cevap Anahtarı' : 'Answer Key');
+    setText('solution-sheet-subtitle', this.uiLang === 'tr' ? 'Öğretmenler & Otomatik Kontrol İçin Çözümler' : 'Solutions for Teachers & Self-Checking');
+
+    // Update categories chips
+    document.querySelectorAll('.cat-chip').forEach(chip => {
+      const cat = chip.dataset.cat;
+      const info = this.categoryMeta[cat];
+      if (info) {
+        const textSpan = chip.querySelector('span:not(.chip-icon)');
+        if (textSpan) textSpan.textContent = info[this.uiLang] || info.en || cat;
+      }
+    });
+
+    // Update sheet titles
+    const titleEl = document.getElementById('sheet-title');
+    const subtitleEl = document.getElementById('sheet-subtitle');
+    if (titleEl && !titleEl.dataset.custom) {
+      titleEl.textContent = this.puzzleType === 'cengel' ? t.sheetTitleCengel : t.sheetTitleClassic;
+    }
+    if (subtitleEl && !subtitleEl.dataset.custom) {
+      subtitleEl.textContent = this.puzzleType === 'cengel' ? t.sheetSubtitleCengel : t.sheetSubtitleClassic;
+    }
+
+    // Update secret keyword label on active cengel views
+    document.querySelectorAll('.secret-bar-label').forEach(el => {
+      el.textContent = t.secretKeywordLabel;
+    });
+
+    // Re-render stats if puzzles exist
+    if (this.puzzleType === 'cengel' && this.currentCengelPuzzles.length > 0) {
+      const totalWords = this.currentCengelPuzzles.reduce((sum, p) => sum + p.words.length, 0);
+      const totalIntersections = this.currentCengelPuzzles.reduce((sum, p) => sum + p.intersections, 0);
+      const avgDensity = Math.round(
+        this.currentCengelPuzzles.reduce((sum, p) => sum + (p.density || 0), 0) / this.currentCengelPuzzles.length
+      );
+      const p0 = this.currentCengelPuzzles[0];
+      const isDual = this.currentCengelPuzzles.length > 1;
+
+      this.statsWords.textContent = `${t.statsWords} ${totalWords} ${t.statsPlaced}`;
+      this.statsGrid.textContent = isDual ? `${t.statsGrid} 2x (${p0.rows}x${p0.cols})` : `${t.statsGrid} ${p0.rows}x${p0.cols}`;
+      this.statsDensity.textContent = `${t.statsDensity} ${avgDensity}% (${t.activeArea})`;
+      this.statsIntersections.textContent = `${t.statsIntersections} ${totalIntersections}`;
+    }
   }
 
   updatePuzzleLanguage() {
@@ -330,7 +446,8 @@ export class CrosswordApp {
       });
 
       this.renderCengelView();
-      this.showToast(`Dil değiştirildi: ${this.clueLang === 'tr' ? 'Türkçe' : (this.clueLang === 'en' ? 'English' : 'Karışık')}`);
+      const langName = this.clueLang === 'tr' ? 'Türkçe' : (this.clueLang === 'en' ? 'English' : (this.uiLang === 'tr' ? 'Karışık' : 'Mixed'));
+      this.showToast(this.uiLang === 'tr' ? `İpucu dili değiştirildi: ${langName}` : `Clue language changed: ${langName}`);
       return;
     }
 
@@ -355,7 +472,8 @@ export class CrosswordApp {
   toggleCategory(chip, cat) {
     if (this.selectedCategories.has(cat)) {
       if (this.selectedCategories.size <= 2) {
-        this.showToast('At least 2 categories must remain selected.');
+        const t = TRANSLATIONS[this.uiLang] || TRANSLATIONS.tr;
+        this.showToast(t.toastMinCategories);
         return;
       }
       this.selectedCategories.delete(cat);
@@ -369,10 +487,11 @@ export class CrosswordApp {
   }
 
   resetSolutionKey() {
+    const t = TRANSLATIONS[this.uiLang] || TRANSLATIONS.tr;
     this.isSolutionVisible = false;
     this.solutionSheet.classList.remove('visible');
     this.btnToggleSolution.classList.remove('active');
-    this.btnToggleSolution.innerHTML = '👁️ Show Answer Key';
+    this.btnToggleSolution.innerHTML = t.btnShowSolution;
     this.pageCountDisplays.forEach(el => el.textContent = '1');
   }
 
@@ -437,24 +556,26 @@ export class CrosswordApp {
   }
 
   generateNewPuzzle(forceSeed = null) {
-    const originalText = this.btnGenerate.innerHTML;
-    this.btnGenerate.innerHTML = '⏳ Generating...';
+    const t = TRANSLATIONS[this.uiLang] || TRANSLATIONS.tr;
+    this.btnGenerate.innerHTML = t.btnGenerating;
     this.btnGenerate.disabled = true;
 
     this.isHintsActive = false;
     this.focusedCell = null;
     if (this.btnHint) {
       this.btnHint.classList.remove('active');
-      this.btnHint.innerHTML = '💡 İpucu Harf';
+      this.btnHint.innerHTML = t.btnHint;
     }
 
     setTimeout(() => {
       const bank = this.getFilteredWords();
       this.currentSeed = forceSeed !== null ? forceSeed : Math.floor(Math.random() * 2147483647);
-      const today = new Date().toLocaleDateString('tr-TR', { year: 'numeric', month: 'short', day: 'numeric' });
+      const dateLocale = this.uiLang === 'tr' ? 'tr-TR' : 'en-US';
+      const today = new Date().toLocaleDateString(dateLocale, { year: 'numeric', month: 'short', day: 'numeric' });
       this.puzzleDateDisplay.textContent = today;
 
       const titleEl = document.querySelector('.sheet-title');
+      const subtitleEl = document.querySelector('.sheet-subtitle');
 
       if (this.puzzleType === 'cengel') {
         this.cengelView.style.display = 'flex';
@@ -475,11 +596,14 @@ export class CrosswordApp {
           else { rows = 14; cols = 12; }
         }
 
-        if (titleEl && (titleEl.textContent === 'English Crossword' || titleEl.textContent === 'Çengel Bulmaca')) {
-          titleEl.textContent = 'Çengel Bulmaca';
+        if (titleEl && !titleEl.dataset.custom) {
+          titleEl.textContent = t.sheetTitleCengel;
+        }
+        if (subtitleEl && !subtitleEl.dataset.custom) {
+          subtitleEl.textContent = t.sheetSubtitleCengel;
         }
 
-        const diffLabel = this.currentDifficulty === 'easy' ? 'Kolay Seviye' : (this.currentDifficulty === 'hard' ? 'Zor Seviye' : 'Orta Seviye');
+        const diffLabel = this.currentDifficulty === 'easy' ? t.diffEasy : (this.currentDifficulty === 'hard' ? t.diffHard : t.diffMedium);
         const baseNum = (this.currentSeed % 80) + 10;
 
         this.currentCengelPuzzles = [];
@@ -510,10 +634,11 @@ export class CrosswordApp {
         }
 
         const puzzleId = `#CGL-${this.currentSeed.toString().substring(0, 4)}`;
+        const typeBadge = this.uiLang === 'tr' ? 'Gazete Çengel' : 'Arrowword';
         this.puzzleIdDisplay.textContent = puzzleId;
         this.solutionPuzzleIdDisplay.textContent = puzzleId;
-        this.puzzleDiffDisplay.textContent = `${diffLabel} (Gazete Çengel)`;
-        this.solutionDiffDisplay.textContent = `${diffLabel} (Gazete Çengel)`;
+        this.puzzleDiffDisplay.textContent = `${diffLabel} (${typeBadge})`;
+        this.solutionDiffDisplay.textContent = `${diffLabel} (${typeBadge})`;
 
         this.renderCengelView();
       } else {
@@ -523,9 +648,11 @@ export class CrosswordApp {
         this.solutionCengelView.style.display = 'none';
         if (this.solutionClassicView) this.solutionClassicView.style.display = 'block';
 
-        // BUG-5 Fix: Restore sheet title when switching back to Classic mode
-        if (titleEl && titleEl.textContent === 'Çengel Bulmaca') {
-          titleEl.textContent = 'English Crossword';
+        if (titleEl && !titleEl.dataset.custom) {
+          titleEl.textContent = t.sheetTitleClassic;
+        }
+        if (subtitleEl && !subtitleEl.dataset.custom) {
+          subtitleEl.textContent = t.sheetSubtitleClassic;
         }
 
         const targetCount = this.targetCounts[this.currentDifficulty];
@@ -544,7 +671,7 @@ export class CrosswordApp {
         this.renderPuzzles();
       }
 
-      this.btnGenerate.innerHTML = originalText;
+      this.btnGenerate.innerHTML = t.btnNewPuzzle;
       this.btnGenerate.disabled = false;
     }, 50);
   }
@@ -598,10 +725,11 @@ export class CrosswordApp {
     );
     const p0 = this.currentCengelPuzzles[0];
 
-    this.statsWords.textContent = `Words: ${totalWords} placed`;
-    this.statsGrid.textContent = isDual ? `Grid: 2x (${p0.rows}x${p0.cols})` : `Grid: ${p0.rows}x${p0.cols}`;
-    this.statsDensity.textContent = `Density: ${avgDensity}% (Aktif Alan)`;
-    this.statsIntersections.textContent = `Intersections: ${totalIntersections}`;
+    const t = TRANSLATIONS[this.uiLang] || TRANSLATIONS.tr;
+    this.statsWords.textContent = `${t.statsWords} ${totalWords} ${t.statsPlaced}`;
+    this.statsGrid.textContent = isDual ? `${t.statsGrid} 2x (${p0.rows}x${p0.cols})` : `${t.statsGrid} ${p0.rows}x${p0.cols}`;
+    this.statsDensity.textContent = `${t.statsDensity} ${avgDensity}% (${t.activeArea})`;
+    this.statsIntersections.textContent = `${t.statsIntersections} ${totalIntersections}`;
   }
 
   createCengelDOMBlock(puzzle, isSolution, pIdx = 0) {
@@ -725,10 +853,11 @@ export class CrosswordApp {
       const secretBar = document.createElement('div');
       secretBar.className = 'cengel-secret-bar';
 
+      const t = TRANSLATIONS[this.uiLang] || TRANSLATIONS.tr;
       const infoDiv = document.createElement('div');
       infoDiv.className = 'secret-bar-info';
       infoDiv.innerHTML = `
-        <span class="secret-bar-label">🔐 ŞİFRELİ KELİME</span>
+        <span class="secret-bar-label">${t.secretKeywordLabel}</span>
         <span class="secret-bar-clue">${puzzle.secretWord.clue}</span>
       `;
 
@@ -772,10 +901,11 @@ export class CrosswordApp {
 
   // YEN-3: Toggle Starter Hint Letters (~15% of letter cells)
   toggleHints() {
+    const t = TRANSLATIONS[this.uiLang] || TRANSLATIONS.tr;
     this.isHintsActive = !this.isHintsActive;
     if (this.btnHint) {
       this.btnHint.classList.toggle('active', this.isHintsActive);
-      this.btnHint.innerHTML = this.isHintsActive ? '💡 İpuçlarını Gizle' : '💡 İpucu Harf';
+      this.btnHint.innerHTML = this.isHintsActive ? t.btnHintHide : t.btnHint;
     }
 
     const rng = new SeededRandom((this.currentSeed || 12345) + 333);
@@ -809,11 +939,7 @@ export class CrosswordApp {
       this.renderGrid(this.crosswordGrid, grid, false, false);
     }
 
-    this.showToast(
-      this.isHintsActive
-        ? '💡 Başlangıç ipucu harfleri tabloya yerleştirildi!'
-        : '💡 İpucu harfler gizlendi.'
-    );
+    this.showToast(this.isHintsActive ? t.toastHintsShown : t.toastHintsHidden);
   }
 
   // YEN-1: Validate User-Entered Letters
@@ -867,12 +993,17 @@ export class CrosswordApp {
       });
     }
 
+    const t = TRANSLATIONS[this.uiLang] || TRANSLATIONS.tr;
     if (correctCount === 0 && wrongCount === 0) {
-      this.showToast('✏️ Kontrol etmek için önce bir kutuya tıklayıp klavyeyle harf girin.');
+      this.showToast(t.toastCheckEmpty);
     } else if (wrongCount === 0 && emptyCount === 0) {
-      this.showToast(`🎉 Tebrikler! Tüm bulmacayı (${correctCount} harf) hatasız çözdünüz!`);
+      this.showToast(t.toastCheckPerfect);
     } else {
-      this.showToast(`✅ ${correctCount} doğru, ❌ ${wrongCount} hatalı harf (${emptyCount} boş kutu kaldı)`);
+      const msg = t.toastCheckScore
+        .replace('{correct}', correctCount)
+        .replace('{wrong}', wrongCount)
+        .replace('{empty}', emptyCount);
+      this.showToast(msg);
     }
   }
 
@@ -929,8 +1060,9 @@ export class CrosswordApp {
 
     if (e.key === ' ') {
       e.preventDefault();
+      const t = TRANSLATIONS[this.uiLang] || TRANSLATIONS.tr;
       this.focusedCell.dir = dir === 'across' ? 'down' : 'across';
-      this.showToast(`Yazma yönü: ${this.focusedCell.dir === 'across' ? '→ Soldan Sağa' : '↓ Yukarıdan Aşağıya'}`);
+      this.showToast(this.focusedCell.dir === 'across' ? t.toastDirectionAcross : t.toastDirectionDown);
       return;
     }
 
@@ -1051,16 +1183,17 @@ export class CrosswordApp {
   }
 
   toggleSolution() {
+    const t = TRANSLATIONS[this.uiLang] || TRANSLATIONS.tr;
     this.isSolutionVisible = !this.isSolutionVisible;
     if (this.isSolutionVisible) {
       this.solutionSheet.classList.add('visible');
       this.btnToggleSolution.classList.add('active');
-      this.btnToggleSolution.innerHTML = '🔒 Hide Answer Key';
+      this.btnToggleSolution.innerHTML = t.btnHideSolution;
       this.pageCountDisplays.forEach(el => el.textContent = '2');
     } else {
       this.solutionSheet.classList.remove('visible');
       this.btnToggleSolution.classList.remove('active');
-      this.btnToggleSolution.innerHTML = '👁️ Show Answer Key';
+      this.btnToggleSolution.innerHTML = t.btnShowSolution;
       this.pageCountDisplays.forEach(el => el.textContent = '1');
     }
   }
@@ -1094,10 +1227,11 @@ export class CrosswordApp {
     }
     
     const density = Math.round((filledCells / (rows * cols)) * 100);
-    this.statsWords.textContent = `Words: ${allWords.length} placed`;
-    this.statsGrid.textContent = `Grid: ${rows}x${cols}`;
-    this.statsDensity.textContent = `Density: ${density}%`;
-    this.statsIntersections.textContent = `Intersections: ${intersections}`;
+    const t = TRANSLATIONS[this.uiLang] || TRANSLATIONS.tr;
+    this.statsWords.textContent = `${t.statsWords} ${allWords.length} ${t.statsPlaced}`;
+    this.statsGrid.textContent = `${t.statsGrid} ${rows}x${cols}`;
+    this.statsDensity.textContent = `${t.statsDensity} ${density}%`;
+    this.statsIntersections.textContent = `${t.statsIntersections} ${intersections}`;
   }
 
   renderGrid(container, grid, isSolution, animate) {
@@ -1211,8 +1345,9 @@ export class CrosswordApp {
     const intersections = puzzle.intersections || 1;
     const diffScore = (avgLen * 0.5) + (rarePoints * 1.5) + (numWords * 0.3) - (intersections * 0.2);
     const score = Math.max(1, Math.min(10, Math.round(diffScore)));
-    const stars = score <= 3 ? '⭐ Easy' : (score <= 6 ? '⭐⭐ Medium' : '⭐⭐⭐ Hard');
-    const diffTitle = this.currentDifficulty.charAt(0).toUpperCase() + this.currentDifficulty.slice(1);
+    const t = TRANSLATIONS[this.uiLang] || TRANSLATIONS.tr;
+    const stars = score <= 3 ? `⭐ ${t.diffEasy}` : (score <= 6 ? `⭐⭐ ${t.diffMedium}` : `⭐⭐⭐ ${t.diffHard}`);
+    const diffTitle = this.currentDifficulty === 'easy' ? t.diffEasy : (this.currentDifficulty === 'hard' ? t.diffHard : t.diffMedium);
     return `${diffTitle} — ${stars} (${score}/10)`;
   }
 
@@ -1222,9 +1357,10 @@ export class CrosswordApp {
     document.body.classList.add('batch-print-active');
     
     const bank = this.getFilteredWords();
+    const t = TRANSLATIONS[this.uiLang] || TRANSLATIONS.tr;
+    const diffLabel = this.currentDifficulty === 'easy' ? t.diffEasy : (this.currentDifficulty === 'hard' ? t.diffHard : t.diffMedium);
 
     if (this.puzzleType === 'cengel') {
-      const diffLabel = this.currentDifficulty === 'easy' ? 'Kolay Seviye' : (this.currentDifficulty === 'hard' ? 'Zor Seviye' : 'Orta Seviye');
       let rows = 18, cols = 13;
       if (this.cengelLayout === 'single') {
         if (this.currentDifficulty === 'easy') { rows = 14; cols = 11; }
@@ -1262,13 +1398,14 @@ export class CrosswordApp {
       }
 
       const isDualBatch = this.cengelLayout === 'dual';
+      const typeBadge = this.uiLang === 'tr' ? 'Gazete Çengel' : 'Arrowword';
 
-      // Render puzzle sheets (BUG-6 Fix: apply layout-single / layout-dual classes)
+      // Render puzzle sheets
       batchPuzzlesList.forEach((puzzles, idx) => {
         const sheet = this.puzzleSheet.cloneNode(true);
         sheet.id = '';
         sheet.querySelector('#puzzle-id').textContent = `Batch #${idx + 1}`;
-        sheet.querySelector('#puzzle-diff-label').textContent = `${diffLabel} (Gazete Çengel)`;
+        sheet.querySelector('#puzzle-diff-label').textContent = `${diffLabel} (${typeBadge})`;
         const classicBox = sheet.querySelector('#classic-view');
         if (classicBox) classicBox.style.display = 'none';
 
@@ -1287,7 +1424,7 @@ export class CrosswordApp {
         });
 
         const footer = sheet.querySelector('.sheet-footer');
-        footer.innerHTML = `<span>Gazete Çengel Bulmacası • Sayfa ${idx + 1} / ${count * 2}</span>`;
+        footer.innerHTML = `<span>${t.footerCengelPage} ${idx + 1} / ${count * 2}</span>`;
         container.appendChild(sheet);
       });
 
@@ -1297,7 +1434,7 @@ export class CrosswordApp {
         sheet.id = '';
         sheet.classList.add('visible');
         sheet.querySelector('#solution-puzzle-id').textContent = `Batch #${idx + 1}`;
-        sheet.querySelector('#solution-diff-label').textContent = `${diffLabel} (Gazete Çengel)`;
+        sheet.querySelector('#solution-diff-label').textContent = `${diffLabel} (${typeBadge})`;
         const classicSol = sheet.querySelector('#solution-classic-view');
         if (classicSol) classicSol.style.display = 'none';
 
@@ -1316,7 +1453,7 @@ export class CrosswordApp {
         });
 
         const footer = sheet.querySelector('.sheet-footer');
-        footer.innerHTML = `<span>Çengel Bulmaca Çözümleri • Sayfa ${count + idx + 1} / ${count * 2}</span>`;
+        footer.innerHTML = `<span>${t.footerCengelSol} ${count + idx + 1} / ${count * 2}</span>`;
         container.appendChild(sheet);
       });
 
@@ -1371,7 +1508,7 @@ export class CrosswordApp {
 
       sheet.querySelector('.page-count-display').textContent = `${count*2}`;
       const footer = sheet.querySelector('.sheet-footer');
-      footer.innerHTML = `<span>Page ${idx+1} of ${count*2} (Puzzles)</span>`;
+      footer.innerHTML = `<span>${t.footerClassicPage} ${idx+1} / ${count*2}</span>`;
       
       container.appendChild(sheet);
     });
@@ -1407,7 +1544,7 @@ export class CrosswordApp {
       });
       
       const footer = sheet.querySelector('.sheet-footer');
-      footer.innerHTML = `<span>Page ${count + idx + 1} of ${count*2} (Solutions)</span>`;
+      footer.innerHTML = `<span>${t.footerClassicSol} ${count + idx + 1} / ${count*2}</span>`;
       
       container.appendChild(sheet);
     });
@@ -1430,7 +1567,8 @@ export class CrosswordApp {
       script.src = 'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.2/jspdf.umd.min.js';
       script.onload = () => this._generatePdf();
       script.onerror = () => {
-        this.showToast('PDF export requires internet. Use Print button and select "Save as PDF" instead.');
+        const t = TRANSLATIONS[this.uiLang] || TRANSLATIONS.tr;
+        this.showToast(t.toastPdfOffline);
       };
       document.head.appendChild(script);
     } else {

@@ -15,11 +15,12 @@
         <div class="brand-title">
           <span class="brand-icon">🧩</span>
           <div>
-            <div class="brand-name">Crossword Maker</div>
-            <div class="brand-sub">Printable A4 Generator</div>
+            <div class="brand-name" id="brand-name">Crossword Maker</div>
+            <div class="brand-sub" id="brand-sub">Printable A4 Generator</div>
           </div>
         </div>
         <div class="sidebar-top-actions">
+          <button id="btn-ui-lang" class="action-btn btn-outline" style="font-weight: 700; min-width: 58px;" title="Switch UI Language / Arayüz Dilini Değiştir">🌐 TR</button>
           <button id="btn-theme" class="action-btn btn-outline btn-icon" title="Toggle Dark/Light Mode">🌙</button>
           <button id="btn-share" class="action-btn btn-outline btn-icon" title="Copy sharing link">🔗</button>
         </div>
@@ -27,17 +28,17 @@
 
       <!-- MAIN ACTIONS -->
       <div class="sidebar-section">
-        <button id="btn-generate" class="action-btn btn-primary btn-block" title="Yeni rastgele bulmaca üret">🔄 New Puzzle</button>
+        <button id="btn-generate" class="action-btn btn-primary btn-block" title="Generate New Puzzle">🔄 New Puzzle</button>
         <div class="sidebar-btn-row">
-          <button id="btn-hint" class="action-btn btn-outline" title="Yardımcı başlangıç harflerini (%15) göster/gizle">💡 İpucu Harf</button>
-          <button id="btn-check" class="action-btn btn-outline" title="Ekranda yazdığınız cevapları kontrol et">✅ Kontrol Et</button>
+          <button id="btn-hint" class="action-btn btn-outline" title="Toggle Starter Hint Letters">💡 Hint Letter</button>
+          <button id="btn-check" class="action-btn btn-outline" title="Check Answers on Grid">✅ Check Answers</button>
         </div>
-        <button id="btn-toggle-solution" class="action-btn btn-outline btn-block" title="Cevap anahtarını göster veya gizle">👁️ Show Answer Key</button>
+        <button id="btn-toggle-solution" class="action-btn btn-outline btn-block" title="Show or Hide Answer Key">👁️ Show Answer Key</button>
       </div>
 
       <!-- EXPORT & PRINT -->
       <div class="sidebar-section">
-        <div class="sidebar-heading">EXPORT & PRINT</div>
+        <div class="sidebar-heading" id="heading-export">EXPORT & PRINT</div>
         <div class="sidebar-btn-row">
           <button id="btn-print" class="action-btn btn-print" title="Print to A4 paper">🖨️ Print (A4)</button>
           <button id="btn-pdf" class="action-btn btn-outline" title="Download as PDF">📥 PDF</button>
@@ -56,35 +57,35 @@
 
       <!-- PUZZLE TYPE -->
       <div class="sidebar-section">
-        <div class="sidebar-heading">BULMACA TÜRÜ</div>
+        <div class="sidebar-heading" id="heading-type">PUZZLE TYPE</div>
         <div class="difficulty-selector segmented-control" id="puzzle-type-selector">
-          <button class="type-btn active" data-type="cengel" title="Gazete tipi sıfır boşluk çengel bulmaca">📰 Çengel</button>
-          <button class="type-btn" data-type="classic" title="Geleneksel numaralı kare bulmaca">🧩 Klasik</button>
+          <button class="type-btn active" data-type="cengel" id="type-btn-cengel" title="Gazete tipi sıfır boşluk çengel bulmaca">📰 Çengel</button>
+          <button class="type-btn" data-type="classic" id="type-btn-classic" title="Geleneksel numaralı kare bulmaca">🧩 Klasik</button>
         </div>
       </div>
 
       <!-- ÇENGEL LAYOUT -->
       <div class="sidebar-section" id="cengel-layout-section">
-        <div class="sidebar-heading">ÇENGEL DÜZENİ</div>
+        <div class="sidebar-heading" id="heading-layout">ÇENGEL DÜZENİ</div>
         <div class="difficulty-selector segmented-control" id="cengel-layout-selector">
-          <button class="cengel-layout-btn active" data-layout="single" title="Bütün sayfayı kaplayan tek büyük bulmaca">📄 Tam Sayfa</button>
-          <button class="cengel-layout-btn" data-layout="dual" title="Sayfayı ikiye bölen 2 bulmaca">📑 İkili (Dual)</button>
+          <button class="cengel-layout-btn active" data-layout="single" id="layout-btn-single" title="Bütün sayfayı kaplayan tek büyük bulmaca">📄 Tam Sayfa</button>
+          <button class="cengel-layout-btn" data-layout="dual" id="layout-btn-dual" title="Sayfayı ikiye bölen 2 bulmaca">📑 İkili (Dual)</button>
         </div>
       </div>
 
       <!-- DIFFICULTY -->
       <div class="sidebar-section">
-        <div class="sidebar-heading">DIFFICULTY</div>
+        <div class="sidebar-heading" id="heading-diff">DIFFICULTY</div>
         <div class="difficulty-selector segmented-control">
-          <button class="diff-btn" data-diff="easy">Easy</button>
-          <button class="diff-btn active" data-diff="medium">Medium</button>
-          <button class="diff-btn" data-diff="hard">Hard</button>
+          <button class="diff-btn" data-diff="easy" id="diff-btn-easy">Easy</button>
+          <button class="diff-btn active" data-diff="medium" id="diff-btn-medium">Medium</button>
+          <button class="diff-btn" data-diff="hard" id="diff-btn-hard">Hard</button>
         </div>
       </div>
 
       <!-- CLUE LANGUAGE -->
       <div class="sidebar-section">
-        <div class="sidebar-heading">CLUE LANGUAGE</div>
+        <div class="sidebar-heading" id="heading-clue-lang">CLUE LANGUAGE</div>
         <div class="difficulty-selector segmented-control" id="clue-lang-selector">
           <button class="lang-btn active" data-lang="mixed">🔀 Mix</button>
           <button class="lang-btn" data-lang="tr">🇹🇷 TR</button>
@@ -94,7 +95,7 @@
 
       <!-- CATEGORIES -->
       <div class="sidebar-section categories-section">
-        <div class="sidebar-heading">CATEGORIES</div>
+        <div class="sidebar-heading" id="heading-categories">CATEGORIES</div>
         <div id="cat-container" class="categories-panel">
           <!-- Categories & quick actions injected dynamically -->
         </div>
@@ -112,7 +113,7 @@
           <div class="stat-badge"><span class="stat-icon">🔀</span> <span id="stats-intersections">Intersections: 0</span></div>
         </div>
 
-        <p class="screen-tip no-print">
+        <p class="screen-tip no-print" id="screen-tip">
           💡 <strong>Tip:</strong> Click <strong>Print (A4)</strong> to print directly or save as PDF. Puzzle title and subtitle are directly editable!
         </p>
       </header>
@@ -121,17 +122,17 @@
       <main id="puzzle-sheet" class="printable-sheet">
         <div class="sheet-header">
           <div>
-            <h1 class="sheet-title" contenteditable="true" title="Click to edit title">English Crossword</h1>
-            <div class="sheet-subtitle" contenteditable="true" title="Click to edit subtitle">Vocabulary & General Knowledge</div>
+            <h1 class="sheet-title" id="sheet-title" contenteditable="true" title="Click to edit title">English Crossword</h1>
+            <div class="sheet-subtitle" id="sheet-subtitle" contenteditable="true" title="Click to edit subtitle">Vocabulary & General Knowledge</div>
             <div class="student-info-row">
-              <span><strong>Name:</strong> _______________________</span>
-              <span><strong>Score:</strong> ______ / 100</span>
+              <span><strong id="label-student-name">Name:</strong> _______________________</span>
+              <span><strong id="label-student-score">Score:</strong> ______ / 100</span>
             </div>
           </div>
           <div class="meta-box">
-            <div><strong>Puzzle ID:</strong> <span id="puzzle-id">#CW-001</span></div>
-            <div><strong>Difficulty:</strong> <span id="puzzle-diff-label">Medium</span></div>
-            <div><strong>Date:</strong> <span id="puzzle-date"></span></div>
+            <div><strong id="meta-puzzle-id-label">Puzzle ID:</strong> <span id="puzzle-id">#CW-001</span></div>
+            <div><strong id="meta-puzzle-diff-label">Difficulty:</strong> <span id="puzzle-diff-label">Medium</span></div>
+            <div><strong id="meta-puzzle-date-label">Date:</strong> <span id="puzzle-date"></span></div>
           </div>
         </div>
 
@@ -148,18 +149,18 @@
 
           <section class="clues-section">
             <div class="clue-column">
-              <h2 class="clue-header">Across</h2>
+              <h2 class="clue-header" id="clue-header-across">Across</h2>
               <ul id="across-clues" class="clue-list"></ul>
             </div>
             <div class="clue-column">
-              <h2 class="clue-header">Down</h2>
+              <h2 class="clue-header" id="clue-header-down">Down</h2>
               <ul id="down-clues" class="clue-list"></ul>
             </div>
           </section>
         </div>
 
-        <footer class="sheet-footer">
-          <span>English Crossword Challenge • Ready for Paper & Pencil</span>
+        <footer class="sheet-footer" id="sheet-footer">
+          <span id="sheet-footer-text">English Crossword Challenge • Ready for Paper & Pencil</span>
           <span>Page 1 of <span class="page-count-display">1</span></span>
         </footer>
       </main>
@@ -168,12 +169,12 @@
       <section id="solution-sheet" class="printable-sheet">
         <div class="sheet-header">
           <div>
-            <h1 class="sheet-title">Answer Key</h1>
-            <div class="sheet-subtitle">Solutions for Teachers & Self-Checking</div>
+            <h1 class="sheet-title" id="solution-sheet-title">Answer Key</h1>
+            <div class="sheet-subtitle" id="solution-sheet-subtitle">Solutions for Teachers & Self-Checking</div>
           </div>
           <div class="meta-box">
-            <div><strong>Puzzle ID:</strong> <span id="solution-puzzle-id">#CW-001</span></div>
-            <div><strong>Difficulty:</strong> <span id="solution-diff-label">Medium</span></div>
+            <div><strong id="meta-sol-id-label">Puzzle ID:</strong> <span id="solution-puzzle-id">#CW-001</span></div>
+            <div><strong id="meta-sol-diff-label">Difficulty:</strong> <span id="solution-diff-label">Medium</span></div>
           </div>
         </div>
 
