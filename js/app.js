@@ -71,7 +71,6 @@ export class CrosswordApp {
     this.statsGrid = document.getElementById('stats-grid');
     this.statsDensity = document.getElementById('stats-density');
     this.statsIntersections = document.getElementById('stats-intersections');
-    this.statsLongest = document.getElementById('stats-longest');
 
     // Quick Category Selection Controls
     const quickControls = document.createElement('div');
@@ -406,22 +405,17 @@ export class CrosswordApp {
     
     // Stats Update (YEN-5)
     let filledCells = 0;
-    let longestWord = '';
     for(let r=0; r<rows; r++) {
       for(let c=0; c<cols; c++) {
         if(!grid[r][c].isBlocked) filledCells++;
       }
     }
-    allWords.forEach(w => {
-      if(w.word.length > longestWord.length) longestWord = w.word;
-    });
     
     const density = Math.round((filledCells / (rows * cols)) * 100);
     this.statsWords.textContent = `Words: ${allWords.length} placed`;
     this.statsGrid.textContent = `Grid: ${rows}x${cols}`;
     this.statsDensity.textContent = `Density: ${density}%`;
     this.statsIntersections.textContent = `Intersections: ${intersections}`;
-    this.statsLongest.textContent = `Longest: ${longestWord}`;
   }
 
   renderGrid(container, grid, isSolution, animate) {
