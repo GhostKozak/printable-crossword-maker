@@ -1,50 +1,92 @@
 @media print {
   @page {
     size: A4 portrait;
-    margin: 10mm 12mm;
+    margin: 8mm 10mm;
   }
+
+  /* Force exact color, border, and background rendering in print preview */
+  *, *::before, *::after {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+    color-adjust: exact !important;
+  }
+
   body {
+    font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif !important;
     background: #ffffff !important;
     padding: 0 !important;
     margin: 0 !important;
+    color: #000000 !important;
   }
-  .no-print, .app-sidebar, .app-topbar, .controls-panel, .screen-tip, .stats-bar, .file-protocol-banner {
+
+  h1, h2, h3, .sheet-title, .clue-header {
+    font-family: Georgia, 'Times New Roman', serif !important;
+  }
+
+  /* Hide screen controls, sidebars, banners, and tooltips */
+  .no-print,
+  .app-sidebar,
+  .app-topbar,
+  .controls-panel,
+  .screen-tip,
+  .stats-bar,
+  .file-protocol-banner,
+  .toast {
     display: none !important;
   }
   
-  .app-layout, .app-main {
+  .app-layout,
+  .app-main {
     display: block !important;
     width: 100% !important;
     padding: 0 !important;
     margin: 0 !important;
   }
 
+  /* ==========================================================================
+     A4 PRINTABLE SHEETS (Exact Physical Fitting & Zero-Blank-Page Guarantee)
+     ========================================================================== */
   .printable-sheet {
     box-shadow: none !important;
     width: 100% !important;
+    max-width: 190mm !important;
     min-height: auto !important;
     padding: 0 !important;
-    margin: 0 !important;
-    page-break-after: always;
+    margin: 0 auto !important;
+    page-break-after: auto !important;
+    break-after: auto !important;
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
     background: #ffffff !important;
     color: #000000 !important;
   }
-  
-  .sheet-header, .clue-header { border-bottom-color: #000000 !important; color: #000000 !important; }
-  .sheet-title, .meta-box strong, .clue-item strong { color: #000000 !important; }
-  .sheet-subtitle, .meta-box, .clue-item, .clue-word-len, .sheet-footer { color: #333333 !important; }
-  
-  .grid-wrapper {
-    max-width: 178mm;
-    margin-left: auto;
-    margin-right: auto;
+
+  /* Normal print logic:
+     - When solution is hidden: puzzle sheet is the only page (no break after = exactly 1 page).
+     - When solution is visible: solution sheet starts on page 2 (break-before: page = exactly 2 pages).
+  */
+  body:not(.batch-print-active) #puzzle-sheet {
+    display: flex !important;
+    flex-direction: column !important;
+    page-break-after: auto !important;
+    break-after: auto !important;
   }
-  .crossword-board {
-    border-color: #000000 !important;
-    background-color: #000000 !important;
+  body:not(.batch-print-active) #solution-sheet.visible {
+    display: flex !important;
+    flex-direction: column !important;
+    page-break-before: always !important;
+    break-before: page !important;
+    page-break-after: auto !important;
+    break-after: auto !important;
+  }
+  body:not(.batch-print-active) #solution-sheet:not(.visible) {
+    display: none !important;
   }
 
-  /* Batch print logic */
+  /* Batch print logic:
+     - All sheets except the last break after.
+     - The last sheet does NOT break after, preventing an accidental blank trailing page.
+  */
   body.batch-print-active #puzzle-sheet,
   body.batch-print-active #solution-sheet {
     display: none !important;
@@ -54,25 +96,178 @@
   }
   #batch-container .printable-sheet {
     display: flex !important;
+    flex-direction: column !important;
+  }
+  #batch-container .printable-sheet:not(:last-child) {
+    page-break-after: always !important;
+    break-after: page !important;
+  }
+  #batch-container .printable-sheet:last-child {
+    page-break-after: auto !important;
+    break-after: auto !important;
+  }
+  
+  /* Sheet Headers & Typography */
+  .sheet-header {
+    border-bottom: 2px solid #000000 !important;
+    padding-bottom: 3mm !important;
+    margin-bottom: 3.5mm !important;
+    color: #000000 !important;
+  }
+  .sheet-title {
+    font-size: 16.5pt !important;
+    color: #000000 !important;
+    line-height: 1.1 !important;
+    font-weight: 800 !important;
+    margin-bottom: 1mm !important;
+  }
+  .sheet-subtitle {
+    font-size: 8pt !important;
+    color: #222222 !important;
+    margin-top: 1px !important;
+    margin-bottom: 1.5mm !important;
+  }
+  .student-info-row {
+    font-size: 7.5pt !important;
+    margin-top: 2.5mm !important;
+    color: #222222 !important;
+  }
+  .meta-box {
+    font-size: 7.5pt !important;
+    color: #222222 !important;
+    line-height: 1.35 !important;
+  }
+  .meta-box strong {
+    color: #000000 !important;
+  }
+  .sheet-footer {
+    border-top: 1px solid #333333 !important;
+    color: #333333 !important;
+    margin-top: auto !important;
+    padding-top: 2.5mm !important;
+    font-size: 7pt !important;
   }
 
-  /* Normal print logic */
-  body:not(.batch-print-active) #solution-sheet.visible {
+  /* ==========================================================================
+     GRID & BOARD RULES (Crisp Vector Borders - Always Visible In Print Preview)
+     ========================================================================== */
+  .cengel-container {
     display: flex !important;
-    page-break-before: always;
+    flex-direction: column !important;
+    align-items: center !important;
+    width: 100% !important;
+    margin-top: 2px !important;
   }
-  body:not(.batch-print-active) #solution-sheet:not(.visible) {
-    display: none !important;
+  .cengel-puzzle-block {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    width: 100% !important;
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
   }
 
+  /* Board Frame: Solid 2px outer border, 0 gap so cell borders meet seamlessly */
+  .cengel-board,
+  .crossword-board {
+    display: grid !important;
+    border: 2px solid #000000 !important;
+    background-color: #000000 !important;
+    gap: 0 !important;
+    margin: 0 auto !important;
+    width: fit-content !important;
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+
+  /* Individual Cell Borders: Right and bottom 1px borders meet outer 2px board */
+  .cengel-cell,
+  .cell {
+    border-right: 1px solid #000000 !important;
+    border-bottom: 1px solid #000000 !important;
+    border-top: none !important;
+    border-left: none !important;
+    box-sizing: border-box !important;
+    position: relative !important;
+  }
+
+  /* Letter Cell in Print */
+  .cengel-cell.letter-cell,
   .cell {
     background-color: #ffffff !important;
     color: #000000 !important;
-    -webkit-print-color-adjust: exact !important;
-    print-color-adjust: exact !important;
+    font-weight: 800 !important;
+  }
+  .cengel-cell.letter-cell.focused-cell,
+  .cell.focused-cell {
+    outline: none !important;
+    background-color: #ffffff !important;
+  }
+  .cengel-cell.letter-cell .letter-char {
+    display: none !important;
+  }
+  .is-solution-sheet .cengel-cell.letter-cell .letter-char,
+  .cell.solution-cell {
+    display: block !important;
+    color: #000000 !important;
+    background-color: #f1f5f9 !important;
+  }
+  .cengel-cell.letter-cell.hint-cell .letter-char {
+    display: block !important;
+    color: #475569 !important;
   }
 
-  /* Hatched blocked cells for massive toner saving */
+  /* Clue Cell in Print */
+  .cengel-cell.clue-cell {
+    background-color: #f8fafc !important;
+    color: #000000 !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: center !important;
+    box-sizing: border-box !important;
+  }
+  .clue-sub {
+    flex: 1 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: center !important;
+    align-items: center !important;
+    position: relative !important;
+    width: 100% !important;
+    height: 100% !important;
+    padding: 1px 3.5px 2px 2px !important;
+    box-sizing: border-box !important;
+  }
+  .cengel-cell.clue-cell.dual-clue .clue-sub:first-child {
+    border-bottom: 0.8px solid #000000 !important;
+  }
+  .clue-text {
+    color: #000000 !important;
+    font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif !important;
+    font-weight: 700 !important;
+    text-align: center !important;
+    word-break: break-word !important;
+    letter-spacing: -0.1px !important;
+    overflow: hidden !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+    padding: 0 1px !important;
+    margin: 0 !important;
+  }
+  .clue-arrow {
+    color: #000000 !important;
+    font-weight: 900 !important;
+    position: absolute !important;
+    right: 1.5px !important;
+    bottom: 1px !important;
+    line-height: 1 !important;
+    pointer-events: none !important;
+  }
+
+  /* Blocked Cells in Print (Crisp diagonal hatching with toner saving) */
+  .cengel-cell.blocked,
   .cell.blocked {
     background-color: #ffffff !important;
     background-image: repeating-linear-gradient(
@@ -82,110 +277,129 @@
       transparent 1.2px,
       transparent 4.5px
     ) !important;
-    -webkit-print-color-adjust: exact !important;
-    print-color-adjust: exact !important;
   }
 
-  .cell-num { color: #000000 !important; }
-  .cell.solution-cell {
-    color: #000000 !important;
-    background-color: #ffffff !important;
+  /* ==========================================================================
+     SINGLE FULL-PAGE ÇENGEL PRINT SIZING
+     Dynamically scales to fill available page width and height!
+     - Easy (15x12): ~14.8mm cells -> 177.6mm width x 222mm height
+     - Medium (18x14): ~12.6mm cells -> 176.4mm width x 226.8mm height
+     - Hard (20x15): ~11.4mm cells -> 171.0mm width x 228.0mm height
+     ========================================================================== */
+  .cengel-container.layout-single,
+  .cengel-container.layout-single .cengel-puzzle-block {
+    --cengel-cell-size: min(calc(182mm / var(--cengel-cols, 14)), calc(220mm / var(--cengel-rows, 18))) !important;
   }
-
-  /* Çengel Bulmaca Print Rules */
-  .cengel-board {
-    border: 2px solid #000000 !important;
-    background-color: #000000 !important;
-    margin: 0 auto !important;
-  }
-  .cengel-cell.letter-cell {
-    background-color: #ffffff !important;
-    color: #000000 !important;
-    -webkit-print-color-adjust: exact !important;
-    print-color-adjust: exact !important;
-  }
-  .cengel-cell.clue-cell {
-    background-color: #f8fafc !important;
-    color: #000000 !important;
-    -webkit-print-color-adjust: exact !important;
-    print-color-adjust: exact !important;
-  }
-  .cengel-banner {
-    background: #0284c7 !important;
-    color: #ffffff !important;
-    -webkit-print-color-adjust: exact !important;
-    print-color-adjust: exact !important;
-  }
-  .cengel-banner-num {
-    background: #0369a1 !important;
-    color: #ffffff !important;
-    -webkit-print-color-adjust: exact !important;
-    print-color-adjust: exact !important;
-  }
-  .cengel-cell.blocked {
-    background-color: #ffffff !important;
-    background-image: repeating-linear-gradient(
-      45deg,
-      #000000 0,
-      #000000 1.2px,
-      transparent 1.2px,
-      transparent 4.5px
-    ) !important;
-    -webkit-print-color-adjust: exact !important;
-    print-color-adjust: exact !important;
-  }
-  .clue-arrow {
-    color: #0284c7 !important;
-    -webkit-print-color-adjust: exact !important;
-    print-color-adjust: exact !important;
-  }
-  .cengel-dual-divider {
-    border-top: 1px dashed #000000 !important;
-  }
-
-  /* Single Full-Page Çengel Print Sizing - Covers the entire page */
   .cengel-container.layout-single .cengel-board {
-    max-width: 186mm !important;
-    width: 100% !important;
-    justify-content: center !important;
+    grid-template-columns: repeat(var(--cengel-cols, 14), var(--cengel-cell-size)) !important;
+    grid-template-rows: repeat(var(--cengel-rows, 18), var(--cengel-cell-size)) !important;
+    max-width: 184mm !important;
+    width: fit-content !important;
   }
   .cengel-container.layout-single .cengel-cell {
-    width: 14.2mm !important;
-    height: 14.2mm !important;
+    width: var(--cengel-cell-size) !important;
+    height: var(--cengel-cell-size) !important;
   }
   .cengel-container.layout-single .clue-text {
-    font-size: 5.2pt !important;
-    line-height: 1.15 !important;
+    font-size: 5.0pt !important;
+    line-height: 1.14 !important;
   }
   .cengel-container.layout-single .clue-text.long-clue {
     font-size: 4.4pt !important;
-    line-height: 1.08 !important;
+    line-height: 1.06 !important;
   }
   .cengel-container.layout-single .clue-arrow {
-    font-size: 7.2pt !important;
+    font-size: 6.8pt !important;
   }
   .cengel-container.layout-single .letter-cell {
-    font-size: 15pt !important;
+    font-size: 13.5pt !important;
   }
 
-  /* Interactive & Hint Print Overrides */
-  .cengel-cell.letter-cell.focused-cell,
-  .cell.focused-cell {
-    outline: none !important;
-    background-color: #ffffff !important;
+  /* Dual clues inside single layout */
+  .cengel-container.layout-single .cengel-cell.clue-cell.dual-clue .clue-text {
+    font-size: 4.3pt !important;
+    line-height: 1.05 !important;
   }
-  .cengel-cell.letter-cell.hint-cell .letter-char {
-    display: block !important;
-    color: #334155 !important;
+  .cengel-container.layout-single .cengel-cell.clue-cell.dual-clue .clue-text.long-clue {
+    font-size: 3.8pt !important;
+    line-height: 1.0 !important;
+  }
+  .cengel-container.layout-single .cengel-cell.clue-cell.dual-clue .clue-arrow {
+    font-size: 5.8pt !important;
   }
 
-  /* Secret Word Bar Print Styles */
+  /* ==========================================================================
+     DUAL 2-IN-1 ÇENGEL PRINT SIZING (8.5mm Cells, 2 Stacked Puzzles Fit 1 Page)
+     - Easy (2x 11x11): 2 * 93.5mm = 187mm + 32mm header/divider/footer = 219mm < 281mm
+     - Medium (2x 13x11): 2 * 110.5mm = 221mm + 32mm = 253mm < 281mm
+     - Hard (2x 14x12): 2 * 119mm = 238mm + 32mm = 270mm < 281mm
+     ========================================================================== */
+  .cengel-container.layout-dual {
+    --cengel-cell-size: 8.5mm !important;
+    gap: 4mm !important;
+  }
+  .cengel-container.layout-dual .cengel-board {
+    grid-template-columns: repeat(var(--cengel-cols, 11), 8.5mm) !important;
+    grid-template-rows: repeat(var(--cengel-rows, 13), 8.5mm) !important;
+    max-width: 184mm !important;
+  }
+  .cengel-container.layout-dual .cengel-cell {
+    width: 8.5mm !important;
+    height: 8.5mm !important;
+  }
+  .cengel-container.layout-dual .clue-text {
+    font-size: 4.0pt !important;
+    line-height: 1.06 !important;
+  }
+  .cengel-container.layout-dual .clue-text.long-clue {
+    font-size: 3.5pt !important;
+    line-height: 0.98 !important;
+  }
+  .cengel-container.layout-dual .clue-arrow {
+    font-size: 5.2pt !important;
+  }
+  .cengel-container.layout-dual .letter-cell {
+    font-size: 9.5pt !important;
+  }
+
+  /* Dual clues inside dual layout (2 clues inside 8.5mm cell) */
+  .cengel-container.layout-dual .cengel-cell.clue-cell.dual-clue .clue-text {
+    font-size: 3.5pt !important;
+    line-height: 1.0 !important;
+  }
+  .cengel-container.layout-dual .cengel-cell.clue-cell.dual-clue .clue-text.long-clue {
+    font-size: 3.1pt !important;
+    line-height: 0.94 !important;
+  }
+  .cengel-container.layout-dual .cengel-cell.clue-cell.dual-clue .clue-arrow {
+    font-size: 4.5pt !important;
+  }
+
+  .cengel-dual-divider {
+    border-top: 1.5px dashed #000000 !important;
+    width: 100% !important;
+    margin: 2mm 0 !important;
+  }
+
+  /* ==========================================================================
+     SECRET WORD BAR PRINT STYLES (Şifreli Kelime Kutusu)
+     ========================================================================== */
   .secret-index-badge {
     background: #ffffff !important;
-    color: #0284c7 !important;
-    border: 0.8px solid #0284c7 !important;
-    -webkit-print-color-adjust: exact !important;
-    print-color-adjust: exact !important;
+    color: #000000 !important;
+    border: 0.8px solid #000000 !important;
+    font-size: 5.5pt !important;
+    font-weight: 800 !important;
+    width: 11px !important;
+    height: 11px !important;
+    line-height: 11px !important;
+    top: 1px !important;
+    left: 1px !important;
+    position: absolute !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    border-radius: 50% !important;
   }
   .cengel-secret-bar {
     display: flex !important;
@@ -193,14 +407,13 @@
     align-items: center !important;
     justify-content: space-between !important;
     flex-wrap: nowrap !important;
-    margin-top: 6px !important;
-    padding: 3px 8px !important;
-    background: #f8fafc !important;
-    border: 1.2px solid #000000 !important;
-    -webkit-print-color-adjust: exact !important;
-    print-color-adjust: exact !important;
+    margin-top: 3.5mm !important;
+    margin-bottom: 4.5mm !important;
+    padding: 2mm 3.5mm !important;
+    background: #ffffff !important;
+    border: 1.5px solid #000000 !important;
     width: 100% !important;
-    max-width: 184.6mm !important;
+    max-width: 184mm !important;
     box-sizing: border-box !important;
   }
   .secret-bar-info {
@@ -208,26 +421,27 @@
     flex-direction: row !important;
     align-items: center !important;
     gap: 6px !important;
-    font-size: 8pt !important;
+    font-size: 7.5pt !important;
   }
   .secret-bar-label {
     color: #000000 !important;
+    font-weight: 800 !important;
     white-space: nowrap !important;
   }
   .secret-bar-clue {
-    color: #333333 !important;
+    color: #222222 !important;
     white-space: nowrap !important;
   }
   .secret-bar-boxes {
     display: flex !important;
     flex-direction: row !important;
     align-items: center !important;
-    gap: 4px !important;
+    gap: 3px !important;
     flex-shrink: 0 !important;
   }
   .secret-box {
-    width: 22px !important;
-    height: 22px !important;
+    width: 6mm !important;
+    height: 6mm !important;
     background: #ffffff !important;
     border: 1.2px solid #000000 !important;
     color: #000000 !important;
@@ -237,6 +451,95 @@
     position: relative !important;
   }
   .secret-box-num {
-    color: #0284c7 !important;
+    color: #000000 !important;
+    font-size: 5pt !important;
+    font-weight: 800 !important;
+    position: absolute !important;
+    top: 0 !important;
+    left: 1px !important;
+  }
+  .secret-box-char {
+    font-size: 8pt !important;
+    font-weight: 800 !important;
+  }
+
+  /* ==========================================================================
+     CLASSIC CROSSWORD PRINT RULES (8.5mm Cells, Fits 1 Page on All Difficulties)
+     ========================================================================== */
+  .grid-wrapper {
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    max-width: 180mm !important;
+    margin: 3mm auto !important;
+  }
+  .crossword-board {
+    --cell-size: 8.5mm !important;
+  }
+  .crossword-board .cell {
+    width: 8.5mm !important;
+    height: 8.5mm !important;
+    font-size: 9.5pt !important;
+  }
+  .cell-num {
+    color: #000000 !important;
+    font-size: 5pt !important;
+    font-weight: 800 !important;
+    top: 0 !important;
+    left: 1px !important;
+  }
+  .clues-section {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 8mm !important;
+    margin-top: 3.5mm !important;
+  }
+  .clue-header {
+    border-bottom: 1.5px solid #000000 !important;
+    color: #000000 !important;
+    font-size: 9.5pt !important;
+    font-weight: 800 !important;
+    padding-bottom: 2px !important;
+    margin-bottom: 3.5px !important;
+  }
+  .clue-list {
+    gap: 2.5px !important;
+  }
+  .clue-item {
+    font-size: 7.2pt !important;
+    line-height: 1.2 !important;
+    color: #000000 !important;
+  }
+  .clue-item strong {
+    color: #000000 !important;
+    font-weight: 800 !important;
+  }
+
+  /* Classic Solution Sheet Word Index Table (4 Columns for Compact Fitting) */
+  .words-summary-table {
+    display: grid !important;
+    grid-template-columns: repeat(4, 1fr) !important;
+    gap: 2mm 4mm !important;
+    margin-top: 3mm !important;
+    font-size: 7pt !important;
+  }
+  .solution-item {
+    display: flex !important;
+    align-items: baseline !important;
+    gap: 4px !important;
+    border-bottom: 0.8px solid #cccccc !important;
+    padding-bottom: 1px !important;
+    color: #000000 !important;
+  }
+  .solution-item .num {
+    font-weight: 800 !important;
+    color: #000000 !important;
+    font-size: 7pt !important;
+    min-width: 18px !important;
+  }
+  .solution-item .word {
+    font-weight: 700 !important;
+    color: #000000 !important;
+    letter-spacing: 0.5px !important;
   }
 }

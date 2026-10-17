@@ -855,7 +855,7 @@ h1, h2, h3, .brand-name, .sheet-title, .clue-header {
 .sheet-footer {
   border-top: 1px solid var(--border-light);
   margin-top: auto;
-  padding-top: 8px;
+  padding-top: 12px;
   display: flex;
   justify-content: space-between;
   font-size: 7.5pt;
@@ -1242,13 +1242,14 @@ h1, h2, h3, .brand-name, .sheet-title, .clue-header {
   justify-content: space-between;
   flex-wrap: nowrap;
   gap: 12px;
-  margin-top: 8px;
-  padding: 6px 12px;
+  margin-top: 14px;
+  margin-bottom: 20px;
+  padding: 8px 14px;
   background: var(--bg);
   border: 1.5px solid var(--border-dark);
   border-radius: 6px;
   width: 100%;
-  max-width: calc(var(--cengel-cols, 13) * var(--cengel-cell-size, 52px) + 2px);
+  max-width: calc(var(--cengel-cols, 14) * var(--cengel-cell-size, 48px) + 2px);
   margin-left: auto;
   margin-right: auto;
   box-sizing: border-box;

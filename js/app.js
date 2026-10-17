@@ -692,11 +692,11 @@ export class CrosswordApp {
         if (this.solutionClassicView) this.solutionClassicView.style.display = 'none';
 
         // Dimension configurations (Full page single or stacked dual)
-        let rows = 16, cols = 12;
+        let rows = 18, cols = 14;
         if (this.cengelLayout === 'single') {
-          if (this.currentDifficulty === 'easy') { rows = 14; cols = 11; }
-          else if (this.currentDifficulty === 'medium') { rows = 16; cols = 12; }
-          else { rows = 18; cols = 13; }
+          if (this.currentDifficulty === 'easy') { rows = 15; cols = 12; }
+          else if (this.currentDifficulty === 'medium') { rows = 18; cols = 14; }
+          else { rows = 20; cols = 15; }
         } else {
           // Dual mode (2 puzzles stacked)
           if (this.currentDifficulty === 'easy') { rows = 11; cols = 11; }
@@ -799,9 +799,9 @@ export class CrosswordApp {
       cellSize = '38px';
     } else {
       const p = this.currentCengelPuzzles[0];
-      if (p.cols <= 11) cellSize = '58px';
-      else if (p.cols <= 12) cellSize = '54px';
-      else cellSize = '52px';
+      if (p.cols <= 12) cellSize = '54px';
+      else if (p.cols <= 14) cellSize = '48px';
+      else cellSize = '44px';
     }
     document.documentElement.style.setProperty('--cengel-cell-size', cellSize);
 
@@ -1479,11 +1479,11 @@ export class CrosswordApp {
     const diffLabel = this.currentDifficulty === 'easy' ? t.diffEasy : (this.currentDifficulty === 'hard' ? t.diffHard : t.diffMedium);
 
     if (this.puzzleType === 'cengel') {
-      let rows = 18, cols = 13;
+      let rows = 18, cols = 14;
       if (this.cengelLayout === 'single') {
-        if (this.currentDifficulty === 'easy') { rows = 14; cols = 11; }
-        else if (this.currentDifficulty === 'medium') { rows = 16; cols = 12; }
-        else { rows = 18; cols = 13; }
+        if (this.currentDifficulty === 'easy') { rows = 15; cols = 12; }
+        else if (this.currentDifficulty === 'medium') { rows = 18; cols = 14; }
+        else { rows = 20; cols = 15; }
       } else {
         if (this.currentDifficulty === 'easy') { rows = 11; cols = 11; }
         else if (this.currentDifficulty === 'medium') { rows = 13; cols = 11; }
