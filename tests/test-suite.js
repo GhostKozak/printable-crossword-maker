@@ -2,6 +2,7 @@ import { RAW_WORD_BANK } from '../js/data/words.js';
 import { CrosswordGenerator } from '../js/core/generator.js';
 import { SeededRandom } from '../js/utils/seeded-random.js';
 import { PdfExporter } from '../js/utils/pdf-exporter.js';
+import { CengelGenerator } from '../js/core/cengel-generator.js';
 
 console.log('=== RUNNING COMPREHENSIVE SYSTEM VERIFICATION ===\n');
 
@@ -87,5 +88,46 @@ if (/[çÇğĞıİöÖşŞüÜ—–“”‘’]/.test(sanitized)) {
   throw new Error('PDF Sanitizer left unmapped Unicode characters');
 }
 console.log('✓ PDF Sanitizer passed');
+
+// 5. Gazete Çengel Generator Verification (Zero-Waste, In-Grid Clues)
+console.log('\n5. Testing Gazete Çengel Generator (Zero-Waste & Clues)...');
+
+// Test 13x11 Dual Layout
+const cengelRng = new SeededRandom(12345);
+const cGenDual = new CengelGenerator(RAW_WORD_BANK, { rows: 13, cols: 11, rng: cengelRng, clueLang: 'mixed' });
+const cDual = cGenDual.generate();
+
+console.log(`- Dual Layout (13x11): Placed ${cDual.words.length} words | Letter cells: ${cDual.letterCells} | Clue cells: ${cDual.clueCells} | Dual clues: ${cDual.dualClueCells}`);
+if (cDual.letterCells + cDual.clueCells !== 13 * 11) {
+  throw new Error(`Zero-waste violation: expected ${13 * 11} cells, got ${cDual.letterCells + cDual.clueCells}`);
+}
+if (cDual.words.length < 20) {
+  throw new Error(`Expected at least 20 words placed in 13x11, got ${cDual.words.length}`);
+}
+
+// Test 15x13 Single Layout
+const cGenSingle = new CengelGenerator(RAW_WORD_BANK, { rows: 15, cols: 13, rng: new SeededRandom(54321), clueLang: 'mixed' });
+const cSingle = cGenSingle.generate();
+console.log(`- Single Layout (15x13): Placed ${cSingle.words.length} words | Letter cells: ${cSingle.letterCells} | Clue cells: ${cSingle.clueCells} | Dual clues: ${cSingle.dualClueCells}`);
+if (cSingle.letterCells + cSingle.clueCells !== 15 * 13) {
+  throw new Error(`Zero-waste violation: expected ${15 * 13} cells, got ${cSingle.letterCells + cSingle.clueCells}`);
+}
+if (cSingle.words.length < 25) {
+  throw new Error(`Expected at least 25 words placed in 15x13, got ${cSingle.words.length}`);
+}
+
+// Test Seed Reproducibility
+const cSeed = 777888;
+const cTest1 = new CengelGenerator(RAW_WORD_BANK, { rows: 13, cols: 11, rng: new SeededRandom(cSeed) }).generate();
+const cTest2 = new CengelGenerator(RAW_WORD_BANK, { rows: 13, cols: 11, rng: new SeededRandom(cSeed) }).generate();
+if (cTest1.words.length !== cTest2.words.length) {
+  throw new Error('Cengel seed determinism failed for word count');
+}
+for (let i = 0; i < cTest1.words.length; i++) {
+  if (cTest1.words[i].word !== cTest2.words[i].word || cTest1.words[i].clue !== cTest2.words[i].clue) {
+    throw new Error(`Cengel determinism mismatch at word index ${i}`);
+  }
+}
+console.log('✓ Gazete Çengel Generator passed (100% cell utilization, zero dead cells, reproducible seed)');
 
 console.log('\n=== ALL TESTS PASSED SUCCESSFULLY! ===');

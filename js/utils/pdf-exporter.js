@@ -217,4 +217,174 @@ export class PdfExporter {
     const safeId = puzzleId.replace(/[^a-zA-Z0-9_-]/g, '');
     doc.save(`crossword-${safeId || 'puzzle'}.pdf`);
   }
+
+  /**
+   * Generates and downloads the authentic Gazete Çengel Bulmaca PDF.
+   */
+  static exportCengel(cengelData, options = {}) {
+    if (!window.jspdf) throw new Error('jsPDF library not loaded');
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+
+    const isDual = Array.isArray(cengelData);
+    const puzzles = isDual ? cengelData : [cengelData];
+    const difficulty = options.difficulty || 'Orta Seviye';
+    const isSolutionVisible = options.isSolutionVisible || false;
+    const puzzleId = options.puzzleId || '#26';
+
+    const renderCengelPage = (isSol) => {
+      // Worksheet header
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(8);
+      doc.setTextColor(100, 100, 100);
+      doc.text('Name: _______________________      Date: ____________      Score: _____ / 100', 15, 12);
+
+      let currentY = 16;
+
+      puzzles.forEach((puzzle, pIdx) => {
+        const subId = isDual ? `${puzzleId}${pIdx === 0 ? 'A' : 'B'}` : puzzleId;
+        const subTitle = isDual ? `${difficulty} - Gazete Cengel #${pIdx + 1}` : `${difficulty} - Gazete Cengel Bulmacasi`;
+
+        // Banner width & grid calculation
+        const cellW = isDual ? 13.0 : 11.5;
+        const gridW = puzzle.cols * cellW;
+        const startX = (210 - gridW) / 2;
+
+        // Draw Newspaper Blue Banner
+        doc.setFillColor(2, 132, 199);
+        doc.rect(startX, currentY, gridW, 7, 'F');
+
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(10.5);
+        doc.setTextColor(255, 255, 255);
+        doc.text(this.sanitizeText(subTitle), startX + 3, currentY + 5);
+
+        // Number Badge
+        doc.setFillColor(3, 105, 161);
+        doc.rect(startX + gridW - 20, currentY + 1, 18, 5, 'F');
+        doc.setFontSize(9);
+        doc.text(this.sanitizeText(subId), startX + gridW - 11, currentY + 4.5, { align: 'center' });
+
+        currentY += 7;
+
+        // Draw Board
+        doc.setDrawColor(0, 0, 0);
+        doc.setLineWidth(0.3);
+
+        for (let r = 0; r < puzzle.rows; r++) {
+          for (let c = 0; c < puzzle.cols; c++) {
+            const cell = puzzle.grid[r][c];
+            const x = startX + c * cellW;
+            const y = currentY + r * cellW;
+
+            if (cell.type === 'letter') {
+              doc.setFillColor(255, 255, 255);
+              doc.rect(x, y, cellW, cellW, 'FD');
+
+              if (isSol && cell.char) {
+                doc.setFont('helvetica', 'bold');
+                doc.setFontSize(cellW > 12 ? 11 : 9.5);
+                doc.setTextColor(29, 78, 216);
+                doc.text(cell.char, x + cellW / 2, y + cellW / 2 + 1.2, { align: 'center' });
+              }
+            } else {
+              // Clue Cell
+              doc.setFillColor(245, 247, 250);
+              doc.rect(x, y, cellW, cellW, 'FD');
+
+              if (cell.acrossWord && cell.downWord) {
+                // Dual Clue
+                doc.setFont('helvetica', 'bold');
+                doc.setFontSize(4.2);
+                doc.setTextColor(20, 20, 20);
+
+                const tAcross = this.sanitizeText(cell.acrossWord.clue);
+                const lA = doc.splitTextToSize(tAcross, cellW - 2.8);
+                doc.text(lA.slice(0, 2), x + 1, y + 2.2);
+
+                doc.setTextColor(2, 132, 199);
+                doc.setFontSize(5);
+                doc.text('>', x + cellW - 1.2, y + cellW / 2 - 0.6, { align: 'right' });
+
+                // Divider line
+                doc.setDrawColor(180, 180, 180);
+                doc.setLineWidth(0.15);
+                doc.line(x, y + cellW / 2, x + cellW, y + cellW / 2);
+                doc.setDrawColor(0, 0, 0);
+                doc.setLineWidth(0.3);
+
+                // Down Clue
+                doc.setFont('helvetica', 'bold');
+                doc.setFontSize(4.2);
+                doc.setTextColor(20, 20, 20);
+                const tDown = this.sanitizeText(cell.downWord.clue);
+                const lD = doc.splitTextToSize(tDown, cellW - 2.8);
+                doc.text(lD.slice(0, 2), x + 1, y + cellW / 2 + 2.2);
+
+                doc.setTextColor(2, 132, 199);
+                doc.setFontSize(5);
+                doc.text('v', x + cellW - 1.2, y + cellW - 0.8, { align: 'right' });
+              } else if (cell.acrossWord) {
+                // Single Across Clue
+                doc.setFont('helvetica', 'bold');
+                doc.setFontSize(4.6);
+                doc.setTextColor(20, 20, 20);
+                const t = this.sanitizeText(cell.acrossWord.clue);
+                const lines = doc.splitTextToSize(t, cellW - 2.5);
+                doc.text(lines.slice(0, 3), x + 1, y + 2.6);
+
+                doc.setTextColor(2, 132, 199);
+                doc.setFontSize(5.5);
+                doc.text('>', x + cellW - 1.2, y + cellW - 1, { align: 'right' });
+              } else if (cell.downWord) {
+                // Single Down Clue
+                doc.setFont('helvetica', 'bold');
+                doc.setFontSize(4.6);
+                doc.setTextColor(20, 20, 20);
+                const t = this.sanitizeText(cell.downWord.clue);
+                const lines = doc.splitTextToSize(t, cellW - 2.5);
+                doc.text(lines.slice(0, 3), x + 1, y + 2.6);
+
+                doc.setTextColor(2, 132, 199);
+                doc.setFontSize(5.5);
+                doc.text('v', x + cellW - 1.2, y + cellW - 1, { align: 'right' });
+              } else {
+                // Emblem
+                doc.setFont('helvetica', 'bold');
+                doc.setFontSize(7);
+                doc.setTextColor(100, 100, 100);
+                doc.text(this.sanitizeText(cell.label || '*'), x + cellW / 2, y + cellW / 2 + 1, { align: 'center' });
+              }
+            }
+          }
+        }
+
+        currentY += (puzzle.rows * cellW) + 12;
+
+        if (isDual && pIdx === 0) {
+          // Cut line
+          doc.setDrawColor(160, 160, 160);
+          doc.setLineDashPattern([2, 2], 0);
+          doc.line(15, currentY - 5, 195, currentY - 5);
+          doc.setLineDashPattern([], 0);
+        }
+      });
+
+      // Footer
+      doc.setFontSize(7.5);
+      doc.setTextColor(120, 120, 120);
+      doc.text('Gazete Cengel Bulmacasi * A4 Baski Sayfasi', 15, 290);
+      doc.text(isSol ? 'Sayfa 2 / 2 (Cevap Anahtari)' : (isSolutionVisible ? 'Sayfa 1 / 2' : 'Sayfa 1 / 1'), 195, 290, { align: 'right' });
+    };
+
+    renderCengelPage(false);
+
+    if (isSolutionVisible) {
+      doc.addPage();
+      renderCengelPage(true);
+    }
+
+    const safeId = puzzleId.replace(/[^a-zA-Z0-9_-]/g, '');
+    doc.save(`cengel-${safeId || 'bulmaca'}.pdf`);
+  }
 }

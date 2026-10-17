@@ -50,6 +50,24 @@
         </div>
       </div>
 
+      <!-- PUZZLE TYPE -->
+      <div class="sidebar-section">
+        <div class="sidebar-heading">PUZZLE TYPE</div>
+        <div class="difficulty-selector segmented-control" id="puzzle-type-selector">
+          <button class="type-btn active" data-type="cengel">📰 Çengel (Gazete)</button>
+          <button class="type-btn" data-type="classic">🧩 Klasik (Kare)</button>
+        </div>
+      </div>
+
+      <!-- ÇENGEL LAYOUT -->
+      <div class="sidebar-section" id="cengel-layout-section">
+        <div class="sidebar-heading">ÇENGEL DÜZENİ</div>
+        <div class="difficulty-selector segmented-control" id="cengel-layout-selector">
+          <button class="cengel-layout-btn active" data-layout="dual" title="Fotoğraftaki gibi sayfada 2 bulmaca">📑 İkili (Dual)</button>
+          <button class="cengel-layout-btn" data-layout="single" title="Sayfayı tam kaplayan tek büyük bulmaca">📄 Tekli (Single)</button>
+        </div>
+      </div>
+
       <!-- DIFFICULTY -->
       <div class="sidebar-section">
         <div class="sidebar-heading">DIFFICULTY</div>
@@ -113,20 +131,28 @@
           </div>
         </div>
 
-        <div class="grid-wrapper">
-          <div id="crossword-grid" class="crossword-board"></div>
+        <!-- 1. GAZETE ÇENGEL VIEW (Zero-Waste, In-Grid Clues) -->
+        <div id="cengel-view" class="cengel-container">
+          <!-- Injected dynamically -->
         </div>
 
-        <section class="clues-section">
-          <div class="clue-column">
-            <h2 class="clue-header">Across</h2>
-            <ul id="across-clues" class="clue-list"></ul>
+        <!-- 2. CLASSIC CROSSWORD VIEW (Numbered Grid + Clue Lists) -->
+        <div id="classic-view" style="display: none;">
+          <div class="grid-wrapper">
+            <div id="crossword-grid" class="crossword-board"></div>
           </div>
-          <div class="clue-column">
-            <h2 class="clue-header">Down</h2>
-            <ul id="down-clues" class="clue-list"></ul>
-          </div>
-        </section>
+
+          <section class="clues-section">
+            <div class="clue-column">
+              <h2 class="clue-header">Across</h2>
+              <ul id="across-clues" class="clue-list"></ul>
+            </div>
+            <div class="clue-column">
+              <h2 class="clue-header">Down</h2>
+              <ul id="down-clues" class="clue-list"></ul>
+            </div>
+          </section>
+        </div>
 
         <footer class="sheet-footer">
           <span>English Crossword Challenge • Ready for Paper & Pencil</span>
@@ -147,13 +173,21 @@
           </div>
         </div>
 
-        <div class="grid-wrapper">
-          <div id="solution-grid" class="crossword-board"></div>
+        <!-- 1. GAZETE ÇENGEL SOLUTION VIEW -->
+        <div id="solution-cengel-view" class="cengel-container is-solution-sheet">
+          <!-- Injected dynamically -->
         </div>
 
-        <div>
-          <h2 class="clue-header" style="margin-top: 14px;">Word Index</h2>
-          <div id="solution-words-summary" class="words-summary-table"></div>
+        <!-- 2. CLASSIC SOLUTION VIEW -->
+        <div id="solution-classic-view" style="display: none;">
+          <div class="grid-wrapper">
+            <div id="solution-grid" class="crossword-board"></div>
+          </div>
+
+          <div>
+            <h2 class="clue-header" style="margin-top: 14px;">Word Index</h2>
+            <div id="solution-words-summary" class="words-summary-table"></div>
+          </div>
         </div>
 
         <footer class="sheet-footer">
@@ -171,7 +205,9 @@
       window.addEventListener('DOMContentLoaded', () => {
         setTimeout(() => {
           const grid = document.getElementById('crossword-grid');
-          if (!grid || !grid.children || grid.children.length === 0) {
+          const cengel = document.getElementById('cengel-view');
+          if ((!grid || !grid.children || grid.children.length === 0) &&
+              (!cengel || !cengel.children || cengel.children.length === 0)) {
             const banner = document.createElement('div');
             banner.className = 'file-protocol-banner no-print';
             banner.innerHTML = `

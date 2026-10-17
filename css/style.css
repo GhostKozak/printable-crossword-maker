@@ -687,6 +687,207 @@ h1, h2, h3, .brand-name, .sheet-title, .clue-header {
 }
 
 /* ==========================================================================
+   GAZETE ÇENGEL BULMACASI (Scandinavian / Arrow Crossword)
+   ========================================================================== */
+.cengel-container {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+  margin-top: 4px;
+}
+
+.cengel-puzzle-block {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+/* Reference-Style Blue Newspaper Banner */
+.cengel-banner {
+  background: #0284c7;
+  color: #ffffff;
+  padding: 6px 14px;
+  border-radius: 6px 6px 0 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+}
+[data-theme="dark"] .cengel-banner {
+  background: #0369a1;
+}
+
+.cengel-banner-title {
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 1.15rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+.cengel-banner-meta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.cengel-banner-num {
+  background: #0369a1;
+  color: #ffffff;
+  font-weight: 800;
+  font-size: 1.1rem;
+  padding: 2px 10px;
+  border-radius: 4px;
+  letter-spacing: 0.5px;
+}
+[data-theme="dark"] .cengel-banner-num {
+  background: #075985;
+}
+
+/* Çengel Board: 100% Zero-Waste Grid */
+.cengel-board {
+  display: grid;
+  border: 2px solid #000000;
+  background-color: #000000;
+  gap: 1px;
+  user-select: none;
+  width: fit-content;
+  margin: 0 auto;
+}
+
+.cengel-cell {
+  width: var(--cengel-cell-size, 38px);
+  height: var(--cengel-cell-size, 38px);
+  position: relative;
+  box-sizing: border-box;
+}
+
+/* Answer Letter Cell */
+.cengel-cell.letter-cell {
+  background-color: #ffffff;
+  color: #000000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 12.5pt;
+  text-transform: uppercase;
+  font-family: system-ui, -apple-system, sans-serif;
+}
+[data-theme="dark"] .cengel-cell.letter-cell {
+  background-color: #1e293b;
+  color: #f8fafc;
+}
+
+.letter-cell .letter-char {
+  display: none;
+}
+.solution-visible .letter-cell .letter-char,
+.is-solution-sheet .letter-cell .letter-char {
+  display: block !important;
+  color: #1d4ed8;
+}
+[data-theme="dark"] .solution-visible .letter-cell .letter-char,
+[data-theme="dark"] .is-solution-sheet .letter-cell .letter-char {
+  color: #60a5fa;
+}
+
+/* In-Grid Clue Cell */
+.cengel-cell.clue-cell {
+  background-color: #f1f5f9;
+  color: #0f172a;
+  display: flex;
+  flex-direction: column;
+  padding: 1.5px;
+  overflow: hidden;
+}
+[data-theme="dark"] .cengel-cell.clue-cell {
+  background-color: #0f172a;
+  color: #cbd5e1;
+}
+
+/* Single Clue */
+.clue-sub {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  padding: 1px;
+}
+
+/* Dual Clue (Split top/bottom) */
+.cengel-cell.clue-cell.dual-clue .clue-sub:first-child {
+  border-bottom: 1px solid #94a3b8;
+}
+
+.clue-text {
+  font-size: 5.6pt;
+  line-height: 1.05;
+  font-weight: 700;
+  text-align: center;
+  word-break: break-word;
+  padding: 0 1px;
+  font-family: system-ui, -apple-system, sans-serif;
+  letter-spacing: -0.1px;
+}
+
+.clue-arrow {
+  position: absolute;
+  font-size: 7.5pt;
+  font-weight: 900;
+  line-height: 1;
+  color: #0284c7;
+}
+[data-theme="dark"] .clue-arrow {
+  color: #38bdf8;
+}
+
+.clue-arrow.arrow-right {
+  right: 1px;
+  bottom: 1px;
+}
+.clue-arrow.arrow-down {
+  right: 1px;
+  bottom: 1px;
+}
+
+/* Branding / Emblem Cell */
+.cengel-cell.clue-cell.emblem-cell {
+  background-color: #e2e8f0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 7.5pt;
+  font-weight: 800;
+  color: #475569;
+}
+[data-theme="dark"] .cengel-cell.clue-cell.emblem-cell {
+  background-color: #1e293b;
+  color: #94a3b8;
+}
+
+/* Dual stacked layout divider */
+.cengel-dual-divider {
+  border-top: 1px dashed #cbd5e1;
+  margin: 10px 0;
+  position: relative;
+  text-align: center;
+}
+.cengel-dual-divider::after {
+  content: "✂️ A4 Kesim Çizgisi";
+  position: absolute;
+  top: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--card-bg);
+  padding: 0 10px;
+  font-size: 7pt;
+  color: var(--text-muted);
+}
+
+/* ==========================================================================
    RESPONSIVE DESIGN (Tablets & Mobile)
    ========================================================================== */
 @media (max-width: 1050px) {

@@ -1,12 +1,16 @@
 import { WORD_BANK } from "./data/words.js";
 import { SeededRandom } from "./utils/seeded-random.js";
 import { CrosswordGenerator } from "./core/generator.js";
+import { CengelGenerator } from "./core/cengel-generator.js";
 import { PdfExporter } from "./utils/pdf-exporter.js";
 
 export class CrosswordApp {
   constructor() {
+    this.puzzleType = 'cengel'; // 'cengel' | 'classic'
+    this.cengelLayout = 'dual'; // 'dual' | 'single'
     this.currentDifficulty = 'medium';
     this.currentPuzzle = null;
+    this.currentCengelPuzzles = [];
     this.isSolutionVisible = false;
     this.targetCounts = { easy: 14, medium: 21, hard: 30 };
     this.categories = ['animals', 'science', 'geography', 'food', 'technology', 'body', 'general', 'sports', 'household', 'weather', 'vehicles', 'culture', 'emotions'];
@@ -38,6 +42,11 @@ export class CrosswordApp {
   }
 
   initDOMElements() {
+    // Mode & Layout Controls
+    this.typeButtons = document.querySelectorAll('.type-btn');
+    this.cengelLayoutButtons = document.querySelectorAll('.cengel-layout-btn');
+    this.cengelLayoutSection = document.getElementById('cengel-layout-section');
+
     this.diffButtons = document.querySelectorAll('.diff-btn');
     this.langButtons = document.querySelectorAll('.lang-btn');
     this.btnGenerate = document.getElementById('btn-generate');
@@ -46,6 +55,14 @@ export class CrosswordApp {
     
     this.puzzleSheet = document.getElementById('puzzle-sheet');
     this.solutionSheet = document.getElementById('solution-sheet');
+
+    // Views
+    this.cengelView = document.getElementById('cengel-view');
+    this.classicView = document.getElementById('classic-view');
+    this.solutionCengelView = document.getElementById('solution-cengel-view');
+    this.solutionClassicView = document.getElementById('solution-classic-view');
+
+    // Classic Crossword Elements
     this.crosswordGrid = document.getElementById('crossword-grid');
     this.solutionGrid = document.getElementById('solution-grid');
     this.acrossCluesList = document.getElementById('across-clues');
@@ -115,6 +132,31 @@ export class CrosswordApp {
   }
 
   bindEvents() {
+    // Puzzle Type Selector (Çengel vs Classic)
+    this.typeButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        this.typeButtons.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        this.puzzleType = btn.dataset.type;
+        if (this.cengelLayoutSection) {
+          this.cengelLayoutSection.style.display = this.puzzleType === 'cengel' ? 'block' : 'none';
+        }
+        this.resetSolutionKey();
+        this.generateNewPuzzle();
+      });
+    });
+
+    // Çengel Layout Selector (Dual vs Single)
+    this.cengelLayoutButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        this.cengelLayoutButtons.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        this.cengelLayout = btn.dataset.layout;
+        this.resetSolutionKey();
+        this.generateNewPuzzle();
+      });
+    });
+
     this.diffButtons.forEach(btn => {
       btn.addEventListener('click', () => {
         this.diffButtons.forEach(b => b.classList.remove('active'));
@@ -137,7 +179,6 @@ export class CrosswordApp {
     });
 
     this.btnGenerate.addEventListener('click', () => {
-      // EKS-3 Reset answer key
       this.resetSolutionKey();
       this.generateNewPuzzle();
     });
@@ -184,7 +225,7 @@ export class CrosswordApp {
       if (!this.currentSeed) return;
       const cats = Array.from(this.selectedCategories).join(',');
       const url = new URL(window.location.href);
-      url.hash = `#seed=${this.currentSeed}&diff=${this.currentDifficulty}&lang=${this.clueLang}&cats=${cats}`;
+      url.hash = `#seed=${this.currentSeed}&type=${this.puzzleType}&layout=${this.cengelLayout}&diff=${this.currentDifficulty}&lang=${this.clueLang}&cats=${cats}`;
       const shareUrl = url.href;
 
       const copyFallback = (text) => {
@@ -241,6 +282,14 @@ export class CrosswordApp {
   }
 
   updatePuzzleLanguage() {
+    if (this.puzzleType === 'cengel') {
+      if (this.currentSeed) {
+        this.generateNewPuzzle(this.currentSeed);
+      }
+      this.showToast(`Dil değiştirildi: ${this.clueLang === 'tr' ? 'Türkçe' : (this.clueLang === 'en' ? 'English' : 'Karışık')}`);
+      return;
+    }
+
     if (!this.currentPuzzle) return;
     this.currentPuzzle.allWords.forEach(w => {
       let availableClues = [];
@@ -278,6 +327,7 @@ export class CrosswordApp {
   resetSolutionKey() {
     this.isSolutionVisible = false;
     this.solutionSheet.classList.remove('visible');
+    if (this.cengelView) this.cengelView.classList.remove('solution-visible');
     this.btnToggleSolution.classList.remove('active');
     this.btnToggleSolution.innerHTML = '👁️ Show Answer Key';
     this.pageCountDisplays.forEach(el => el.textContent = '1');
@@ -287,10 +337,25 @@ export class CrosswordApp {
     if (window.location.hash) {
       const params = new URLSearchParams(window.location.hash.slice(1));
       const seed = params.get('seed');
+      const pType = params.get('type');
+      const pLayout = params.get('layout');
       const diff = params.get('diff');
       const lang = params.get('lang');
       const cats = params.get('cats');
       
+      if (pType && ['cengel', 'classic'].includes(pType)) {
+        this.puzzleType = pType;
+        this.typeButtons.forEach(b => b.classList.toggle('active', b.dataset.type === pType));
+        if (this.cengelLayoutSection) {
+          this.cengelLayoutSection.style.display = this.puzzleType === 'cengel' ? 'block' : 'none';
+        }
+      }
+
+      if (pLayout && ['dual', 'single'].includes(pLayout)) {
+        this.cengelLayout = pLayout;
+        this.cengelLayoutButtons.forEach(b => b.classList.toggle('active', b.dataset.layout === pLayout));
+      }
+
       if (diff && this.targetCounts[diff]) {
         this.currentDifficulty = diff;
         this.diffButtons.forEach(b => {
@@ -329,54 +394,238 @@ export class CrosswordApp {
   }
 
   generateNewPuzzle(forceSeed = null) {
-    // EKS-5 Loading indicator
     const originalText = this.btnGenerate.innerHTML;
     this.btnGenerate.innerHTML = '⏳ Generating...';
     this.btnGenerate.disabled = true;
 
     setTimeout(() => {
-      const targetCount = this.targetCounts[this.currentDifficulty];
       const bank = this.getFilteredWords();
-      
       this.currentSeed = forceSeed !== null ? forceSeed : Math.floor(Math.random() * 2147483647);
-      const rng = new SeededRandom(this.currentSeed);
-      const generator = new CrosswordGenerator(bank, targetCount, rng, this.clueLang);
-      
-      this.currentPuzzle = generator.generate();
-
-      const puzzleId = '#CW-' + this.currentSeed.toString().substring(0,4);
-      const today = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
-
-      // Difficulty Score (YEN-8)
-      const scoreLabel = this.calculateDifficultyScore(this.currentPuzzle);
-
-      this.puzzleIdDisplay.textContent = puzzleId;
-      this.solutionPuzzleIdDisplay.textContent = puzzleId;
-      this.puzzleDiffDisplay.textContent = scoreLabel;
-      this.solutionDiffDisplay.textContent = scoreLabel;
+      const today = new Date().toLocaleDateString('tr-TR', { year: 'numeric', month: 'short', day: 'numeric' });
       this.puzzleDateDisplay.textContent = today;
 
-      this.renderPuzzles();
-      
+      if (this.puzzleType === 'cengel') {
+        this.cengelView.style.display = 'flex';
+        this.classicView.style.display = 'none';
+        this.solutionCengelView.style.display = 'flex';
+        if (this.solutionClassicView) this.solutionClassicView.style.display = 'none';
+
+        // Dimension configurations
+        let rows = 13, cols = 11;
+        if (this.cengelLayout === 'single') {
+          if (this.currentDifficulty === 'easy') { rows = 13; cols = 11; }
+          else if (this.currentDifficulty === 'medium') { rows = 15; cols = 13; }
+          else { rows = 16; cols = 14; }
+        } else {
+          // Dual mode (2 puzzles stacked)
+          if (this.currentDifficulty === 'easy') { rows = 11; cols = 11; }
+          else if (this.currentDifficulty === 'medium') { rows = 13; cols = 11; }
+          else { rows = 14; cols = 12; }
+        }
+
+        const diffLabel = this.currentDifficulty === 'easy' ? 'Kolay Seviye' : (this.currentDifficulty === 'hard' ? 'Zor Seviye' : 'Orta Seviye');
+        const baseNum = (this.currentSeed % 80) + 10;
+
+        this.currentCengelPuzzles = [];
+
+        if (this.cengelLayout === 'dual') {
+          const rng1 = new SeededRandom(this.currentSeed);
+          const gen1 = new CengelGenerator(bank, { rows, cols, rng: rng1, clueLang: this.clueLang });
+          const p1 = gen1.generate();
+          p1.puzzleNumber = `#${baseNum}`;
+          p1.difficultyLabel = diffLabel;
+
+          const seed2 = (this.currentSeed + 101) % 2147483647;
+          const rng2 = new SeededRandom(seed2);
+          const gen2 = new CengelGenerator(bank, { rows, cols, rng: rng2, clueLang: this.clueLang });
+          const p2 = gen2.generate();
+          p2.puzzleNumber = `#${baseNum + 1}`;
+          p2.difficultyLabel = diffLabel;
+
+          this.currentCengelPuzzles = [p1, p2];
+        } else {
+          const rng = new SeededRandom(this.currentSeed);
+          const gen = new CengelGenerator(bank, { rows, cols, rng, clueLang: this.clueLang });
+          const p = gen.generate();
+          p.puzzleNumber = `#${baseNum}`;
+          p.difficultyLabel = diffLabel;
+
+          this.currentCengelPuzzles = [p];
+        }
+
+        const puzzleId = `#CGL-${this.currentSeed.toString().substring(0, 4)}`;
+        this.puzzleIdDisplay.textContent = puzzleId;
+        this.solutionPuzzleIdDisplay.textContent = puzzleId;
+        this.puzzleDiffDisplay.textContent = `${diffLabel} (Gazete Çengel)`;
+        this.solutionDiffDisplay.textContent = `${diffLabel} (Gazete Çengel)`;
+
+        this.renderCengelView();
+      } else {
+        // Classic Crossword View
+        this.cengelView.style.display = 'none';
+        this.classicView.style.display = 'block';
+        this.solutionCengelView.style.display = 'none';
+        if (this.solutionClassicView) this.solutionClassicView.style.display = 'block';
+
+        const targetCount = this.targetCounts[this.currentDifficulty];
+        const rng = new SeededRandom(this.currentSeed);
+        const generator = new CrosswordGenerator(bank, targetCount, rng, this.clueLang);
+        this.currentPuzzle = generator.generate();
+
+        const puzzleId = '#CW-' + this.currentSeed.toString().substring(0, 4);
+        const scoreLabel = this.calculateDifficultyScore(this.currentPuzzle);
+
+        this.puzzleIdDisplay.textContent = puzzleId;
+        this.solutionPuzzleIdDisplay.textContent = puzzleId;
+        this.puzzleDiffDisplay.textContent = scoreLabel;
+        this.solutionDiffDisplay.textContent = scoreLabel;
+
+        this.renderPuzzles();
+      }
+
       this.btnGenerate.innerHTML = originalText;
       this.btnGenerate.disabled = false;
-      
-      if(forceSeed !== null) {
-        // clear hash so normal generation works next
+
+      if (forceSeed !== null) {
         history.replaceState(null, null, window.location.pathname + window.location.search);
       }
     }, 50);
+  }
+
+  renderCengelView() {
+    this.cengelView.innerHTML = '';
+    this.solutionCengelView.innerHTML = '';
+
+    const isDual = this.currentCengelPuzzles.length > 1;
+    const cellSize = isDual ? '34px' : '40px';
+    document.documentElement.style.setProperty('--cengel-cell-size', cellSize);
+
+    this.currentCengelPuzzles.forEach((puzzle, idx) => {
+      if (idx > 0) {
+        const divider1 = document.createElement('div');
+        divider1.className = 'cengel-dual-divider';
+        this.cengelView.appendChild(divider1);
+
+        const divider2 = document.createElement('div');
+        divider2.className = 'cengel-dual-divider';
+        this.solutionCengelView.appendChild(divider2);
+      }
+
+      // Puzzle view (unsolved)
+      const block1 = this.createCengelDOMBlock(puzzle, false);
+      this.cengelView.appendChild(block1);
+
+      // Solution view (solved)
+      const block2 = this.createCengelDOMBlock(puzzle, true);
+      this.solutionCengelView.appendChild(block2);
+    });
+
+    // Update Stats bar
+    const totalWords = this.currentCengelPuzzles.reduce((sum, p) => sum + p.words.length, 0);
+    const totalIntersections = this.currentCengelPuzzles.reduce((sum, p) => sum + p.intersections, 0);
+    const p0 = this.currentCengelPuzzles[0];
+
+    this.statsWords.textContent = `Words: ${totalWords} placed`;
+    this.statsGrid.textContent = isDual ? `Grid: 2x (${p0.rows}x${p0.cols})` : `Grid: ${p0.rows}x${p0.cols}`;
+    this.statsDensity.textContent = 'Density: 100% (Sıfır Boşluk)';
+    this.statsIntersections.textContent = `Intersections: ${totalIntersections}`;
+  }
+
+  createCengelDOMBlock(puzzle, isSolution) {
+    const block = document.createElement('div');
+    block.className = 'cengel-puzzle-block';
+
+    // Newspaper Blue Banner
+    const banner = document.createElement('div');
+    banner.className = 'cengel-banner';
+    banner.innerHTML = `
+      <div class="cengel-banner-title">ÇENGEL BULMACA</div>
+      <div class="cengel-banner-meta">
+        <span class="cengel-banner-level">${puzzle.difficultyLabel || 'Orta Seviye'}</span>
+        <span class="cengel-banner-num">${puzzle.puzzleNumber || '#1'}</span>
+      </div>
+    `;
+    block.appendChild(banner);
+
+    // Board Grid
+    const board = document.createElement('div');
+    board.className = 'cengel-board';
+    board.style.setProperty('--cengel-rows', puzzle.rows);
+    board.style.setProperty('--cengel-cols', puzzle.cols);
+    board.style.gridTemplateRows = `repeat(${puzzle.rows}, var(--cengel-cell-size))`;
+    board.style.gridTemplateColumns = `repeat(${puzzle.cols}, var(--cengel-cell-size))`;
+
+    for (let r = 0; r < puzzle.rows; r++) {
+      for (let c = 0; c < puzzle.cols; c++) {
+        const cell = puzzle.grid[r][c];
+        const cellDiv = document.createElement('div');
+
+        if (cell.type === 'letter') {
+          cellDiv.className = 'cengel-cell letter-cell';
+          const span = document.createElement('span');
+          span.className = 'letter-char';
+          span.textContent = cell.char;
+          if (isSolution) {
+            span.style.display = 'block';
+          }
+          cellDiv.appendChild(span);
+        } else {
+          // Clue Cell
+          cellDiv.className = 'cengel-cell clue-cell';
+          if (cell.isBranding) {
+            cellDiv.classList.add('emblem-cell');
+            cellDiv.textContent = cell.label || '★';
+          } else if (cell.acrossWord && cell.downWord) {
+            cellDiv.classList.add('dual-clue');
+            cellDiv.innerHTML = `
+              <div class="clue-sub">
+                <span class="clue-text">${cell.acrossWord.clue}</span>
+                <span class="clue-arrow arrow-right">→</span>
+              </div>
+              <div class="clue-sub">
+                <span class="clue-text">${cell.downWord.clue}</span>
+                <span class="clue-arrow arrow-down">↓</span>
+              </div>
+            `;
+          } else if (cell.acrossWord) {
+            cellDiv.innerHTML = `
+              <div class="clue-sub">
+                <span class="clue-text">${cell.acrossWord.clue}</span>
+                <span class="clue-arrow arrow-right">→</span>
+              </div>
+            `;
+          } else if (cell.downWord) {
+            cellDiv.innerHTML = `
+              <div class="clue-sub">
+                <span class="clue-text">${cell.downWord.clue}</span>
+                <span class="clue-arrow arrow-down">↓</span>
+              </div>
+            `;
+          } else {
+            cellDiv.classList.add('emblem-cell');
+            cellDiv.textContent = '★';
+          }
+        }
+
+        board.appendChild(cellDiv);
+      }
+    }
+
+    block.appendChild(board);
+    return block;
   }
 
   toggleSolution() {
     this.isSolutionVisible = !this.isSolutionVisible;
     if (this.isSolutionVisible) {
       this.solutionSheet.classList.add('visible');
+      if (this.cengelView) this.cengelView.classList.add('solution-visible');
       this.btnToggleSolution.classList.add('active');
       this.btnToggleSolution.innerHTML = '🔒 Hide Answer Key';
       this.pageCountDisplays.forEach(el => el.textContent = '2');
     } else {
       this.solutionSheet.classList.remove('visible');
+      if (this.cengelView) this.cengelView.classList.remove('solution-visible');
       this.btnToggleSolution.classList.remove('active');
       this.btnToggleSolution.innerHTML = '👁️ Show Answer Key';
       this.pageCountDisplays.forEach(el => el.textContent = '1');
@@ -475,6 +724,7 @@ export class CrosswordApp {
   }
 
   renderSolutionWordsSummary(words) {
+    if (!this.solutionWordsSummary) return;
     this.solutionWordsSummary.innerHTML = '';
     words.forEach(item => {
       const div = document.createElement('div');
@@ -520,6 +770,112 @@ export class CrosswordApp {
     document.body.classList.add('batch-print-active');
     
     const bank = this.getFilteredWords();
+
+    if (this.puzzleType === 'cengel') {
+      const diffLabel = this.currentDifficulty === 'easy' ? 'Kolay Seviye' : (this.currentDifficulty === 'hard' ? 'Zor Seviye' : 'Orta Seviye');
+      let rows = 13, cols = 11;
+      if (this.cengelLayout === 'single') {
+        if (this.currentDifficulty === 'easy') { rows = 13; cols = 11; }
+        else if (this.currentDifficulty === 'medium') { rows = 15; cols = 13; }
+        else { rows = 16; cols = 14; }
+      } else {
+        if (this.currentDifficulty === 'easy') { rows = 11; cols = 11; }
+        else if (this.currentDifficulty === 'medium') { rows = 13; cols = 11; }
+        else { rows = 14; cols = 12; }
+      }
+
+      const batchPuzzlesList = [];
+      for (let i = 0; i < count; i++) {
+        const seed = Math.floor(Math.random() * 2147483647);
+        const baseNum = (seed % 80) + 10;
+        if (this.cengelLayout === 'dual') {
+          const rng1 = new SeededRandom(seed);
+          const p1 = new CengelGenerator(bank, { rows, cols, rng: rng1, clueLang: this.clueLang }).generate();
+          p1.puzzleNumber = `#${baseNum}`;
+          p1.difficultyLabel = diffLabel;
+
+          const rng2 = new SeededRandom((seed + 101) % 2147483647);
+          const p2 = new CengelGenerator(bank, { rows, cols, rng: rng2, clueLang: this.clueLang }).generate();
+          p2.puzzleNumber = `#${baseNum + 1}`;
+          p2.difficultyLabel = diffLabel;
+
+          batchPuzzlesList.push([p1, p2]);
+        } else {
+          const rng = new SeededRandom(seed);
+          const p = new CengelGenerator(bank, { rows, cols, rng, clueLang: this.clueLang }).generate();
+          p.puzzleNumber = `#${baseNum}`;
+          p.difficultyLabel = diffLabel;
+          batchPuzzlesList.push([p]);
+        }
+      }
+
+      // Render puzzle sheets
+      batchPuzzlesList.forEach((puzzles, idx) => {
+        const sheet = this.puzzleSheet.cloneNode(true);
+        sheet.id = '';
+        sheet.querySelector('#puzzle-id').textContent = `Batch #${idx + 1}`;
+        sheet.querySelector('#puzzle-diff-label').textContent = `${diffLabel} (Gazete Çengel)`;
+        const classicBox = sheet.querySelector('#classic-view');
+        if (classicBox) classicBox.style.display = 'none';
+
+        const cView = sheet.querySelector('#cengel-view');
+        cView.style.display = 'flex';
+        cView.innerHTML = '';
+        puzzles.forEach((puz, pIdx) => {
+          if (pIdx > 0) {
+            const div = document.createElement('div');
+            div.className = 'cengel-dual-divider';
+            cView.appendChild(div);
+          }
+          cView.appendChild(this.createCengelDOMBlock(puz, false));
+        });
+
+        const footer = sheet.querySelector('.sheet-footer');
+        footer.innerHTML = `<span>Gazete Çengel Bulmacası • Sayfa ${idx + 1} / ${count * 2}</span>`;
+        container.appendChild(sheet);
+      });
+
+      // Render solution sheets
+      batchPuzzlesList.forEach((puzzles, idx) => {
+        const sheet = this.solutionSheet.cloneNode(true);
+        sheet.id = '';
+        sheet.classList.add('visible');
+        sheet.querySelector('#solution-puzzle-id').textContent = `Batch #${idx + 1}`;
+        sheet.querySelector('#solution-diff-label').textContent = `${diffLabel} (Gazete Çengel)`;
+        const classicSol = sheet.querySelector('#solution-classic-view');
+        if (classicSol) classicSol.style.display = 'none';
+
+        const sView = sheet.querySelector('#solution-cengel-view');
+        sView.style.display = 'flex';
+        sView.innerHTML = '';
+        puzzles.forEach((puz, pIdx) => {
+          if (pIdx > 0) {
+            const div = document.createElement('div');
+            div.className = 'cengel-dual-divider';
+            sView.appendChild(div);
+          }
+          sView.appendChild(this.createCengelDOMBlock(puz, true));
+        });
+
+        const footer = sheet.querySelector('.sheet-footer');
+        footer.innerHTML = `<span>Çengel Bulmaca Çözümleri • Sayfa ${count + idx + 1} / ${count * 2}</span>`;
+        container.appendChild(sheet);
+      });
+
+      const onAfterPrint = () => {
+        document.body.classList.remove('batch-print-active');
+        container.innerHTML = '';
+        window.removeEventListener('afterprint', onAfterPrint);
+      };
+      window.addEventListener('afterprint', onAfterPrint);
+
+      setTimeout(() => {
+        window.print();
+      }, 100);
+      return;
+    }
+    
+    // Classic batch print
     const targetCount = this.targetCounts[this.currentDifficulty];
     const generatedPuzzles = [];
     
@@ -556,7 +912,6 @@ export class CrosswordApp {
       sheet.querySelector('#puzzle-diff-label').textContent = batchDiffLabel;
 
       sheet.querySelector('.page-count-display').textContent = `${count*2}`;
-      // Footer text modification
       const footer = sheet.querySelector('.sheet-footer');
       footer.innerHTML = `<span>Page ${idx+1} of ${count*2} (Puzzles)</span>`;
       
@@ -626,6 +981,17 @@ export class CrosswordApp {
   }
 
   _generatePdf() {
+    if (this.puzzleType === 'cengel') {
+      if (!this.currentCengelPuzzles || this.currentCengelPuzzles.length === 0) return;
+      const diffLabel = this.currentDifficulty === 'easy' ? 'Kolay Seviye' : (this.currentDifficulty === 'hard' ? 'Zor Seviye' : 'Orta Seviye');
+      PdfExporter.exportCengel(this.currentCengelPuzzles, {
+        difficulty: diffLabel,
+        isSolutionVisible: this.isSolutionVisible,
+        puzzleId: this.currentCengelPuzzles[0].puzzleNumber || '#26'
+      });
+      return;
+    }
+
     if (!this.currentPuzzle) return;
     const titleEl = document.querySelector('.sheet-title');
     const subtitleEl = document.querySelector('.sheet-subtitle');

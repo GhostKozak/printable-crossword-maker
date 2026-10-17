@@ -91,4 +91,43 @@
     color: #000000 !important;
     background-color: #ffffff !important;
   }
+
+  /* Çengel Bulmaca Print Rules */
+  .cengel-board {
+    border: 2px solid #000000 !important;
+    background-color: #000000 !important;
+    margin: 0 auto !important;
+  }
+  .cengel-cell.letter-cell {
+    background-color: #ffffff !important;
+    color: #000000 !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+  .cengel-cell.clue-cell {
+    background-color: #f8fafc !important;
+    color: #000000 !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+  .cengel-banner {
+    background: #0284c7 !important;
+    color: #ffffff !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+  .cengel-banner-num {
+    background: #0369a1 !important;
+    color: #ffffff !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+  .clue-arrow {
+    color: #0284c7 !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+  .cengel-dual-divider {
+    border-top: 1px dashed #000000 !important;
+  }
 }
