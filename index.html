@@ -8,38 +8,38 @@
   <link rel="stylesheet" href="css/print.css" />
 </head>
 <body>
-  <header class="controls-panel no-print">
-    <div class="controls-top">
-      <div class="brand-title">
-        <span>🧩</span> English Crossword Maker
+  <div class="app-layout">
+    <!-- SIDEBAR: CONTROLS & SETTINGS -->
+    <aside class="app-sidebar no-print">
+      <div class="sidebar-brand">
+        <div class="brand-title">
+          <span class="brand-icon">🧩</span>
+          <div>
+            <div class="brand-name">Crossword Maker</div>
+            <div class="brand-sub">Printable A4 Generator</div>
+          </div>
+        </div>
+        <div class="sidebar-top-actions">
+          <button id="btn-theme" class="action-btn btn-outline btn-icon" title="Toggle Dark/Light Mode">🌙</button>
+          <button id="btn-share" class="action-btn btn-outline btn-icon" title="Copy sharing link">🔗</button>
+        </div>
       </div>
-      <div class="control-group">
-        <button id="btn-theme" class="action-btn btn-outline" title="Toggle Dark/Light Mode">🌙 Mode</button>
-        <button id="btn-share" class="action-btn btn-outline" title="Copy sharing link">🔗 Share</button>
-      </div>
-    </div>
 
-    <div class="control-group" style="justify-content: space-between;">
-      <div class="control-group">
-        <div class="difficulty-selector">
-          <button class="diff-btn" data-diff="easy">Easy</button>
-          <button class="diff-btn active" data-diff="medium">Medium</button>
-          <button class="diff-btn" data-diff="hard">Hard</button>
-        </div>
-        <div class="difficulty-selector" id="clue-lang-selector" style="margin-left: 8px;">
-          <button class="lang-btn active" data-lang="mixed">🔀 Mix</button>
-          <button class="lang-btn" data-lang="tr">🇹🇷 TR</button>
-          <button class="lang-btn" data-lang="en">🇬🇧 EN</button>
-        </div>
-        <button id="btn-generate" class="action-btn btn-primary" title="Create a new random puzzle">🔄 New Puzzle</button>
-        <button id="btn-toggle-solution" class="action-btn btn-outline" title="Show or hide solution key">👁️ Show Answer Key</button>
+      <!-- MAIN ACTIONS -->
+      <div class="sidebar-section">
+        <button id="btn-generate" class="action-btn btn-primary btn-block" title="Create a new random puzzle">🔄 New Puzzle</button>
+        <button id="btn-toggle-solution" class="action-btn btn-outline btn-block" title="Show or hide solution key">👁️ Show Answer Key</button>
       </div>
-      
-      <div class="control-group">
-        <button id="btn-pdf" class="action-btn btn-outline" title="Download as PDF">📥 Download PDF</button>
-        <button id="btn-print" class="action-btn btn-print" title="Print to A4 paper">🖨️ Print (A4)</button>
-        <div class="dropdown-container">
-          <button id="btn-batch-print" class="action-btn btn-print" title="Batch Print">📄 Batch Print ▾</button>
+
+      <!-- EXPORT & PRINT -->
+      <div class="sidebar-section">
+        <div class="sidebar-heading">EXPORT & PRINT</div>
+        <div class="sidebar-btn-row">
+          <button id="btn-print" class="action-btn btn-print" title="Print to A4 paper">🖨️ Print (A4)</button>
+          <button id="btn-pdf" class="action-btn btn-outline" title="Download as PDF">📥 PDF</button>
+        </div>
+        <div class="dropdown-container btn-block" style="margin-top: 8px;">
+          <button id="btn-batch-print" class="action-btn btn-print btn-block" title="Batch Print">📄 Batch Print ▾</button>
           <div class="dropdown-content" id="batch-dropdown">
             <button data-count="2">2 Puzzles</button>
             <button data-count="4">4 Puzzles</button>
@@ -49,96 +49,127 @@
           </div>
         </div>
       </div>
-    </div>
-    
-    <div id="cat-container" class="categories-panel">
-      <!-- Categories injected here -->
-    </div>
-  </header>
 
-  <div class="stats-bar" id="stats-container">
-    <span id="stats-words">Words: 0 placed</span>
-    <span id="stats-grid">Grid: 0x0</span>
-    <span id="stats-density">Density: 0%</span>
-    <span id="stats-intersections">Intersections: 0</span>
-    <span id="stats-longest">Longest: </span>
-  </div>
-
-  <p class="screen-tip no-print">
-    💡 <strong>Tip:</strong> Click <strong>Print (A4)</strong> to send directly to your printer or save as PDF. If <em>Answer Key</em> is active, it prints as page 2.
-  </p>
-
-  <main id="puzzle-sheet" class="printable-sheet">
-    <div class="sheet-header">
-      <div>
-        <h1 class="sheet-title" contenteditable="true" title="Click to edit title">English Crossword</h1>
-        <div class="sheet-subtitle" contenteditable="true" title="Click to edit subtitle">Vocabulary & General Knowledge</div>
-        <div class="student-info-row">
-          <span><strong>Name:</strong> _______________________</span>
-          <span><strong>Score:</strong> ______ / 100</span>
+      <!-- DIFFICULTY -->
+      <div class="sidebar-section">
+        <div class="sidebar-heading">DIFFICULTY</div>
+        <div class="difficulty-selector segmented-control">
+          <button class="diff-btn" data-diff="easy">Easy</button>
+          <button class="diff-btn active" data-diff="medium">Medium</button>
+          <button class="diff-btn" data-diff="hard">Hard</button>
         </div>
       </div>
-      <div class="meta-box">
-        <div><strong>Puzzle ID:</strong> <span id="puzzle-id">#CW-001</span></div>
-        <div><strong>Difficulty:</strong> <span id="puzzle-diff-label">Medium</span></div>
-        <div><strong>Date:</strong> <span id="puzzle-date"></span></div>
+
+      <!-- CLUE LANGUAGE -->
+      <div class="sidebar-section">
+        <div class="sidebar-heading">CLUE LANGUAGE</div>
+        <div class="difficulty-selector segmented-control" id="clue-lang-selector">
+          <button class="lang-btn active" data-lang="mixed">🔀 Mix</button>
+          <button class="lang-btn" data-lang="tr">🇹🇷 TR</button>
+          <button class="lang-btn" data-lang="en">🇬🇧 EN</button>
+        </div>
       </div>
-    </div>
 
-    <div class="grid-wrapper">
-      <div id="crossword-grid" class="crossword-board"></div>
-    </div>
-
-    <section class="clues-section">
-      <div class="clue-column">
-        <h2 class="clue-header">Across</h2>
-        <ul id="across-clues" class="clue-list"></ul>
+      <!-- CATEGORIES -->
+      <div class="sidebar-section categories-section">
+        <div class="sidebar-heading">CATEGORIES</div>
+        <div id="cat-container" class="categories-panel">
+          <!-- Categories & quick actions injected dynamically -->
+        </div>
       </div>
-      <div class="clue-column">
-        <h2 class="clue-header">Down</h2>
-        <ul id="down-clues" class="clue-list"></ul>
-      </div>
-    </section>
+    </aside>
 
-    <footer class="sheet-footer">
-      <span>English Crossword Challenge • Ready for Paper & Pencil</span>
-      <span>Page 1 of <span class="page-count-display">1</span></span>
-    </footer>
-  </main>
+    <!-- MAIN VIEW AREA -->
+    <div class="app-main">
+      <!-- TOPBAR: STATS & SCREEN TIPS -->
+      <header class="app-topbar no-print">
+        <div class="stats-bar" id="stats-container">
+          <div class="stat-badge"><span class="stat-icon">📝</span> <span id="stats-words">Words: 0 placed</span></div>
+          <div class="stat-badge"><span class="stat-icon">📐</span> <span id="stats-grid">Grid: 0x0</span></div>
+          <div class="stat-badge"><span class="stat-icon">📊</span> <span id="stats-density">Density: 0%</span></div>
+          <div class="stat-badge"><span class="stat-icon">🔀</span> <span id="stats-intersections">Intersections: 0</span></div>
+          <div class="stat-badge"><span class="stat-icon">🔤</span> <span id="stats-longest">Longest: -</span></div>
+        </div>
 
-  <section id="solution-sheet" class="printable-sheet">
-    <div class="sheet-header">
-      <div>
-        <h1 class="sheet-title">Answer Key</h1>
-        <div class="sheet-subtitle">Solutions for Teachers & Self-Checking</div>
-      </div>
-      <div class="meta-box">
-        <div><strong>Puzzle ID:</strong> <span id="solution-puzzle-id">#CW-001</span></div>
-        <div><strong>Difficulty:</strong> <span id="solution-diff-label">Medium</span></div>
-      </div>
+        <p class="screen-tip no-print">
+          💡 <strong>Tip:</strong> Click <strong>Print (A4)</strong> to print directly or save as PDF. Puzzle title and subtitle are directly editable!
+        </p>
+      </header>
+
+      <!-- PRINTABLE PUZZLE SHEET -->
+      <main id="puzzle-sheet" class="printable-sheet">
+        <div class="sheet-header">
+          <div>
+            <h1 class="sheet-title" contenteditable="true" title="Click to edit title">English Crossword</h1>
+            <div class="sheet-subtitle" contenteditable="true" title="Click to edit subtitle">Vocabulary & General Knowledge</div>
+            <div class="student-info-row">
+              <span><strong>Name:</strong> _______________________</span>
+              <span><strong>Score:</strong> ______ / 100</span>
+            </div>
+          </div>
+          <div class="meta-box">
+            <div><strong>Puzzle ID:</strong> <span id="puzzle-id">#CW-001</span></div>
+            <div><strong>Difficulty:</strong> <span id="puzzle-diff-label">Medium</span></div>
+            <div><strong>Date:</strong> <span id="puzzle-date"></span></div>
+          </div>
+        </div>
+
+        <div class="grid-wrapper">
+          <div id="crossword-grid" class="crossword-board"></div>
+        </div>
+
+        <section class="clues-section">
+          <div class="clue-column">
+            <h2 class="clue-header">Across</h2>
+            <ul id="across-clues" class="clue-list"></ul>
+          </div>
+          <div class="clue-column">
+            <h2 class="clue-header">Down</h2>
+            <ul id="down-clues" class="clue-list"></ul>
+          </div>
+        </section>
+
+        <footer class="sheet-footer">
+          <span>English Crossword Challenge • Ready for Paper & Pencil</span>
+          <span>Page 1 of <span class="page-count-display">1</span></span>
+        </footer>
+      </main>
+
+      <!-- PRINTABLE SOLUTION SHEET -->
+      <section id="solution-sheet" class="printable-sheet">
+        <div class="sheet-header">
+          <div>
+            <h1 class="sheet-title">Answer Key</h1>
+            <div class="sheet-subtitle">Solutions for Teachers & Self-Checking</div>
+          </div>
+          <div class="meta-box">
+            <div><strong>Puzzle ID:</strong> <span id="solution-puzzle-id">#CW-001</span></div>
+            <div><strong>Difficulty:</strong> <span id="solution-diff-label">Medium</span></div>
+          </div>
+        </div>
+
+        <div class="grid-wrapper">
+          <div id="solution-grid" class="crossword-board"></div>
+        </div>
+
+        <div>
+          <h2 class="clue-header" style="margin-top: 14px;">Word Index</h2>
+          <div id="solution-words-summary" class="words-summary-table"></div>
+        </div>
+
+        <footer class="sheet-footer">
+          <span>Official Solution Key • Please do not peek before completing!</span>
+          <span>Page 2 of 2</span>
+        </footer>
+      </section>
+
+      <div id="batch-container"></div>
     </div>
-
-    <div class="grid-wrapper">
-      <div id="solution-grid" class="crossword-board"></div>
-    </div>
-
-    <div>
-      <h2 class="clue-header" style="margin-top: 14px;">Word Index</h2>
-      <div id="solution-words-summary" class="words-summary-table"></div>
-    </div>
-
-    <footer class="sheet-footer">
-      <span>Official Solution Key • Please do not peek before completing!</span>
-      <span>Page 2 of 2</span>
-    </footer>
-  </section>
-
-  <div id="batch-container"></div>
+  </div>
 
   <script>
     if (window.location.protocol === 'file:') {
       window.addEventListener('DOMContentLoaded', () => {
-        // Check if modules were blocked after a brief moment
         setTimeout(() => {
           const grid = document.getElementById('crossword-grid');
           if (!grid || !grid.children || grid.children.length === 0) {

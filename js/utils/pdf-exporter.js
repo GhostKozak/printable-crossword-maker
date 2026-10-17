@@ -92,8 +92,24 @@ export class PdfExporter {
           const y = startY + r * cellW;
 
           if (cell.isBlocked) {
-            doc.setFillColor(30, 30, 30);
-            doc.rect(x, y, cellW, cellW, 'F');
+            doc.setFillColor(255, 255, 255);
+            doc.rect(x, y, cellW, cellW, 'FD');
+
+            // Draw diagonal hatch lines for toner savings
+            doc.setDrawColor(70, 70, 70);
+            doc.setLineWidth(0.2);
+            const step = 1.6;
+            for (let offset = -cellW; offset <= cellW; offset += step) {
+              const uMin = Math.max(0, offset);
+              const uMax = Math.min(cellW, cellW + offset);
+              const vMin = uMin - offset;
+              const vMax = uMax - offset;
+              if (uMin < uMax) {
+                doc.line(x + uMin, y + vMin, x + uMax, y + vMax);
+              }
+            }
+            doc.setDrawColor(40, 40, 40);
+            doc.setLineWidth(0.4);
           } else {
             doc.setFillColor(255, 255, 255);
             doc.rect(x, y, cellW, cellW, 'FD');

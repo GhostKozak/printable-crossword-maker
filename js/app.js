@@ -172,11 +172,11 @@ export class CrosswordApp {
       if (isDark) {
         document.documentElement.removeAttribute('data-theme');
         localStorage.setItem('theme', 'light');
-        this.btnTheme.textContent = '🌙 Mode';
+        this.btnTheme.textContent = '🌙';
       } else {
         document.documentElement.setAttribute('data-theme', 'dark');
         localStorage.setItem('theme', 'dark');
-        this.btnTheme.textContent = '☀️ Mode';
+        this.btnTheme.textContent = '☀️';
       }
     });
 
@@ -233,7 +233,7 @@ export class CrosswordApp {
     const saved = localStorage.getItem('theme');
     if (saved === 'dark') {
       document.documentElement.setAttribute('data-theme', 'dark');
-      this.btnTheme.textContent = '☀️ Mode';
+      this.btnTheme.textContent = '☀️';
     }
     // Sync language buttons
     this.langButtons.forEach(b => {
