@@ -598,7 +598,7 @@ h1, h2, h3, .brand-name, .sheet-title, .clue-header {
 .app-topbar {
   width: 100%;
   max-width: min(210mm, 100%);
-  margin-bottom: 20px;
+  margin-bottom: 18px;
   display: flex;
   flex-direction: column;
   gap: 8px;
@@ -607,37 +607,43 @@ h1, h2, h3, .brand-name, .sheet-title, .clue-header {
 .stats-bar {
   width: 100%;
   background: var(--card-bg);
-  padding: 12px 20px;
-  border-radius: 10px;
-  font-size: 0.85rem;
+  padding: 8px 10px;
+  border-radius: 12px;
+  font-size: 0.8rem;
   color: var(--text-muted);
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
-  align-items: center;
-  gap: 12px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  box-shadow: 0 2px 10px rgba(15, 23, 42, 0.05);
   border: 1px solid var(--border-light);
-  transition: background-color 0.3s;
+  transition: background-color 0.3s, border-color 0.3s;
 }
 
 .stat-badge {
-  display: inline-flex;
+  display: flex;
   align-items: center;
+  justify-content: center;
   gap: 6px;
-  font-weight: 600;
+  font-weight: 700;
   color: var(--text-main);
   white-space: nowrap;
+  background: var(--bg);
+  padding: 6px 10px;
+  border-radius: 8px;
+  border: 1px solid var(--border-light);
 }
 .stat-icon {
-  font-size: 1rem;
+  font-size: 0.95rem;
 }
 
 .screen-tip {
-  font-size: 0.82rem;
+  font-size: 0.78rem;
   color: var(--text-muted);
   text-align: center;
-  margin-top: 2px;
+  background: var(--card-bg);
+  border: 1px dashed var(--border-light);
+  border-radius: 8px;
+  padding: 6px 12px;
 }
 
 .file-protocol-banner {
@@ -662,7 +668,7 @@ h1, h2, h3, .brand-name, .sheet-title, .clue-header {
 }
 
 /* ==========================================================================
-   PRINTABLE SHEETS (A4 Portrait Layout)
+   PRINTABLE SHEETS (Editorial A4 Portrait Worksheet Layout)
    ========================================================================== */
 .printable-sheet {
   background: var(--card-bg);
@@ -670,70 +676,174 @@ h1, h2, h3, .brand-name, .sheet-title, .clue-header {
   max-width: min(210mm, 100%);
   min-height: 297mm;
   padding: 10mm 12mm;
-  box-shadow: 0 6px 25px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 12px 36px -4px rgba(15, 23, 42, 0.12), 0 4px 12px -2px rgba(15, 23, 42, 0.06);
+  border: 1px solid var(--border-light);
+  border-top: 4px solid var(--border-dark);
   display: flex;
   flex-direction: column;
   position: relative;
   margin-bottom: 28px;
   color: var(--text-main);
-  border-radius: 4px;
+  border-radius: 6px;
 }
 
+/* 2-Tier Editorial Masthead Header */
 .sheet-header {
-  border-bottom: 2px solid var(--border-dark);
-  padding-bottom: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
   margin-bottom: 14px;
+  border-bottom: 2px solid var(--border-dark);
+  padding-bottom: 10px;
+}
+
+.sheet-header-top {
   display: flex;
   justify-content: space-between;
-  align-items: flex-end;
+  align-items: flex-start;
+  gap: 16px;
+}
+
+.sheet-brand-col {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+  flex: 1;
 }
 
 .sheet-title {
   font-size: 22pt;
-  font-weight: 700;
-  letter-spacing: 1px;
+  font-weight: 800;
+  letter-spacing: 0.4px;
   color: var(--text-main);
-  line-height: 1.1;
+  line-height: 1.08;
+  display: inline-block;
+  border-radius: 4px;
+  transition: background-color 0.15s, outline 0.15s;
 }
 
 .sheet-subtitle {
-  font-size: 9pt;
+  font-size: 8.5pt;
+  font-weight: 700;
   color: var(--text-muted);
   text-transform: uppercase;
-  letter-spacing: 0.5px;
-  margin-top: 3px;
+  letter-spacing: 1px;
+  margin-top: 2px;
+  padding-left: 8px;
+  border-left: 3px solid var(--primary);
   font-family: system-ui, -apple-system, sans-serif;
-}
-
-.student-info-row {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 20px;
-  font-size: 0.85rem;
-  margin-top: 8px;
-  color: var(--text-muted);
+  line-height: 1.25;
 }
 
 .sheet-title[contenteditable="true"]:hover,
 .sheet-subtitle[contenteditable="true"]:hover {
   outline: 1px dashed var(--primary);
+  outline-offset: 2px;
   cursor: text;
 }
 .sheet-title[contenteditable="true"]:focus,
 .sheet-subtitle[contenteditable="true"]:focus {
   outline: 2px solid var(--primary);
-  background: rgba(59, 130, 246, 0.05);
-  border-radius: 4px;
+  outline-offset: 2px;
+  background: rgba(59, 130, 246, 0.06);
 }
 
+/* Framed Editorial Metadata Box */
 .meta-box {
-  text-align: right;
-  font-size: 8.5pt;
+  background: var(--bg);
+  border: 1.5px solid var(--border-light);
+  border-radius: 8px;
+  padding: 6px 12px;
+  font-size: 8pt;
   color: var(--text-muted);
-  line-height: 1.4;
+  line-height: 1.45;
+  font-family: system-ui, -apple-system, sans-serif;
+  min-width: 165px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex-shrink: 0;
+}
+
+.meta-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.meta-box strong {
+  color: var(--text-muted);
+  font-weight: 700;
+  text-transform: uppercase;
+  font-size: 7pt;
+  letter-spacing: 0.4px;
+}
+
+.meta-val {
+  color: var(--text-main);
+  font-weight: 700;
+  text-align: right;
+}
+
+.meta-id-pill {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-weight: 800;
+  color: var(--primary);
+}
+
+/* Full-Width Solver / Student Worksheet Strip */
+.student-info-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  padding-top: 8px;
+  border-top: 1px solid var(--border-light);
+  font-size: 8.5pt;
+  color: var(--text-main);
   font-family: system-ui, -apple-system, sans-serif;
 }
-.meta-box strong {
+
+.student-field {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.student-field.name-field {
+  flex: 1;
+  max-width: 340px;
+}
+
+.student-field strong {
+  font-weight: 800;
+  text-transform: uppercase;
+  font-size: 7.5pt;
+  letter-spacing: 0.5px;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+.student-write-line {
+  flex: 1;
+  min-width: 140px;
+  height: 14px;
+  border-bottom: 1.5px solid var(--border-dark);
+  display: inline-block;
+}
+
+.student-score-line {
+  width: 44px;
+  height: 14px;
+  border-bottom: 1.5px solid var(--border-dark);
+  display: inline-block;
+}
+
+.score-total {
+  font-weight: 800;
+  font-size: 8.5pt;
   color: var(--text-main);
 }
 
@@ -741,16 +851,17 @@ h1, h2, h3, .brand-name, .sheet-title, .clue-header {
   display: flex;
   justify-content: center;
   align-items: center;
-  margin: 10px 0 16px 0;
+  margin: 8px 0 14px 0;
   flex-shrink: 0;
 }
 
 .crossword-board {
   display: grid;
-  border: 2px solid var(--border-dark);
+  border: 2.5px solid var(--border-dark);
   background-color: var(--border-dark);
   gap: 1px;
   user-select: none;
+  box-shadow: 0 4px 14px rgba(15, 23, 42, 0.08);
 }
 
 .cell {
@@ -802,12 +913,13 @@ h1, h2, h3, .brand-name, .sheet-title, .clue-header {
   pointer-events: none;
 }
 
+/* Editorial Clues Section */
 .clues-section {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 16px;
+  gap: 20px;
   flex-grow: 1;
-  margin-top: 8px;
+  margin-top: 6px;
 }
 
 .clue-column {
@@ -816,13 +928,15 @@ h1, h2, h3, .brand-name, .sheet-title, .clue-header {
 }
 
 .clue-header {
-  font-size: 11pt;
-  font-weight: 700;
-  border-bottom: 1.5px solid var(--border-dark);
-  padding-bottom: 3px;
+  font-size: 10.5pt;
+  font-weight: 800;
+  text-transform: uppercase;
+  border-top: 2px solid var(--border-dark);
+  border-bottom: 1px solid var(--border-dark);
+  padding: 4px 0;
   margin-bottom: 8px;
   color: var(--text-main);
-  letter-spacing: 0.5px;
+  letter-spacing: 0.6px;
 }
 
 .clue-list {
@@ -838,12 +952,15 @@ h1, h2, h3, .brand-name, .sheet-title, .clue-header {
   color: var(--text-main);
   display: flex;
   align-items: baseline;
-  gap: 5px;
+  gap: 6px;
+  padding: 1px 4px;
+  border-radius: 4px;
 }
 .clue-item strong {
-  font-weight: 700;
-  min-width: 18px;
-  color: var(--text-main);
+  font-weight: 800;
+  min-width: 20px;
+  color: var(--primary);
+  font-variant-numeric: tabular-nums;
 }
 .clue-word-len {
   color: var(--text-muted);
@@ -852,14 +969,31 @@ h1, h2, h3, .brand-name, .sheet-title, .clue-header {
   white-space: nowrap;
 }
 
+/* Editorial Colophon Footer */
 .sheet-footer {
-  border-top: 1px solid var(--border-light);
+  border-top: 1.5px solid var(--border-dark);
   margin-top: auto;
-  padding-top: 12px;
+  padding-top: 10px;
   display: flex;
+  align-items: center;
   justify-content: space-between;
   font-size: 7.5pt;
   color: var(--text-muted);
+}
+
+.footer-brand {
+  font-weight: 600;
+  letter-spacing: 0.2px;
+}
+
+.footer-page-badge {
+  font-weight: 800;
+  color: var(--text-main);
+  background: var(--bg);
+  border: 1px solid var(--border-light);
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 7pt;
 }
 
 #solution-sheet {
@@ -874,12 +1008,16 @@ h1, h2, h3, .brand-name, .sheet-title, .clue-header {
   background-color: var(--bg);
 }
 
+.word-index-section {
+  margin-top: 12px;
+}
+
 .words-summary-table {
-  margin-top: 16px;
+  margin-top: 10px;
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(4, 1fr);
   gap: 6px 12px;
-  font-size: 8.5pt;
+  font-size: 8pt;
 }
 
 .solution-item {
@@ -890,13 +1028,15 @@ h1, h2, h3, .brand-name, .sheet-title, .clue-header {
   padding-bottom: 2px;
 }
 .solution-item .num {
-  font-weight: 700;
-  color: var(--text-main);
+  font-weight: 800;
+  color: var(--text-muted);
   min-width: 22px;
+  font-size: 7.5pt;
 }
 .solution-item .word {
-  font-weight: 700;
+  font-weight: 800;
   color: var(--primary);
+  letter-spacing: 0.3px;
 }
 
 #batch-container {
@@ -1235,43 +1375,50 @@ h1, h2, h3, .brand-name, .sheet-title, .clue-header {
   color: #38bdf8;
 }
 
-/* Secret Keyword Bar below Çengel Board */
+/* Secret Keyword Bar below Çengel Board (Editorial Prize / Cipher Banner) */
 .cengel-secret-bar {
   display: flex;
   align-items: center;
   justify-content: space-between;
   flex-wrap: nowrap;
-  gap: 12px;
+  gap: 14px;
   margin-top: 14px;
   margin-bottom: 20px;
-  padding: 8px 14px;
+  padding: 9px 14px;
   background: var(--bg);
-  border: 1.5px solid var(--border-dark);
-  border-radius: 6px;
+  border: 2px solid var(--border-dark);
+  border-radius: 8px;
   width: 100%;
   max-width: calc(var(--cengel-cols, 14) * var(--cengel-cell-size, 48px) + 2px);
   margin-left: auto;
   margin-right: auto;
   box-sizing: border-box;
+  box-shadow: 0 3px 10px rgba(15, 23, 42, 0.06);
 }
 .secret-bar-info {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
   font-size: 0.85rem;
   min-width: 0;
 }
 .secret-bar-label {
   font-weight: 800;
-  color: #0284c7;
-  letter-spacing: 0.3px;
+  font-size: 0.75rem;
+  background: var(--primary);
+  color: #ffffff;
+  padding: 4px 10px;
+  border-radius: 5px;
+  letter-spacing: 0.4px;
   white-space: nowrap;
+  text-transform: uppercase;
 }
 [data-theme="dark"] .secret-bar-label {
-  color: #38bdf8;
+  background: #0284c7;
+  color: #ffffff;
 }
 .secret-bar-clue {
-  font-weight: 600;
+  font-weight: 700;
   color: var(--text-main);
   white-space: nowrap;
   overflow: hidden;
@@ -1282,28 +1429,29 @@ h1, h2, h3, .brand-name, .sheet-title, .clue-header {
   display: flex !important;
   flex-direction: row !important;
   align-items: center !important;
-  gap: 5px !important;
+  gap: 6px !important;
   flex-shrink: 0 !important;
 }
 .secret-box {
-  width: 28px;
-  height: 28px;
-  border: 1.5px solid #0284c7;
+  width: 30px;
+  height: 30px;
+  border: 1.5px solid var(--border-dark);
   background: var(--card-bg);
-  border-radius: 4px;
+  border-radius: 5px;
   position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
   font-weight: 800;
-  font-size: 11pt;
+  font-size: 11.5pt;
   color: var(--text-main);
   flex-shrink: 0;
+  box-shadow: inset 0 1px 2px rgba(15, 23, 42, 0.06);
 }
 .secret-box-num {
   position: absolute;
   top: 1px;
-  left: 2px;
+  left: 2.5px;
   font-size: 5.5pt;
   font-weight: 800;
   color: #0284c7;
@@ -1315,10 +1463,11 @@ h1, h2, h3, .brand-name, .sheet-title, .clue-header {
 
 /* Dual stacked layout divider */
 .cengel-dual-divider {
-  border-top: 1px dashed #cbd5e1;
-  margin: 10px 0;
+  border-top: 1.5px dashed var(--border-light);
+  margin: 12px 0;
   position: relative;
   text-align: center;
+  width: 100%;
 }
 .cengel-dual-divider::after {
   content: "✂️ A4 Kesim Çizgisi";
@@ -1329,6 +1478,7 @@ h1, h2, h3, .brand-name, .sheet-title, .clue-header {
   background: var(--card-bg);
   padding: 0 10px;
   font-size: 7pt;
+  font-weight: 700;
   color: var(--text-muted);
 }
 
@@ -1350,5 +1500,8 @@ h1, h2, h3, .brand-name, .sheet-title, .clue-header {
   }
   .app-main {
     padding: 16px 12px;
+  }
+  .stats-bar {
+    grid-template-columns: repeat(2, 1fr);
   }
 }

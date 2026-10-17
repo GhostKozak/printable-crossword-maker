@@ -138,18 +138,28 @@
       <!-- PRINTABLE PUZZLE SHEET -->
       <main id="puzzle-sheet" class="printable-sheet">
         <div class="sheet-header">
-          <div>
-            <h1 class="sheet-title" id="sheet-title" contenteditable="true" title="Click to edit title">English Crossword</h1>
-            <div class="sheet-subtitle" id="sheet-subtitle" contenteditable="true" title="Click to edit subtitle">Vocabulary & General Knowledge</div>
-            <div class="student-info-row">
-              <span><strong id="label-student-name">Name:</strong> _______________________</span>
-              <span><strong id="label-student-score">Score:</strong> ______ / 100</span>
+          <div class="sheet-header-top">
+            <div class="sheet-brand-col">
+              <h1 class="sheet-title" id="sheet-title" contenteditable="true" title="Click to edit title">English Crossword</h1>
+              <div class="sheet-subtitle" id="sheet-subtitle" contenteditable="true" title="Click to edit subtitle">Vocabulary & General Knowledge</div>
+            </div>
+            <div class="meta-box">
+              <div class="meta-row"><strong id="meta-puzzle-id-label">Puzzle ID:</strong> <span id="puzzle-id" class="meta-val meta-id-pill">#CW-001</span></div>
+              <div class="meta-row"><strong id="meta-puzzle-diff-label">Difficulty:</strong> <span id="puzzle-diff-label" class="meta-val">Medium</span></div>
+              <div class="meta-row"><strong id="meta-puzzle-date-label">Date:</strong> <span id="puzzle-date" class="meta-val"></span></div>
             </div>
           </div>
-          <div class="meta-box">
-            <div><strong id="meta-puzzle-id-label">Puzzle ID:</strong> <span id="puzzle-id">#CW-001</span></div>
-            <div><strong id="meta-puzzle-diff-label">Difficulty:</strong> <span id="puzzle-diff-label">Medium</span></div>
-            <div><strong id="meta-puzzle-date-label">Date:</strong> <span id="puzzle-date"></span></div>
+
+          <div class="student-info-row">
+            <div class="student-field name-field">
+              <strong id="label-student-name">Name:</strong>
+              <span class="student-write-line"></span>
+            </div>
+            <div class="student-field score-field">
+              <strong id="label-student-score">Score:</strong>
+              <span class="student-score-line"></span>
+              <span class="score-total">/ 100</span>
+            </div>
           </div>
         </div>
 
@@ -177,21 +187,23 @@
         </div>
 
         <footer class="sheet-footer" id="sheet-footer">
-          <span id="sheet-footer-text">English Crossword Challenge • Ready for Paper & Pencil</span>
-          <span>Page 1 of <span class="page-count-display">1</span></span>
+          <span class="footer-brand" id="sheet-footer-text">English Crossword Challenge • Ready for Paper & Pencil</span>
+          <span class="footer-page-badge">Page 1 of <span class="page-count-display">1</span></span>
         </footer>
       </main>
 
       <!-- PRINTABLE SOLUTION SHEET -->
       <section id="solution-sheet" class="printable-sheet">
-        <div class="sheet-header">
-          <div>
-            <h1 class="sheet-title" id="solution-sheet-title">Answer Key</h1>
-            <div class="sheet-subtitle" id="solution-sheet-subtitle">Solutions for Teachers & Self-Checking</div>
-          </div>
-          <div class="meta-box">
-            <div><strong id="meta-sol-id-label">Puzzle ID:</strong> <span id="solution-puzzle-id">#CW-001</span></div>
-            <div><strong id="meta-sol-diff-label">Difficulty:</strong> <span id="solution-diff-label">Medium</span></div>
+        <div class="sheet-header solution-header">
+          <div class="sheet-header-top">
+            <div class="sheet-brand-col">
+              <h1 class="sheet-title" id="solution-sheet-title">Answer Key</h1>
+              <div class="sheet-subtitle" id="solution-sheet-subtitle">Solutions for Teachers & Self-Checking</div>
+            </div>
+            <div class="meta-box">
+              <div class="meta-row"><strong id="meta-sol-id-label">Puzzle ID:</strong> <span id="solution-puzzle-id" class="meta-val meta-id-pill">#CW-001</span></div>
+              <div class="meta-row"><strong id="meta-sol-diff-label">Difficulty:</strong> <span id="solution-diff-label" class="meta-val">Medium</span></div>
+            </div>
           </div>
         </div>
 
@@ -206,15 +218,15 @@
             <div id="solution-grid" class="crossword-board"></div>
           </div>
 
-          <div>
-            <h2 class="clue-header" style="margin-top: 14px;">Word Index</h2>
+          <div class="word-index-section">
+            <h2 class="clue-header" id="solution-word-index-title">Word Index</h2>
             <div id="solution-words-summary" class="words-summary-table"></div>
           </div>
         </div>
 
         <footer class="sheet-footer">
-          <span>Official Solution Key • Please do not peek before completing!</span>
-          <span>Page 2 of 2</span>
+          <span class="footer-brand">Official Solution Key • Please do not peek before completing!</span>
+          <span class="footer-page-badge">Page 2 of 2</span>
         </footer>
       </section>
 

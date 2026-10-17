@@ -685,6 +685,7 @@ export class CrosswordApp {
       const titleEl = document.querySelector('.sheet-title');
       const subtitleEl = document.querySelector('.sheet-subtitle');
 
+      document.body.dataset.puzzleType = this.puzzleType;
       if (this.puzzleType === 'cengel') {
         this.cengelView.style.display = 'flex';
         this.classicView.style.display = 'none';
@@ -1473,6 +1474,7 @@ export class CrosswordApp {
     const container = document.getElementById('batch-container');
     container.innerHTML = '';
     document.body.classList.add('batch-print-active');
+    document.body.dataset.puzzleType = this.puzzleType;
     
     const bank = this.getFilteredWords();
     const t = TRANSLATIONS[this.uiLang] || TRANSLATIONS.tr;
@@ -1605,6 +1607,11 @@ export class CrosswordApp {
       sheet.id = '';
       sheet.querySelector('#puzzle-id').textContent = `Batch #${idx+1}`;
       
+      const cView = sheet.querySelector('#cengel-view');
+      if (cView) cView.style.display = 'none';
+      const clView = sheet.querySelector('#classic-view');
+      if (clView) clView.style.display = 'block';
+
       const maxDim = Math.max(puzzle.rows, puzzle.cols);
       let cellSizePx = 28;
       if (maxDim > 18) cellSizePx = 21;
@@ -1637,6 +1644,11 @@ export class CrosswordApp {
       sheet.id = '';
       sheet.classList.add('visible');
       sheet.querySelector('#solution-puzzle-id').textContent = `Batch #${idx+1}`;
+
+      const sCView = sheet.querySelector('#solution-cengel-view');
+      if (sCView) sCView.style.display = 'none';
+      const sClView = sheet.querySelector('#solution-classic-view');
+      if (sClView) sClView.style.display = 'block';
 
       const maxDim = Math.max(puzzle.rows, puzzle.cols);
       let cellSizePx = 28;

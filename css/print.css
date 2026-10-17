@@ -48,10 +48,13 @@
      ========================================================================== */
   .printable-sheet {
     box-shadow: none !important;
+    border: none !important;
+    border-top: 2.5px solid #000000 !important;
+    border-radius: 0 !important;
     width: 100% !important;
     max-width: 190mm !important;
     min-height: auto !important;
-    padding: 0 !important;
+    padding: 2mm 0 0 0 !important;
     margin: 0 auto !important;
     page-break-after: auto !important;
     break-after: auto !important;
@@ -107,51 +110,146 @@
     break-after: auto !important;
   }
   
-  /* Sheet Headers & Typography */
+  /* 2-Tier Editorial Sheet Headers & Typography */
   .sheet-header {
-    border-bottom: 2px solid #000000 !important;
-    padding-bottom: 3mm !important;
-    margin-bottom: 3.5mm !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 2mm !important;
+    border-bottom: 1.8px solid #000000 !important;
+    padding-bottom: 2mm !important;
+    margin-bottom: 3mm !important;
     color: #000000 !important;
+  }
+  .sheet-header-top {
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: flex-start !important;
+    gap: 6mm !important;
+  }
+  .sheet-brand-col {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 0.8mm !important;
   }
   .sheet-title {
-    font-size: 16.5pt !important;
+    font-size: 16pt !important;
     color: #000000 !important;
-    line-height: 1.1 !important;
+    line-height: 1.08 !important;
     font-weight: 800 !important;
-    margin-bottom: 1mm !important;
+    margin: 0 !important;
   }
   .sheet-subtitle {
-    font-size: 8pt !important;
-    color: #222222 !important;
-    margin-top: 1px !important;
-    margin-bottom: 1.5mm !important;
-  }
-  .student-info-row {
     font-size: 7.5pt !important;
-    margin-top: 2.5mm !important;
-    color: #222222 !important;
+    font-weight: 700 !important;
+    color: #111111 !important;
+    border-left: 2.5px solid #000000 !important;
+    padding-left: 2mm !important;
+    margin-top: 0.5mm !important;
+    margin-bottom: 0 !important;
   }
   .meta-box {
-    font-size: 7.5pt !important;
-    color: #222222 !important;
-    line-height: 1.35 !important;
+    background: #ffffff !important;
+    border: 1.2px solid #000000 !important;
+    border-radius: 4px !important;
+    padding: 1.5mm 3mm !important;
+    font-size: 7pt !important;
+    color: #000000 !important;
+    line-height: 1.3 !important;
+    min-width: 44mm !important;
+  }
+  .meta-row {
+    display: flex !important;
+    justify-content: space-between !important;
+    gap: 3mm !important;
   }
   .meta-box strong {
+    color: #222222 !important;
+    font-size: 6.5pt !important;
+  }
+  .meta-val, .meta-id-pill {
+    color: #000000 !important;
+    font-weight: 800 !important;
+  }
+  .student-info-row {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    border-top: 0.8px solid #000000 !important;
+    padding-top: 1.8mm !important;
+    margin-top: 0.5mm !important;
+    font-size: 7.5pt !important;
     color: #000000 !important;
   }
-  .sheet-footer {
-    border-top: 1px solid #333333 !important;
-    color: #333333 !important;
-    margin-top: auto !important;
-    padding-top: 2.5mm !important;
+  .student-field {
+    display: flex !important;
+    align-items: baseline !important;
+    gap: 2mm !important;
+  }
+  .student-field strong {
+    color: #000000 !important;
     font-size: 7pt !important;
+  }
+  .student-write-line {
+    width: 55mm !important;
+    height: 3.2mm !important;
+    border-bottom: 1.2px solid #000000 !important;
+  }
+  .student-score-line {
+    width: 12mm !important;
+    height: 3.2mm !important;
+    border-bottom: 1.2px solid #000000 !important;
+  }
+  .score-total {
+    color: #000000 !important;
+    font-weight: 800 !important;
+    font-size: 7.5pt !important;
+  }
+  .sheet-footer {
+    border-top: 1.2px solid #000000 !important;
+    color: #000000 !important;
+    margin-top: auto !important;
+    padding-top: 2mm !important;
+    font-size: 7pt !important;
+  }
+  .footer-page-badge {
+    background: #ffffff !important;
+    color: #000000 !important;
+    border: 1px solid #000000 !important;
+    padding: 0.5mm 2.5mm !important;
+    font-weight: 800 !important;
+  }
+
+  /* ==========================================================================
+     VIEW VISIBILITY & ISOLATION (Ensures Çengel and Classic Never Mix in Print)
+     ========================================================================== */
+  #cengel-view[style*="display: none"],
+  #cengel-view[style*="display:none"],
+  #solution-cengel-view[style*="display: none"],
+  #solution-cengel-view[style*="display:none"],
+  #classic-view[style*="display: none"],
+  #classic-view[style*="display:none"],
+  #solution-classic-view[style*="display: none"],
+  #solution-classic-view[style*="display:none"],
+  body[data-puzzle-type="classic"] #cengel-view,
+  body[data-puzzle-type="classic"] #solution-cengel-view,
+  body[data-puzzle-type="cengel"] #classic-view,
+  body[data-puzzle-type="cengel"] #solution-classic-view {
+    display: none !important;
+  }
+
+  body[data-puzzle-type="classic"] #classic-view,
+  #classic-view:not([style*="display: none"]):not([style*="display:none"]) {
+    display: block !important;
+  }
+  body[data-puzzle-type="classic"] #solution-sheet.visible #solution-classic-view,
+  #solution-classic-view:not([style*="display: none"]):not([style*="display:none"]) {
+    display: block !important;
   }
 
   /* ==========================================================================
      GRID & BOARD RULES (Crisp Vector Borders - Always Visible In Print Preview)
      ========================================================================== */
-  .cengel-container {
+  .cengel-container:not([style*="display: none"]):not([style*="display:none"]) {
     display: flex !important;
     flex-direction: column !important;
     align-items: center !important;
@@ -424,12 +522,18 @@
     font-size: 7.5pt !important;
   }
   .secret-bar-label {
+    background: #ffffff !important;
     color: #000000 !important;
+    border: 1.2px solid #000000 !important;
+    padding: 0.6mm 2mm !important;
+    border-radius: 3px !important;
+    font-size: 6.8pt !important;
     font-weight: 800 !important;
     white-space: nowrap !important;
   }
   .secret-bar-clue {
-    color: #222222 !important;
+    color: #111111 !important;
+    font-weight: 700 !important;
     white-space: nowrap !important;
   }
   .secret-bar-boxes {
