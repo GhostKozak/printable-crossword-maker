@@ -139,7 +139,8 @@ h1, h2, h3, .brand-name, .sheet-title, .clue-header {
   display: flex;
   gap: 8px;
 }
-.sidebar-btn-row > .action-btn {
+.sidebar-btn-row > .action-btn,
+.sidebar-btn-row > .dropdown-container {
   flex: 1;
   justify-content: center;
 }

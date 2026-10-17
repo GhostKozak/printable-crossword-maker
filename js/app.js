@@ -352,10 +352,12 @@ export class CrosswordApp {
       }
     });
 
-    // PDF
-    this.btnPdf.addEventListener('click', () => {
-      this.exportPdf();
-    });
+    // PDF (if present)
+    if (this.btnPdf) {
+      this.btnPdf.addEventListener('click', () => {
+        this.exportPdf();
+      });
+    }
   }
 
   applyTheme() {
