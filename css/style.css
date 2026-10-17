@@ -964,13 +964,13 @@ h1, h2, h3, .brand-name, .sheet-title, .clue-header {
   outline-color: #38bdf8;
 }
 
-.cengel-cell.letter-cell.user-filled .letter-char,
 .cengel-cell.letter-cell.hint-cell .letter-char {
   display: block !important;
 }
 
-.cengel-cell.letter-cell.user-filled .letter-char,
+.cengel-cell.letter-cell.user-filled .user-char,
 .cell.user-filled .user-char {
+  display: block;
   color: var(--text-main);
 }
 
@@ -988,7 +988,7 @@ h1, h2, h3, .brand-name, .sheet-title, .clue-header {
 .cell.cell-correct {
   background-color: #dcfce7 !important;
 }
-.cengel-cell.letter-cell.cell-correct .letter-char,
+.cengel-cell.letter-cell.cell-correct .user-char,
 .cell.cell-correct .user-char {
   color: #15803d !important;
 }
@@ -996,7 +996,7 @@ h1, h2, h3, .brand-name, .sheet-title, .clue-header {
 [data-theme="dark"] .cell.cell-correct {
   background-color: #064e3b !important;
 }
-[data-theme="dark"] .cengel-cell.letter-cell.cell-correct .letter-char,
+[data-theme="dark"] .cengel-cell.letter-cell.cell-correct .user-char,
 [data-theme="dark"] .cell.cell-correct .user-char {
   color: #4ade80 !important;
 }
@@ -1005,7 +1005,7 @@ h1, h2, h3, .brand-name, .sheet-title, .clue-header {
 .cell.cell-wrong {
   background-color: #fee2e2 !important;
 }
-.cengel-cell.letter-cell.cell-wrong .letter-char,
+.cengel-cell.letter-cell.cell-wrong .user-char,
 .cell.cell-wrong .user-char {
   color: #b91c1c !important;
 }
@@ -1013,7 +1013,7 @@ h1, h2, h3, .brand-name, .sheet-title, .clue-header {
 [data-theme="dark"] .cell.cell-wrong {
   background-color: #450a0a !important;
 }
-[data-theme="dark"] .cengel-cell.letter-cell.cell-wrong .letter-char,
+[data-theme="dark"] .cengel-cell.letter-cell.cell-wrong .user-char,
 [data-theme="dark"] .cell.cell-wrong .user-char {
   color: #f87171 !important;
 }

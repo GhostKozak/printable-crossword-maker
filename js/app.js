@@ -637,27 +637,26 @@ export class CrosswordApp {
             cellDiv.appendChild(badge);
           }
 
-          const span = document.createElement('span');
-          span.className = 'letter-char';
-          span.textContent = cell.char;
-
           if (isSolution) {
+            const span = document.createElement('span');
+            span.className = 'letter-char';
+            span.textContent = cell.char;
             span.style.display = 'block';
             cellDiv.appendChild(span);
           } else {
             if (cell.isHint) {
               cellDiv.classList.add('hint-cell');
+              const span = document.createElement('span');
+              span.className = 'letter-char';
+              span.textContent = cell.char;
               span.style.display = 'block';
               cellDiv.appendChild(span);
-            } else {
-              cellDiv.appendChild(span);
-              if (cell.userChar) {
-                cellDiv.classList.add('user-filled');
-                const uSpan = document.createElement('span');
-                uSpan.className = 'user-char';
-                uSpan.textContent = cell.userChar;
-                cellDiv.appendChild(uSpan);
-              }
+            } else if (cell.userChar) {
+              cellDiv.classList.add('user-filled');
+              const uSpan = document.createElement('span');
+              uSpan.className = 'user-char';
+              uSpan.textContent = cell.userChar;
+              cellDiv.appendChild(uSpan);
             }
 
             if (
