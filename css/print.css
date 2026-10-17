@@ -145,27 +145,27 @@
 
   /* Single Full-Page Çengel Print Sizing - Covers the entire page */
   .cengel-container.layout-single .cengel-board {
-    max-width: 180mm !important;
+    max-width: 186mm !important;
     width: 100% !important;
     justify-content: center !important;
   }
   .cengel-container.layout-single .cengel-cell {
-    width: 13.6mm !important;
-    height: 13.6mm !important;
+    width: 14.2mm !important;
+    height: 14.2mm !important;
   }
   .cengel-container.layout-single .clue-text {
-    font-size: 4.8pt !important;
+    font-size: 5.2pt !important;
     line-height: 1.15 !important;
   }
   .cengel-container.layout-single .clue-text.long-clue {
-    font-size: 4.1pt !important;
+    font-size: 4.4pt !important;
     line-height: 1.08 !important;
   }
   .cengel-container.layout-single .clue-arrow {
-    font-size: 7.0pt !important;
+    font-size: 7.2pt !important;
   }
   .cengel-container.layout-single .letter-cell {
-    font-size: 14pt !important;
+    font-size: 15pt !important;
   }
 
   /* Interactive & Hint Print Overrides */
@@ -188,25 +188,53 @@
     print-color-adjust: exact !important;
   }
   .cengel-secret-bar {
-    margin-top: 8px !important;
-    padding: 6px 10px !important;
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    flex-wrap: nowrap !important;
+    margin-top: 6px !important;
+    padding: 3px 8px !important;
     background: #f8fafc !important;
     border: 1.2px solid #000000 !important;
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;
+    width: 100% !important;
+    max-width: 184.6mm !important;
+    box-sizing: border-box !important;
+  }
+  .secret-bar-info {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    gap: 6px !important;
+    font-size: 8pt !important;
   }
   .secret-bar-label {
     color: #000000 !important;
+    white-space: nowrap !important;
   }
   .secret-bar-clue {
     color: #333333 !important;
+    white-space: nowrap !important;
+  }
+  .secret-bar-boxes {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    gap: 4px !important;
+    flex-shrink: 0 !important;
   }
   .secret-box {
-    width: 24px !important;
-    height: 24px !important;
+    width: 22px !important;
+    height: 22px !important;
     background: #ffffff !important;
     border: 1.2px solid #000000 !important;
     color: #000000 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    position: relative !important;
   }
   .secret-box-num {
     color: #0284c7 !important;

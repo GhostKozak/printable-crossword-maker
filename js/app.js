@@ -559,14 +559,14 @@ export class CrosswordApp {
     this.solutionCengelView.classList.toggle('layout-single', !isDual);
     this.solutionCengelView.classList.toggle('layout-dual', isDual);
 
-    let cellSize = '50px';
+    let cellSize = '52px';
     if (isDual) {
-      cellSize = '36px';
+      cellSize = '38px';
     } else {
       const p = this.currentCengelPuzzles[0];
-      if (p.rows >= 18) cellSize = '46px';
-      else if (p.rows >= 16) cellSize = '50px';
-      else cellSize = '54px';
+      if (p.cols <= 11) cellSize = '58px';
+      else if (p.cols <= 12) cellSize = '54px';
+      else cellSize = '52px';
     }
     document.documentElement.style.setProperty('--cengel-cell-size', cellSize);
 
@@ -607,6 +607,8 @@ export class CrosswordApp {
   createCengelDOMBlock(puzzle, isSolution, pIdx = 0) {
     const block = document.createElement('div');
     block.className = 'cengel-puzzle-block';
+    block.style.setProperty('--cengel-rows', puzzle.rows);
+    block.style.setProperty('--cengel-cols', puzzle.cols);
 
     // Board Grid (No banner above grid)
     const board = document.createElement('div');

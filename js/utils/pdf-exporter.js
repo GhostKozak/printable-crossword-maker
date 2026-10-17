@@ -257,8 +257,8 @@ export class PdfExporter {
 
       puzzles.forEach((puzzle, pIdx) => {
         const hasSecret = !isDual && puzzle.secretWord;
-        const maxAvailW = 182;
-        const maxAvailH = isDual ? 122 : (hasSecret ? 236 : 254);
+        const maxAvailW = 186;
+        const maxAvailH = isDual ? 122 : (hasSecret ? 246 : 256);
         const cellW = Math.min(maxAvailW / puzzle.cols, maxAvailH / puzzle.rows);
         const gridW = puzzle.cols * cellW;
         const startX = (210 - gridW) / 2;
@@ -368,37 +368,37 @@ export class PdfExporter {
           }
         }
 
-        currentY += (puzzle.rows * cellW) + 6;
+        currentY += (puzzle.rows * cellW) + 4;
 
         // Render Secret Keyword Bar on Single Full-Page Mode
         if (hasSecret) {
           const sw = puzzle.secretWord;
           doc.setFont('helvetica', 'bold');
-          doc.setFontSize(9);
+          doc.setFontSize(8.5);
           doc.setTextColor(15, 23, 42);
-          doc.text(`SIFRELI KELIME (${this.sanitizeText(sw.clue)}):`, startX, currentY + 4);
+          doc.text(`SIFRELI KELIME (${this.sanitizeText(sw.clue)}):`, startX, currentY + 3.8);
 
-          const boxSize = 8.5;
-          const boxesStartX = startX + gridW - (sw.word.length * (boxSize + 1.5));
+          const boxSize = 7.5;
+          const boxesStartX = startX + gridW - (sw.word.length * (boxSize + 1.2));
           for (let i = 0; i < sw.word.length; i++) {
-            const bx = boxesStartX + i * (boxSize + 1.5);
+            const bx = boxesStartX + i * (boxSize + 1.2);
             const by = currentY - 1.5;
             doc.setFillColor(248, 250, 252);
             doc.setDrawColor(2, 132, 199);
             doc.setLineWidth(0.35);
             doc.rect(bx, by, boxSize, boxSize, 'FD');
 
-            doc.setFontSize(5.5);
+            doc.setFontSize(5.0);
             doc.setTextColor(2, 132, 199);
-            doc.text(String(i + 1), bx + 1, by + 2.2);
+            doc.text(String(i + 1), bx + 0.8, by + 1.8);
 
             if (isSol) {
-              doc.setFontSize(9.5);
+              doc.setFontSize(8.5);
               doc.setTextColor(29, 78, 216);
-              doc.text(sw.word[i], bx + boxSize / 2, by + boxSize / 2 + 1.5, { align: 'center' });
+              doc.text(sw.word[i], bx + boxSize / 2, by + boxSize / 2 + 1.2, { align: 'center' });
             }
           }
-          currentY += 10;
+          currentY += 8;
         }
 
         if (isDual && pIdx === 0) {
